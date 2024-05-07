@@ -4,4 +4,5 @@
   <!--<object name="example_ct" meta_type="Dexterity FTI"/>-->
   <object name="Form" meta_type="Dexterity FTI"/>
   <object name="Fieldset" meta_type="Dexterity FTI"/>
+  <object name="Field" meta_type="Dexterity FTI"/>
 </object>

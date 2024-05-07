@@ -1,39 +1,30 @@
 <?xml version="1.0"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    name="Form"
+    name="Field"
     meta_type="Dexterity FTI"
     i18n:domain="edi.jsonforms">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">Form</property>
+      name="title">Field</property>
   <property
       i18n:translate=""
-      name="description">The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organazing them into fieldsets.</property>
+      name="description">A Field represents a specific data entry point within a Form where users input information. Various types are possible, such as textline, number, email and more.</property>
 
   <property name="allow_discussion">False</property>
-  <property name="factory">Form</property>
+  <property name="factory">Field</property>
   <property name="icon_expr">string:${portal_url}/document_icon.png</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
-  <property name="global_allow">True</property>
-  <property name="filter_content_types">True</property>
-  <property name="allowed_content_types">
-    <element value="Field" />
-        <element value="Fieldset" />
-      <!--
-    <element value="Document" />
-    <element value="File" />
-  -->
-  </property>
+  <property name="global_allow">False</property>
   <!-- Schema, class and security -->
-  <property name="add_permission">edi.jsonforms.AddForm</property>
-  <property name="klass">edi.jsonforms.content.form.Form</property>
+  <property name="add_permission">edi.jsonforms.AddField</property>
+  <property name="klass">edi.jsonforms.content.field.Field</property>
   <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema">edi.jsonforms.content.form.IForm</property>
+  <property name="schema">edi.jsonforms.content.field.IField</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">
@@ -55,14 +46,10 @@
     <!--<element value="plone.tableofcontents"/>-->
     <!--<element value="plone.versioning" />-->
     <!--<element value="plone.translatable" />-->
-    <!--<element value="plone.nextprevioustoggle" />-->
-    <!--<element value="plone.nextpreviousenabled" />-->
-    <!--<element value="plone.navigationroot" />-->
-    <!--<element value="plone.selectablecontrainstypes" />-->
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++Form</property>
+  <property name="add_view_expr">string:${folder_url}/++add++Field</property>
   <property name="default_view">view</property>
   <property name="default_view_fallback">False</property>
   <property name="immediate_view">view</property>
