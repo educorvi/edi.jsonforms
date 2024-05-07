@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.jsonforms.AddOption"
+        title="edi.jsonforms: Add Option"
+    />
+
+
+    <permission
         id="edi.jsonforms.AddSelectionField"
         title="edi.jsonforms: Add SelectionField"
     />

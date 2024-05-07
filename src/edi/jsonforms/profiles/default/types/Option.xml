@@ -1,38 +1,30 @@
 <?xml version="1.0"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    name="SelectionField"
+    name="Option"
     meta_type="Dexterity FTI"
     i18n:domain="edi.jsonforms">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">SelectionField</property>
+      name="title">Option</property>
   <property
       i18n:translate=""
-      name="description">A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible.</property>
+      name="description">An Option represents a specific choice available to users within a Form. Options define the predefined values that users can select from, such as specific items, categories, or responses.</property>
 
   <property name="allow_discussion">False</property>
-  <property name="factory">SelectionField</property>
+  <property name="factory">Option</property>
   <property name="icon_expr">string:${portal_url}/document_icon.png</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
   <property name="global_allow">False</property>
-  <property name="filter_content_types">True</property>
-  <property name="allowed_content_types">
-    <element value="Option" />
-      <!--
-    <element value="Document" />
-    <element value="File" />
-  -->
-  </property>
   <!-- Schema, class and security -->
-  <property name="add_permission">edi.jsonforms.AddSelectionField</property>
-  <property name="klass">edi.jsonforms.content.selection_field.SelectionField</property>
+  <property name="add_permission">edi.jsonforms.AddOption</property>
+  <property name="klass">edi.jsonforms.content.option.Option</property>
   <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema">edi.jsonforms.content.selection_field.ISelectionField</property>
+  <property name="schema">edi.jsonforms.content.option.IOption</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">
@@ -54,14 +46,10 @@
     <!--<element value="plone.tableofcontents"/>-->
     <!--<element value="plone.versioning" />-->
     <!--<element value="plone.translatable" />-->
-    <!--<element value="plone.nextprevioustoggle" />-->
-    <!--<element value="plone.nextpreviousenabled" />-->
-    <!--<element value="plone.navigationroot" />-->
-    <!--<element value="plone.selectablecontrainstypes" />-->
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++SelectionField</property>
+  <property name="add_view_expr">string:${folder_url}/++add++Option</property>
   <property name="default_view">view</property>
   <property name="default_view_fallback">False</property>
   <property name="immediate_view">view</property>
