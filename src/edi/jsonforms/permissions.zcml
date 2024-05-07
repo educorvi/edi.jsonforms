@@ -6,6 +6,12 @@
   <configure zcml:condition="installed AccessControl.security">
   <!-- -*- extra stuff goes here -*- -->
 
+    <permission
+        id="edi.jsonforms.AddForm"
+        title="edi.jsonforms: Add Form"
+    />
+
+
 
   </configure>
 
