@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.jsonforms.AddFieldset"
+        title="edi.jsonforms: Add Fieldset"
+    />
+
+
+    <permission
         id="edi.jsonforms.AddForm"
         title="edi.jsonforms: Add Form"
     />
