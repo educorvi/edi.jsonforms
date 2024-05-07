@@ -5,4 +5,5 @@
   <object name="Form" meta_type="Dexterity FTI"/>
   <object name="Fieldset" meta_type="Dexterity FTI"/>
   <object name="Field" meta_type="Dexterity FTI"/>
+  <object name="SelectionField" meta_type="Dexterity FTI"/>
 </object>
