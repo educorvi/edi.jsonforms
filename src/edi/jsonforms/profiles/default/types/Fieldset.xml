@@ -21,12 +21,9 @@
   <property name="global_allow">False</property>
   <property name="filter_content_types">True</property>
   <property name="allowed_content_types">
-    <element value="Field" />
     <element value="Fieldset" />
-  <!--
-    <element value="Document" />
-    <element value="File" />
-  -->
+    <element value="Field" />
+    <element value="SelectionField" />
   </property>
   <!-- Schema, class and security -->
   <property name="add_permission">edi.jsonforms.AddFieldset</property>
