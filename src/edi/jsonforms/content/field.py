@@ -11,9 +11,10 @@ from zope.interface import implementer
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.autoform import directives
 from z3c.form.browser.radio import RadioFieldWidget
+# from z3c.relationfield.schema import RelationChoice
 
 
-from edi.jsonforms.content.common import Required_categories
+from edi.jsonforms.content.common import Required_categories, IDependent
 from edi.jsonforms import _
 
 answer_types = [
@@ -32,7 +33,7 @@ answer_types = [
 Answer_types = SimpleVocabulary(answer_types)
 
 
-class IField(model.Schema):
+class IField(IDependent):
     """ Marker interface and Dexterity Python Schema for Field
     """
     title = schema.TextLine(title=_('Title of the field/question'), required=True)
@@ -49,6 +50,7 @@ class IField(model.Schema):
                                     source=Required_categories,
                                     default='optional',
                                     required=True)
+
 
     # helptext = schema.Text(title="Unformatierte Hilfestellung zur Übergabe ans JSON-Schema", required=False)
 

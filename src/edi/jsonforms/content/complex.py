@@ -14,7 +14,7 @@ from edi.jsonforms import _
 from edi.jsonforms.content.common import Required_categories
 
 
-class IComplex(IFieldset):
+class IComplex(IDependent):
     """ Marker interface and Dexterity Python Schema for Complex
     """
     directives.widget(required_choice=RadioFieldWidget)
