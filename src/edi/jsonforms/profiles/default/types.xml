@@ -7,4 +7,5 @@
   <object name="Field" meta_type="Dexterity FTI"/>
   <object name="SelectionField" meta_type="Dexterity FTI"/>
   <object name="Option" meta_type="Dexterity FTI"/>
+  <object name="Array" meta_type="Dexterity FTI"/>
 </object>

@@ -1,37 +1,37 @@
 <?xml version="1.0"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    name="Form"
+    name="Array"
     meta_type="Dexterity FTI"
     i18n:domain="edi.jsonforms">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">Form</property>
+      name="title">Array</property>
   <property
       i18n:translate=""
-      name="description">The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets.</property>
+      name="description">An Array is a structured element that allows the repeated entry of related information by providinng a template for a set of fields. It allows users to dynamically add additional sets of the same fields as needed. Arrays are particularly useful for capturing repetitive data entries, such as multiple contact or items in a list.</property>
 
   <property name="allow_discussion">False</property>
-  <property name="factory">Form</property>
+  <property name="factory">Array</property>
   <property name="icon_expr">string:${portal_url}/document_icon.png</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
-  <property name="global_allow">True</property>
+  <property name="global_allow">False</property>
   <property name="filter_content_types">True</property>
   <property name="allowed_content_types">
-    <element value="Array" />
-        <element value="Fieldset" />
-    <element value="Field" />
-    <element value="SelectionField" />
+  <!--
+    <element value="Document" />
+    <element value="File" />
+  -->
   </property>
   <!-- Schema, class and security -->
-  <property name="add_permission">edi.jsonforms.AddForm</property>
-  <property name="klass">edi.jsonforms.content.form.Form</property>
+  <property name="add_permission">edi.jsonforms.AddArray</property>
+  <property name="klass">edi.jsonforms.content.array.Array</property>
   <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema">edi.jsonforms.content.form.IForm</property>
+  <property name="schema">edi.jsonforms.content.array.IArray</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">
@@ -60,7 +60,7 @@
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++Form</property>
+  <property name="add_view_expr">string:${folder_url}/++add++Array</property>
   <property name="default_view">view</property>
   <property name="default_view_fallback">False</property>
   <property name="immediate_view">view</property>
