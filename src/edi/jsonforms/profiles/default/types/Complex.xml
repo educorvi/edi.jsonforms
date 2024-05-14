@@ -10,7 +10,7 @@
       name="title">Complex</property>
   <property
       i18n:translate=""
-      name="description">A Complex is used to group fields together that are connected. Unlike normal fieldsets, a complex doesn't only group to enhance clarity and structure but to encapsulate related data or concepts.</property>
+      name="description">A Complex is used to group fields together that are connected. Unlike normal fieldsets, a complex doesn't only group to enhance clarity and structure but to encapsulate related data or concepts. A Complex (including all contained fields, fieldsets, arrays, ...) can be dependent from the option of another field but a normal fieldset not.</property>
 
   <property name="allow_discussion">False</property>
   <property name="factory">Complex</property>

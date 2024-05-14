@@ -10,7 +10,7 @@
       name="title">Array</property>
   <property
       i18n:translate=""
-      name="description">An Array is a structured element that allows the repeated entry of related information by providinng a template for a set of fields. It allows users to dynamically add additional sets of the same fields as needed. Arrays are particularly useful for capturing repetitive data entries, such as multiple contact or items in a list.</property>
+      name="description">An Array is a structured element that allows the repeated entry of related information by providing a template for a set of fields. It allows users to dynamically add additional sets of the same fields as needed. Arrays are particularly useful for capturing repetitive data entries, such as multiple contact or items in a list. An Array can be dependent from another field.</property>
 
   <property name="allow_discussion">False</property>
   <property name="factory">Array</property>
