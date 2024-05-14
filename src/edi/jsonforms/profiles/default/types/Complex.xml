@@ -1,38 +1,37 @@
 <?xml version="1.0"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    name="Form"
+    name="Complex"
     meta_type="Dexterity FTI"
     i18n:domain="edi.jsonforms">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">Form</property>
+      name="title">Complex</property>
   <property
       i18n:translate=""
-      name="description">The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets.</property>
+      name="description">A Complex is used to group fields together that are connected. Unlike normal fieldsets, a complex doesn't only group to enhance clarity and structure but to encapsulate related data or concepts.</property>
 
   <property name="allow_discussion">False</property>
-  <property name="factory">Form</property>
+  <property name="factory">Complex</property>
   <property name="icon_expr">string:${portal_url}/document_icon.png</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
-  <property name="global_allow">True</property>
+  <property name="global_allow">False</property>
   <property name="filter_content_types">True</property>
   <property name="allowed_content_types">
-    <element value="Complex" />
-        <element value="Array" />
-        <element value="Fieldset" />
-    <element value="Field" />
-    <element value="SelectionField" />
+  <!--
+    <element value="Document" />
+    <element value="File" />
+  -->
   </property>
   <!-- Schema, class and security -->
-  <property name="add_permission">edi.jsonforms.AddForm</property>
-  <property name="klass">edi.jsonforms.content.form.Form</property>
+  <property name="add_permission">edi.jsonforms.AddComplex</property>
+  <property name="klass">edi.jsonforms.content.complex.Complex</property>
   <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema">edi.jsonforms.content.form.IForm</property>
+  <property name="schema">edi.jsonforms.content.complex.IComplex</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">
@@ -61,7 +60,7 @@
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++Form</property>
+  <property name="add_view_expr">string:${folder_url}/++add++Complex</property>
   <property name="default_view">view</property>
   <property name="default_view_fallback">False</property>
   <property name="immediate_view">view</property>

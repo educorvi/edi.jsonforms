@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.jsonforms.AddComplex"
+        title="edi.jsonforms: Add Complex"
+    />
+
+
+    <permission
         id="edi.jsonforms.AddArray"
         title="edi.jsonforms: Add Array"
     />
