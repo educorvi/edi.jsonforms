@@ -13,9 +13,7 @@ from plone.autoform import directives
 from z3c.form.browser.radio import RadioFieldWidget
 
 
-
-
-
+from edi.jsonforms.content.common import Required_categories
 from edi.jsonforms import _
 
 answer_types = [
@@ -33,13 +31,6 @@ answer_types = [
 ]
 Answer_types = SimpleVocabulary(answer_types)
 
-required_categories = [
-        SimpleTerm('optional', 'optional', _('Optional')),
-        SimpleTerm('required', 'required', _('Required')),
-        SimpleTerm('depend_required', 'depend_required', _('Dependent Required')),
-        ]
-Required_categories = SimpleVocabulary(required_categories)
-
 
 class IField(model.Schema):
     """ Marker interface and Dexterity Python Schema for Field
@@ -54,7 +45,7 @@ class IField(model.Schema):
                                required=True)
 
     directives.widget(required_choice=RadioFieldWidget)
-    required_choice2 = schema.Choice(title=_('Selection of Field Requirement'),
+    required_choice = schema.Choice(title=_('Selection of Field Requirement'),
                                     source=Required_categories,
                                     default='optional',
                                     required=True)
