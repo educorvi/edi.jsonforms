@@ -25,14 +25,16 @@ answer_types = [
     SimpleTerm('email', 'email', _('Email')),                       # input
     SimpleTerm('date', 'date', _('Date')),                          # input
     SimpleTerm('datetime-local', 'datetime-local', _('Date and time')),# input
-    #week, month, time?
-    SimpleTerm('number', 'number', _('Number')),                    # input
-    # SimpleTerm('integer', 'integer', _('Ganzzahl')),
+    SimpleTerm('time', 'time', _('Time')),
+    SimpleTerm('number', 'number', _('Decimal number')),            # input
+    SimpleTerm('integer', 'integer', _('Whole number')),
+    SimpleTerm('boolean', 'boolean', _('Checkbox (yes/no)')),  # input (checkbox with one option)
 ]
 Answer_types = SimpleVocabulary(answer_types)
 
 
 class IField(IDependent):
+#class IField(model.Schema):
     """ Marker interface and Dexterity Python Schema for Field
     """
     title = schema.TextLine(title=_('Title of the field/question'), required=True)

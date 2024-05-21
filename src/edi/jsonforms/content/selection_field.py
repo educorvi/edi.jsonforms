@@ -21,7 +21,6 @@ from edi.jsonforms.content.field import IField
 selection_answer_types = [
     SimpleTerm('radio', 'radio', _('Radiobuttons (single selection)')),             # input
     SimpleTerm('checkbox', 'checkbox', _('Checkboxes (multi-selection)')),        # input
-    SimpleTerm('boolean', 'boolean', _('Checkbox (yes/no)')),                       # input (checkbox with one option)
     SimpleTerm('select', 'select', _('Selection (single selection)')),             # select
     SimpleTerm('selectmultiple', 'selectmultiple', _('Selection (multi-selection)')),  # select (with attribute multiple)
     SimpleTerm('file', 'file', _('File upload (single upload)')),                   # input
