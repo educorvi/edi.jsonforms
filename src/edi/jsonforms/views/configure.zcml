@@ -7,6 +7,14 @@
   -*- extra stuff goes here -*-
 
   <browser:page
+    name="ui-schema-view"
+    for="Products.CMFCore.interfaces.IFolderish"
+    class=".ui_schema_view.UiSchemaView"
+    template="ui_schema_view.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
     name="json-schema-view"
     for="Products.CMFCore.interfaces.IFolderish"
     class=".json_schema_view.JsonSchemaView"
