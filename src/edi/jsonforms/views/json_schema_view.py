@@ -90,8 +90,15 @@ class JsonSchemaView(BrowserView):
         elif answer_type == 'datetime-local':
             field_schema['type'] = 'string'
             field_schema['format'] = 'date-time'
+        elif answer_type == 'time':
+            field_schema['type'] = 'string'
+            field_schema['format'] = 'time'
         elif answer_type == 'number':
             field_schema['type'] = 'number'
+        elif answer_type == 'integer':
+            field_schema['type'] = 'integer'
+        elif answer_type == 'boolean':
+            field_schema['type'] = 'boolean'
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield):
@@ -108,8 +115,6 @@ class JsonSchemaView(BrowserView):
             selectionfield_schema['enum'] = []
             for o in options:
                 selectionfield_schema['enum'].append(o.Title)
-        elif answer_type == 'boolean':
-            selectionfield_schema['type'] = 'boolean'
         elif answer_type == 'file':
             selectionfield_schema['type'] = 'string'
             selectionfield_schema['format'] = 'uri'
