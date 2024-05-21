@@ -11,17 +11,14 @@ from zope.interface import implementer
 
 
 from edi.jsonforms import _
-from edi.jsonforms.content.common import Required_categories
+from edi.jsonforms.content.common import Required_categories, IDependent
 
 
-class IComplex(IDependent):
+#class IComplex(IDependent):
+class IComplex(model.Schema):
     """ Marker interface and Dexterity Python Schema for Complex
     """
-    directives.widget(required_choice=RadioFieldWidget)
-    required_choice = schema.Choice(title=_('Selection of Field Requirement'),
-                                    source=Required_categories,
-                                    default='optional',
-                                    required=True)
+
 
 
 
