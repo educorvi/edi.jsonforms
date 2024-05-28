@@ -4,16 +4,12 @@ from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
 
-# from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from edi.jsonforms.views.common import possibly_required_types
+
 
 
 class JsonSchemaView(BrowserView):
-    # If you want to define a template here, please remove the template from
-    # the configure.zcml registration of this view.
-    # template = ViewPageTemplateFile('json_schema_view.pt')
     jsonschema = {}
-
-    possibly_required_types = ['Field', 'SelectionField', 'Array']
 
     def __call__(self):
         form = self.context
@@ -35,41 +31,15 @@ class JsonSchemaView(BrowserView):
                 self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
 
             # mark children as required
-            if child_object.portal_type in self.possibly_required_types and child_object.required_choice == 'required':
+            if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                 if child_object.dependent_from_object is not None:
-                    self.jsonschema = self.add_dependent_required(self.jsonschema, child_object, child_id)
+                    self.jsonschema = add_dependent_required(self.jsonschema, child_object, child_id)
                 else:
                     self.jsonschema['required'].append(child_id)
 
         # Implement your own actions:
         self.msg = json.dumps(self.jsonschema)
         return self.index()
-
-    def add_dependent_required(self, schema, child_object, child_id):
-        dependent_from = child_object.dependent_from_object.to_object
-        dependent_id = create_id(dependent_from.id, dependent_from.UID())
-        if dependent_from.portal_type == 'Option':
-            selection_parent = dependent_from.aq_parent
-            if_then = {
-                'if': {
-                    'properties': {
-                        create_id(selection_parent.id, selection_parent.UID()): {'const': dependent_from.title}
-                    }
-                },
-                'then': {
-                    'required': child_id
-                }
-            }
-            if 'allOf' in schema:
-                schema['allOf'].append(if_then)
-            else:
-                schema['allOf'] = [if_then]
-        else:
-            if dependent_id in schema['dependentRequired']:
-                schema['dependentRequired'][dependent_id].append(child_id)
-            else:
-                schema['dependentRequired'][dependent_id] = [child_id]
-        return schema
 
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()
@@ -80,7 +50,7 @@ class JsonSchemaView(BrowserView):
                 schema = modify_schema_for_fieldset(self, schema, child_object)
             else:
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
-                if child_object.portal_type in self.possibly_required_types and child_object.required_choice == 'required':
+                if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                     schema['required'].append(child_id)
                     schema = add_title_and_description(schema, child_object.title, child_object.description)
         return schema
@@ -188,9 +158,9 @@ class JsonSchemaView(BrowserView):
                 complex_schema['properties'][create_id(child.id, child_object.UID())] = self.get_schema_for_child(child_object)
 
             # mark children as required
-            if child_object.portal_type in self.possibly_required_types and child_object.required_choice == 'required':
+            if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                 if child_object.dependent_from_object is not None:
-                    complex_schema = self.add_dependent_required(complex_schema, child_object, child_id)
+                    complex_schema = add_dependent_required(complex_schema, child_object, child_id)
                 else:
                     complex_schema['required'].append(child_id)
 
@@ -206,3 +176,29 @@ def add_title_and_description(schema, title, description):
 
 def create_id(id, uid):
     return str(id) + str(uid)
+
+def add_dependent_required(schema, child_object, child_id):
+    dependent_from = child_object.dependent_from_object.to_object
+    dependent_id = create_id(dependent_from.id, dependent_from.UID())
+    if dependent_from.portal_type == 'Option':
+        selection_parent = dependent_from.aq_parent
+        if_then = {
+            'if': {
+                'properties': {
+                    create_id(selection_parent.id, selection_parent.UID()): {'const': dependent_from.title}
+                }
+            },
+            'then': {
+                'required': child_id
+            }
+        }
+        if 'allOf' in schema:
+            schema['allOf'].append(if_then)
+        else:
+            schema['allOf'] = [if_then]
+    else:
+        if dependent_id in schema['dependentRequired']:
+            schema['dependentRequired'][dependent_id].append(child_id)
+        else:
+            schema['dependentRequired'][dependent_id] = [child_id]
+    return schema

@@ -11,9 +11,10 @@ from zope.interface import implementer
 
 
 # from edi.jsonforms import _
+from edi.jsonforms.content.common import IDependent
 
 
-class IFieldset(model.Schema):
+class IFieldset(IDependent):
     """ Marker interface and Dexterity Python Schema for Fieldset
     """
 
