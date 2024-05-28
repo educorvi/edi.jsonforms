@@ -14,8 +14,8 @@ from edi.jsonforms import _
 from edi.jsonforms.content.common import Required_categories, IDependent
 
 
-#class IComplex(IDependent):
-class IComplex(model.Schema):
+class IComplex(IDependent):
+#class IComplex(model.Schema):
     """ Marker interface and Dexterity Python Schema for Complex
     """
 

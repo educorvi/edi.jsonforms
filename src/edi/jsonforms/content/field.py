@@ -11,6 +11,10 @@ from zope.interface import implementer
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.autoform import directives
 from z3c.form.browser.radio import RadioFieldWidget
+from z3c.relationfield.schema import RelationChoice
+from plone.app.vocabularies.catalog import CatalogSource
+from plone.supermodel.directives import fieldset
+
 
 
 from edi.jsonforms.content.common import Required_categories, IDependent
