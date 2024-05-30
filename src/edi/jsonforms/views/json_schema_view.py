@@ -4,7 +4,7 @@ from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
 
-from edi.jsonforms.views.common import possibly_required_types
+from edi.jsonforms.views.common import possibly_required_types, create_id
 
 
 
@@ -37,7 +37,6 @@ class JsonSchemaView(BrowserView):
                 else:
                     self.jsonschema['required'].append(child_id)
 
-        # Implement your own actions:
         self.msg = json.dumps(self.jsonschema)
         return self.index()
 
@@ -107,7 +106,6 @@ class JsonSchemaView(BrowserView):
     def get_schema_for_selectionfield(self, selectionfield):
         selectionfield_schema = add_title_and_description({}, selectionfield.title, selectionfield.description)
         answer_type = selectionfield.answer_type
-        options = selectionfield.getFolderContents()
         if answer_type == 'radio' or answer_type == 'select':
             selectionfield_schema['type'] = 'string'
             selectionfield_schema['enum'] = []
@@ -125,6 +123,7 @@ class JsonSchemaView(BrowserView):
             }
 
         if answer_type in ['radio', 'checkbox']:
+            options = selectionfield.getFolderContents()
             for o in options:
                 selectionfield_schema['enum'].append(o.Title)
         return selectionfield_schema
@@ -173,9 +172,6 @@ def add_title_and_description(schema, title, description):
     if description:
         schema['description'] = description
     return schema
-
-def create_id(id, uid):
-    return str(id) + str(uid)
 
 def add_dependent_required(schema, child_object, child_id):
     dependent_from = child_object.dependent_from_object.to_object
