@@ -51,7 +51,6 @@ class JsonSchemaView(BrowserView):
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
                 if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                     schema['required'].append(child_id)
-                    schema = add_title_and_description(schema, child_object.title, child_object.description)
         return schema
 
     def get_schema_for_child(self, child):
@@ -70,10 +69,12 @@ class JsonSchemaView(BrowserView):
     def get_schema_for_field(self, field):
         field_schema = add_title_and_description({}, field.title, field.description)
         answer_type = field.answer_type
-        if answer_type == 'text':
+        if answer_type in ['text', 'textarea']:
             field_schema['type'] = 'string'
-        elif answer_type == 'textarea':
-            field_schema['type'] = 'string'
+            if field.minimum:
+                field_schema['minLength'] = field.minimum
+            if field.maximum:
+                field_schema['maxLength'] = field.maximum
         elif answer_type == 'password':
             field_schema['type'] = 'string'
         elif answer_type == 'tel':
@@ -101,6 +102,12 @@ class JsonSchemaView(BrowserView):
             field_schema['type'] = 'integer'
         elif answer_type == 'boolean':
             field_schema['type'] = 'boolean'
+
+        if answer_type in ['number', 'integer']:
+            if field.minimum:
+                field_schema['minimum'] = field.minimum
+            if field.maximum:
+                field_schema['maximum'] = field.maximum
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield):

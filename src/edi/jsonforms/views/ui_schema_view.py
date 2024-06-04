@@ -68,12 +68,9 @@ class UiSchemaView(BrowserView):
             field_schema['options'] = {'format': 'date-time'}
         elif answer_type == 'time':
             field_schema['options'] = {'format': 'time'}
-        elif answer_type == 'number':
-            pass
-            # TODO
-        elif answer_type == 'integer':
-            pass
-            # TODO
+        elif answer_type in ['number', 'integer']:
+            if field.unit:
+                field_schema['options'] = {'append': field.unit}
         elif answer_type == 'boolean':
             pass
             # TODO
@@ -94,7 +91,13 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'select':
             pass # nothing
         elif answer_type in ['file', 'file-multi']:
-            selectionfield_schema['options'] = {'acceptedFileType': '*'}
+            if selectionfield.accepted_file_types:
+                selectionfield_schema['options'] = {'acceptedFileType': selectionfield.accepted_file_types}
+            else:
+                selectionfield_schema['options'] = {'acceptedFileType': '*'}
+
+            if answer_type == 'file-multi':
+                selectionfield_schema['options']['allowMultipleFiles'] = True
 
         return selectionfield_schema
 
