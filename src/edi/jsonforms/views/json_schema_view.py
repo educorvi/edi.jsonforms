@@ -22,7 +22,7 @@ class JsonSchemaView(BrowserView):
         self.jsonschema['dependentRequired'] = {}
         for child in children:
             child_object = child.getObject()
-            child_id = create_id(child.id, child_object.UID())
+            child_id = create_id(child_object)
 
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
@@ -44,7 +44,7 @@ class JsonSchemaView(BrowserView):
         children = fieldset.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            child_id = create_id(child.id, child_object.UID())
+            child_id = create_id(child_object)
             if child_object.portal_type == 'Fieldset':
                 schema = modify_schema_for_fieldset(self, schema, child_object)
             else:
@@ -82,13 +82,13 @@ class JsonSchemaView(BrowserView):
             # or simply '^[\d+\-()\s]{1,25}$' (max 25 symbols, +, -, (, ), numbers and space are allowed
         elif answer_type == 'url':
             field_schema['type'] = 'string'
-            field_schema['type'] = 'hostname'
+            field_schema['format'] = 'hostname'
         elif answer_type == 'email':
             field_schema['type'] = 'string'
             field_schema['format'] = 'email'
         elif answer_type == 'date':
             field_schema['type'] = 'string'
-            field_schema['type'] = 'date'
+            field_schema['format'] = 'date'
         elif answer_type == 'datetime-local':
             field_schema['type'] = 'string'
             field_schema['format'] = 'date-time'
@@ -144,17 +144,18 @@ class JsonSchemaView(BrowserView):
                 complex_schema['description'] = object.description
         complex_schema['properties'] = {}
         complex_schema['required'] = []
+        complex_schema['dependentRequired'] = {}
 
         children = object.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            child_id = create_id(child.id, child_object.UID())
+            child_id = create_id(child_object)
 
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 complex_schema = self.modify_schema_for_fieldset(complex_schema, child_object)
             else:
-                complex_schema['properties'][create_id(child.id, child_object.UID())] = self.get_schema_for_child(child_object)
+                complex_schema['properties'][create_id(child_object)] = self.get_schema_for_child(child_object)
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
@@ -175,13 +176,13 @@ def add_title_and_description(schema, title, description):
 
 def add_dependent_required(schema, child_object, child_id):
     dependent_from = child_object.dependent_from_object.to_object
-    dependent_id = create_id(dependent_from.id, dependent_from.UID())
+    dependent_id = create_id(dependent_from)
     if dependent_from.portal_type == 'Option':
         selection_parent = dependent_from.aq_parent
         if_then = {
             'if': {
                 'properties': {
-                    create_id(selection_parent.id, selection_parent.UID()): {'const': dependent_from.title}
+                    create_id(selection_parent): {'const': dependent_from.title}
                 }
             },
             'then': {

@@ -16,16 +16,18 @@ class UiSchemaView(BrowserView):
 
     def __call__(self):
         form = self.context
-        self.uischema['type'] = 'VerticalLayout'
-        children = form.getFolderContents()
-        self.uischema['elements'] = []
+        self.uischema = {'version': 2.0, 'layout': {}}
 
+        layout = {'type': 'VerticalLayout', 'elements': []}
+
+        children = form.getFolderContents()
         for child in children:
             child_object = child.getObject()
 
             # add children to the schema
-            self.uischema['elements'].append(self.get_schema_for_child(child_object, '#/properties/'))
+            layout['elements'].append(self.get_schema_for_child(child_object, '/properties/'))
 
+        self.uischema['layout'] = layout
         self.msg = json.dumps(self.uischema)
         return self.index()
 
@@ -53,19 +55,19 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'textarea':
             field_schema['options'] = {'multi': True}
         elif answer_type == 'password':
-            field_schema['format'] = 'password'
+            field_schema['options'] = {'format': 'password'}
         elif answer_type == 'tel':
-            field_schema['format'] = 'tel'
+            field_schema['options'] = {'format': 'tel'}
         elif answer_type == 'url':
-            field_schema['format'] = 'url'
+            field_schema['options'] = {'format': 'url'}
         elif answer_type == 'email':
-            field_schema['format'] = 'email'
+            field_schema['options'] = {'format': 'email'}
         elif answer_type == 'date':
-            field_schema['format'] = 'date'
+            field_schema['options'] = {'format': 'date'}
         elif answer_type == 'datetime-local':
-            field_schema['format'] = 'date-time'
+            field_schema['options'] = {'format': 'date-time'}
         elif answer_type == 'time':
-            field_schema['format'] = 'time'
+            field_schema['options'] = {'format': 'time'}
         elif answer_type == 'number':
             pass
             # TODO
@@ -87,6 +89,7 @@ class UiSchemaView(BrowserView):
                 'stacked': True
             }
         elif answer_type in ['checkbox', 'selectmultiple']:
+            # TODO differentiate between checkbox and selectmultiple, both are displayed as checkboxes
             selectionfield_schema['options'] = {'stacked': True}
         elif answer_type == 'select':
             pass # nothing
@@ -118,7 +121,7 @@ class UiSchemaView(BrowserView):
 
 
     def get_base_schema(self, child, scope):
-        child_id = create_id(child.id, child.UID())
+        child_id = create_id(child)
         child_scope = scope + child_id
         base_schema = {
             'type': 'Control',
@@ -135,7 +138,7 @@ class UiSchemaView(BrowserView):
     def create_group(self, group, scope):
         group_schema = {
             'type': 'Group',
-            'label': group.title,
+            'options': {'label': group.title},
         }
 
         if group.dependent_from_object:
@@ -157,12 +160,12 @@ class UiSchemaView(BrowserView):
         }
 
         dependent_from = child.dependent_from_object.to_object
-        dependent_id = create_id(dependent_from.id, dependent_from.UID())
+        dependent_id = create_id(dependent_from)
         if dependent_from.portal_type not in ['Option', 'Field']:
             return {}
         elif dependent_from.portal_type == 'Option':
             parent = dependent_from.aq_parent
-            dependent_id = create_id(parent.id, parent.UID())
+            dependent_id = create_id(parent)
 
         scope = self.lookup_scopes.get(dependent_id)
         if scope is None:
@@ -173,17 +176,16 @@ class UiSchemaView(BrowserView):
 
             while parent.portal_type != 'Form':
                 if parent.portal_type != 'Fieldset':
-                    scope = create_id(parent.id, parent.UID()) + '/properties/' + scope
+                    scope = create_id(parent) + '/properties/' + scope
                 parent = parent.aq_parent
 
-            scope = '#/properties/' + scope
+            scope = '/properties/' + scope
 
         showOn['scope'] = scope
 
         if dependent_from.portal_type == 'Field':
             if dependent_from.answer_type == 'boolean':
-                # TODO change
-                showOn['type'] = 'NOT_EQUALS'
+                showOn['referenceValue'] = True
             else:
                 showOn['type'] = 'NOT_EQUALS'
         elif dependent_from.portal_type == 'Option':
