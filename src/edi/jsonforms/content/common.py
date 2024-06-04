@@ -4,6 +4,7 @@ from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 from plone.autoform import directives
 from zope import schema
+from zope.interface import invariant, Invalid
 from zope.interface import provider
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
@@ -17,6 +18,15 @@ required_categories = [
     SimpleTerm('required', 'required', _('Required'))
 ]
 Required_categories = SimpleVocabulary(required_categories)
+
+
+def getBasePath(context):
+    basePath = context
+
+    while basePath.aq_parent.portal_type not in ['Form', 'Complex', 'Array', 'Fieldset']:
+        basePath = basePath.aq_parent
+
+    return "/".join(basePath.aq_parent.getPhysicalPath())
 
 
 class IDependent(model.Schema):
@@ -46,6 +56,23 @@ class IDependent(model.Schema):
         RelatedItemsFieldWidget,
         vocabulary="plone.app.vocabularies.Catalog",
         pattern_options={
+            "basePath": getBasePath,
             "selectableTypes": ["Option", "Field"],
         },
     )
+
+
+    @invariant
+    def check_dependent_from_object(data):
+        dep = data.dependent_from_object
+        if dep:
+            # check that self and object from which dependent are in the same group (complex, array or fieldset. Or Form)
+            dep_path = getBasePath(dep)
+            self_path = getBasePath(data.__context__)
+            if not dep_path.startswith(self_path):
+                raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
+
+            # check that self isn't dependent from itself
+            if "/".join(dep.getPhysicalPath()) == "/".join(data.__context__.getPhysicalPath()):
+                raise Invalid(_("Cannot be dependent from itself."))
+
