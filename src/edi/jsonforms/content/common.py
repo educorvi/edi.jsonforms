@@ -4,11 +4,12 @@ from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 from plone.autoform import directives
 from zope import schema
-from zope.interface import invariant, Invalid
+from zope.interface import Invalid
 from zope.interface import provider
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from z3c.relationfield.schema import RelationChoice, RelationList
+from z3c.form.browser.radio import RadioFieldWidget
 
 from edi.jsonforms import _
 
@@ -29,6 +30,21 @@ def getBasePath(context):
     return "/".join(basePath.aq_parent.getPhysicalPath())
 
 
+def check_dependent_from_object(data):
+    dep = data.dependent_from_object
+    if dep:
+        # check that self and object from which dependent are in the same group (complex, array or fieldset. Or Form)
+        import pdb; pdb.set_trace()
+        dep_path = getBasePath(dep)
+        self_path = getBasePath(data.__context__)
+        if not dep_path.startswith(self_path):
+            raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
+
+        # check that self isn't dependent from itself
+        if "/".join(dep.getPhysicalPath()) == "/".join(data.__context__.getPhysicalPath()):
+            raise Invalid(_("Cannot be dependent from itself."))
+
+
 class IDependent(model.Schema):
 
     fieldset(
@@ -37,42 +53,38 @@ class IDependent(model.Schema):
         fields=['dependent_from_object']
     )
 
-    # dependent_from_object = RelationList(
-    #     title=_('Dependent from this answer option:'),
-    #     description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
-    #     value_type=RelationChoice(
-    #         vocabulary="plone.app.vocabularies.Catalog",
-    #     ),
-    #     required=False)
-    dependent_from_object = RelationChoice(
+    dependent_from_object = RelationList(
         title=_('Dependent from this answer option:'),
         description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
-        vocabulary="plone.app.vocabularies.Catalog",
-        required=False
-    )
+        value_type=RelationChoice(
+            vocabulary="plone.app.vocabularies.Catalog",
+        ),
+        required=False)
+    # dependent_from_object = RelationChoice(
+    #     title=_('Dependent from this answer option:'),
+    #     description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
+    #     vocabulary="plone.app.vocabularies.Catalog",
+    #     required=False
+    # )
 
     directives.widget(
         "dependent_from_object",
         RelatedItemsFieldWidget,
         vocabulary="plone.app.vocabularies.Catalog",
         pattern_options={
-            "basePath": getBasePath,
+            #"basePath": getBasePath,
             "selectableTypes": ["Option", "Field"],
         },
     )
 
+class IDependentBase(IDependent):
+    title = schema.TextLine(title=_('Title of the field/question'), required=True)
 
-    @invariant
-    def check_dependent_from_object(data):
-        dep = data.dependent_from_object
-        if dep:
-            # check that self and object from which dependent are in the same group (complex, array or fieldset. Or Form)
-            dep_path = getBasePath(dep)
-            self_path = getBasePath(data.__context__)
-            if not dep_path.startswith(self_path):
-                raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
+    description = schema.Text(title=_('Description of the field/question'), required=False)
 
-            # check that self isn't dependent from itself
-            if "/".join(dep.getPhysicalPath()) == "/".join(data.__context__.getPhysicalPath()):
-                raise Invalid(_("Cannot be dependent from itself."))
+    directives.widget(required_choice=RadioFieldWidget)
+    required_choice = schema.Choice(title=_('Selection of Field Requirement'),
+                                    source=Required_categories,
+                                    default='optional',
+                                    required=True)
 
