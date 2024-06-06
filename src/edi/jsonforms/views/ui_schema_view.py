@@ -16,7 +16,7 @@ class UiSchemaView(BrowserView):
 
     def __call__(self):
         form = self.context
-        self.uischema = {'version': 2.0, 'layout': {}}
+        self.uischema = {'version': '2.0', 'layout': {}}
 
         layout = {'type': 'VerticalLayout', 'elements': []}
 
@@ -133,7 +133,7 @@ class UiSchemaView(BrowserView):
         self.lookup_scopes[child_id] = child_scope
 
         # add showOn dependencies
-        if child.dependent_from_object:
+        if child.dependencies:
             base_schema['showOn'] = self.create_showon_properties(child)
 
         return base_schema
@@ -144,7 +144,7 @@ class UiSchemaView(BrowserView):
             'options': {'label': group.title},
         }
 
-        if group.dependent_from_object:
+        if group.dependencies:
             group_schema['showOn'] = self.create_showon_properties(group)
 
         group_schema['elements'] = []
@@ -162,36 +162,41 @@ class UiSchemaView(BrowserView):
             'referenceValue': ''
         }
 
-        dependent_from = child.dependent_from_object.to_object
-        dependent_id = create_id(dependent_from)
-        if dependent_from.portal_type not in ['Option', 'Field']:
-            return {}
-        elif dependent_from.portal_type == 'Option':
-            parent = dependent_from.aq_parent
-            dependent_id = create_id(parent)
+        dependencies = child.dependencies
+        for dep in dependencies:
+            dep = dep.to_object
+            dep_id = create_id(dep)
+            if dep.portal_type not in ['Option', 'Field']:
+                return {}
+            elif dep.portal_type == 'Option':
+                parent = dep.aq_parent
+                dep_id = create_id(parent)
 
-        scope = self.lookup_scopes.get(dependent_id)
-        if scope is None:
-            scope = dependent_id
-            parent = dependent_from.aq_parent
-            if dependent_from.portal_type == 'Option':
-                parent = parent.aq_parent
+            scope = self.lookup_scopes.get(dep_id)
+            if scope is None:
+                scope = dep_id
+                parent = dep.aq_parent
+                if dep.portal_type == 'Option':
+                    parent = parent.aq_parent
 
-            while parent.portal_type != 'Form':
-                if parent.portal_type != 'Fieldset':
-                    scope = create_id(parent) + '/properties/' + scope
-                parent = parent.aq_parent
+                while parent.portal_type != 'Form':
+                    if parent.portal_type != 'Fieldset':
+                        scope = create_id(parent) + '/properties/' + scope
+                    parent = parent.aq_parent
 
-            scope = '/properties/' + scope
+                scope = '/properties/' + scope
 
-        showOn['scope'] = scope
+            showOn['scope'] = scope
 
-        if dependent_from.portal_type == 'Field':
-            if dependent_from.answer_type == 'boolean':
-                showOn['referenceValue'] = True
-            else:
-                showOn['type'] = 'NOT_EQUALS'
-        elif dependent_from.portal_type == 'Option':
-            showOn['referenceValue'] = dependent_from.title
+            if dep.portal_type == 'Field':
+                if dep.answer_type == 'boolean':
+                    showOn['referenceValue'] = True
+                else:
+                    showOn['type'] = 'NOT_EQUALS'
+            elif dep.portal_type == 'Option':
+                showOn['referenceValue'] = dep.title
+
+            # TODO remove
+            return showOn
 
         return showOn

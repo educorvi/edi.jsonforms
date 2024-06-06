@@ -32,7 +32,7 @@ class JsonSchemaView(BrowserView):
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if child_object.dependent_from_object is not None:
+                if child_object.dependencies is not None:
                     self.jsonschema = add_dependent_required(self.jsonschema, child_object, child_id)
                 else:
                     self.jsonschema['required'].append(child_id)
@@ -166,7 +166,7 @@ class JsonSchemaView(BrowserView):
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if child_object.dependent_from_object is not None:
+                if child_object.dependencies_object is not None:
                     complex_schema = add_dependent_required(complex_schema, child_object, child_id)
                 else:
                     complex_schema['required'].append(child_id)
@@ -182,27 +182,29 @@ def add_title_and_description(schema, title, description):
     return schema
 
 def add_dependent_required(schema, child_object, child_id):
-    dependent_from = child_object.dependent_from_object.to_object
-    dependent_id = create_id(dependent_from)
-    if dependent_from.portal_type == 'Option':
-        selection_parent = dependent_from.aq_parent
-        if_then = {
-            'if': {
-                'properties': {
-                    create_id(selection_parent): {'const': dependent_from.title}
+    dependencies = child_object.dependencies
+    for dep in dependencies:
+        dep = dep.to_object
+        dep_id = create_id(dep)
+        if dep.portal_type == 'Option':
+            selection_parent = dep.aq_parent
+            if_then = {
+                'if': {
+                    'properties': {
+                        create_id(selection_parent): {'const': dep.title}
+                    }
+                },
+                'then': {
+                    'required': child_id
                 }
-            },
-            'then': {
-                'required': child_id
             }
-        }
-        if 'allOf' in schema:
-            schema['allOf'].append(if_then)
+            if 'allOf' in schema:
+                schema['allOf'].append(if_then)
+            else:
+                schema['allOf'] = [if_then]
         else:
-            schema['allOf'] = [if_then]
-    else:
-        if dependent_id in schema['dependentRequired']:
-            schema['dependentRequired'][dependent_id].append(child_id)
-        else:
-            schema['dependentRequired'][dependent_id] = [child_id]
+            if dep_id in schema['dependentRequired']:
+                schema['dependentRequired'][dep_id].append(child_id)
+            else:
+                schema['dependentRequired'][dep_id] = [child_id]
     return schema
