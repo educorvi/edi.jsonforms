@@ -4,6 +4,7 @@ from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 from plone.autoform import directives
 from zope import schema
+from zope.globalrequest import getRequest
 from zope.interface import Invalid
 from zope.interface import provider
 from zope.schema.interfaces import IContextSourceBinder
@@ -21,28 +22,49 @@ required_categories = [
 Required_categories = SimpleVocabulary(required_categories)
 
 
-def getBasePath(context):
+def get_base_path(context):
+    # basePath = context
+    #
+    # while basePath.aq_parent.portal_type not in ['Form', 'Complex', 'Array', 'Fieldset']:
+    #     basePath = basePath.aq_parent
+    #
+    # return "/".join(basePath.aq_parent.getPhysicalPath())
+    return get_base_path_parent(context.aq_parent)
+
+def get_base_path_parent(context):
     basePath = context
 
-    while basePath.aq_parent.portal_type not in ['Form', 'Complex', 'Array', 'Fieldset']:
+    while basePath.portal_type not in ['Form', 'Complex', 'Array', 'Fieldset']:
         basePath = basePath.aq_parent
 
-    return "/".join(basePath.aq_parent.getPhysicalPath())
+    return "/".join(basePath.getPhysicalPath())
 
 
-def check_dependent_from_object(data):
-    dep = data.dependent_from_object
-    if dep:
-        # check that self and object from which dependent are in the same group (complex, array or fieldset. Or Form)
-        import pdb; pdb.set_trace()
-        dep_path = getBasePath(dep)
-        self_path = getBasePath(data.__context__)
-        if not dep_path.startswith(self_path):
-            raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
+def check_dependencies(data):
+    import pdb;pdb.set_trace()
+    try:
+        # editing process, object already exists and has a context
+        context = data.context
+        self_base_path = get_base_path(context)
+        self_path = "/".join(context.getPhysicalPath())
+    except:
+        # adding process, object doesn't exist yet and has no context attribute
+        context = getRequest().PUBLISHED.context
+        self_base_path = get_base_path_parent(context)
+        self_path = ""  # irrelevant, cannot depend on itself because it doesn't exist yet
 
-        # check that self isn't dependent from itself
-        if "/".join(dep.getPhysicalPath()) == "/".join(data.__context__.getPhysicalPath()):
-            raise Invalid(_("Cannot be dependent from itself."))
+    if data.dependencies:
+        dependencies = data.dependencies
+        for dep in dependencies:
+            # check that self and object on which dependent are in the same group (complex, array or fieldset. Or Form)
+            dep_base_path = get_base_path(dep)
+            if not dep_base_path.startswith(self_base_path):
+                raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
+
+            dep_path = "/".join(dep.getPhysicalPath())
+            # check that self isn't dependent from itself
+            if dep_path == self_path:
+                raise Invalid(_("Cannot be dependent from itself."))
 
 
 class IDependent(model.Schema):
@@ -50,17 +72,17 @@ class IDependent(model.Schema):
     fieldset(
         'dependencies',
         label=_('Dependencies'),
-        fields=['dependent_from_object']
+        fields=['dependencies']
     )
 
-    dependent_from_object = RelationList(
+    dependencies = RelationList(
         title=_('Dependent from this answer option:'),
         description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
         value_type=RelationChoice(
             vocabulary="plone.app.vocabularies.Catalog",
         ),
         required=False)
-    # dependent_from_object = RelationChoice(
+    # dependencies = RelationChoice(
     #     title=_('Dependent from this answer option:'),
     #     description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
     #     vocabulary="plone.app.vocabularies.Catalog",
@@ -68,11 +90,11 @@ class IDependent(model.Schema):
     # )
 
     directives.widget(
-        "dependent_from_object",
+        "dependencies",
         RelatedItemsFieldWidget,
         vocabulary="plone.app.vocabularies.Catalog",
         pattern_options={
-            #"basePath": getBasePath,
+            #"basePath": get_base_path,
             "selectableTypes": ["Option", "Field"],
         },
     )
