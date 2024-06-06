@@ -7,7 +7,6 @@ from plone.supermodel import model
 # from plone.supermodel.directives import fieldset
 # from z3c.form.browser.radio import RadioFieldWidget
 from zope import schema
-from zope.globalrequest import getRequest
 from zope.interface import implementer, invariant
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from plone.autoform import directives
@@ -17,7 +16,7 @@ from plone.supermodel.directives import fieldset
 
 
 
-from edi.jsonforms.content.common import IDependentBase, check_dependent_from_object
+from edi.jsonforms.content.common import IDependentBase, check_dependencies
 from edi.jsonforms import _
 
 answer_types = [
@@ -47,10 +46,10 @@ class IField(IDependentBase):
                                default='text',
                                required=True)
 
-    # @invariant
-    # def check_dependencies(self):
-    #     import pdb; pdb.set_trace()
-    #     check_dependent_from_object(self)
+    @invariant
+    def check_dependencies(self):
+        import pdb; pdb.set_trace()
+        check_dependencies(self)
 
     fieldset(
         'advanced-options',
@@ -70,6 +69,25 @@ class IField(IDependentBase):
     unit = schema.TextLine(title=_('Unit of the answer.'),
                               description = _('Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt)'),
                               required=False)
+
+
+    @invariant
+    def min_max_invariant(data):
+        if data.minimum or data.maximum:
+            if data.answer_type not in ['text', 'textarea', 'number', 'integer']:
+                raise Invalid(_('Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Decimal number, Whole number.'))
+
+    @invariant
+    def placeholder_invariant(data):
+        if data.placeholder:
+            if data.answer_type not in ['text', 'textarea']:
+                raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea.'))
+
+    @invariant
+    def unit_invariant(data):
+        if data.unit:
+            if data.answer_type not in ['number', 'integer']:
+                raise Invalid(_('Unit is only a valid option for the following answer types: Decimal Number, Whole Number.'))
 
 
 # helptext = schema.Text(title='Unformatierte Hilfestellung zur Übergabe ans JSON-Schema', required=False)
@@ -105,11 +123,6 @@ class IField(IDependentBase):
 #
 #     exclusiveMaximum = schema.Bool(title='Wenn ausgewählt wird das Maximum als < interpretiert',
 #                               required = False)
-    # @invariant
-    # def einheit_invariant(data):
-    #     if data.einheit:
-    #         if data.antworttyp not in ['number', 'integer']:
-    #             raise Invalid(u'Bei Angabe von Einheiten muss der Antworttyp Zahlenwert ausgewählt werden.')
     #
     # @invariant
     # def pattern_invariant(data):
@@ -117,17 +130,6 @@ class IField(IDependentBase):
     #         if data.antworttyp not in ['text', 'textarea']:
     #             raise Invalid(u'Für den ausgewählten Antworttyp kann keine Validierung mittels regulärem Ausdruck durchgeführt werden.')
     #
-    # @invariant
-    # def length_invariant(data):
-    #     if data.minLength or data.maxLength:
-    #         if data.antworttyp not in ['text', 'textarea']:
-    #             raise Invalid(u'Für den ausgewählten Antworttyp kann keine Längenvalidierung durchgeführt werden.')
-    #
-    # @invariant
-    # def numrange_invariant(data):
-    #     if data.minimum or data.maximum:
-    #         if data.antworttyp not in ['number', 'integer']:
-    #             raise Invalid(u'Für den ausgewählten Antworttyp kann keine Minimum/Maximum Validierung durchgeführt werden.')
     #
     # @invariant
     # def antworttyp_relation(data):
@@ -135,11 +137,7 @@ class IField(IDependentBase):
     #         if not data.rel_antworttyp:
     #             raise Invalid(u'Es muss ein Verweis auf einen XUV/JUV Datentypen angegeben werden.')
     #
-    # @invariant
-    # def placeholder_invariant(data):
-    #     if data.placeholder:
-    #         if data.answer_type not in ['text', 'textarea']:
-    #             raise Invalid(_('A Placeholder is only possible if the answer type is 'text' or 'textarea'.'))
+
 
 @implementer(IField)
 class Field(Item):
