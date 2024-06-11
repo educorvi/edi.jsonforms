@@ -9,4 +9,5 @@
   <object name="Option" meta_type="Dexterity FTI"/>
   <object name="Array" meta_type="Dexterity FTI"/>
   <object name="Complex" meta_type="Dexterity FTI"/>
+  <object name="UploadField" meta_type="Dexterity FTI"/>
 </object>

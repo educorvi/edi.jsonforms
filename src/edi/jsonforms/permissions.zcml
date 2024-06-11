@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.jsonforms.AddUploadField"
+        title="edi.jsonforms: Add UploadField"
+    />
+
+
+    <permission
         id="edi.jsonforms.AddComplex"
         title="edi.jsonforms: Add Complex"
     />
