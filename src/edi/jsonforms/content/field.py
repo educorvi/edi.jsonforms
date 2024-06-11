@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
-# from plone.app.textfield import RichText
-# from plone.autoform import directives
-from plone.dexterity.content import Item
-# from plone.namedfile import field as namedfile
-from plone.supermodel import model
-# from plone.supermodel.directives import fieldset
-# from z3c.form.browser.radio import RadioFieldWidget
-from zope import schema
-from zope.interface import implementer, invariant
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-from plone.autoform import directives
-from z3c.relationfield.schema import RelationChoice
+import re
+from plone.app.textfield import RichText
 from plone.app.vocabularies.catalog import CatalogSource
+from plone.autoform import directives
+from plone.dexterity.content import Item
+from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 
+from zope import schema
+from zope.interface import implementer, Invalid, invariant
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
+from z3c.relationfield.schema import RelationChoice
 
 from edi.jsonforms.content.common import IDependentBase, check_dependencies
 from edi.jsonforms import _
+
+
 
 answer_types = [
     SimpleTerm('text', 'text', _('Textline')),                      # input
@@ -35,7 +34,12 @@ answer_types = [
 ]
 Answer_types = SimpleVocabulary(answer_types)
 
-#addview = getRequest().PUBLISHED
+def check_regex(value):
+    try:
+        re.compile(value)
+        return True
+    except re.error:
+        raise Invalid(_('The provided regular expression isn\'t valid.'))
 
 class IField(IDependentBase):
 #class IField(model.Schema):
@@ -46,97 +50,66 @@ class IField(IDependentBase):
                                default='text',
                                required=True)
 
-    @invariant
-    def check_dependencies(self):
-        import pdb; pdb.set_trace()
-        check_dependencies(self)
+    # @invariant
+    # def check_dependencies(self):
+    #     #import pdb; pdb.set_trace()
+    #     #check_dependencies(self)
+    #     pass
 
     fieldset(
         'advanced-options',
         label=_('Advanced Options'),
-        fields=['minimum', 'maximum', 'placeholder', 'unit']
+        fields=['minimum', 'maximum', 'placeholder', 'unit', 'pattern']
     )
 
     minimum = schema.Int(title=_('Minimum'),
-                         description=_('For a number/integer this is the minimal value it must have. For a Textline/-area this is the minimal length the text must have. (>=)'),
+                         description=_('For a number/integer this is the minimal value it must have. For a Textline/-area/Password this is the minimal length the text must have. For other answer types this options is ignored. (>=)'),
                          required = False)
     maximum = schema.Int(title=_('Maximum'),
-                         description=_('For a number/integer this is the maximal value it can have. For a Textline/-area this is the maximal length the text can have. (<=)'),
+                         description=_('For a number/integer this is the maximal value it can have. For a Textline/-area/Password this is the maximal length the text can have. For other answer types this options is ignored. (<=)'),
                          required = False)
-    placeholder = schema.TextLine(title=_('Placeholder'),
-                                  description=_('Only use this for the answer types Textline and Textarea.'),
-                                  required=False)
     unit = schema.TextLine(title=_('Unit of the answer.'),
-                              description = _('Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt)'),
-                              required=False)
+                           description=_('Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt). For other answer types this options is ignored.'),
+                           required=False)
+    placeholder = schema.TextLine(title=_('Placeholder'),
+                                  description=_('Only use this for the answer types Textline/-area or Password. For other answer types this options is ignored.'),
+                                  required=False)
+    pattern = schema.TextLine(title=_('Regular expression to validate a Textline/-area field.'),
+                              description='Only use this for the answer types Textline and Textarea. For other answer types this options is ignored. Example: ',
+                              constraint=check_regex, required=False)
 
-
-    @invariant
-    def min_max_invariant(data):
-        if data.minimum or data.maximum:
-            if data.answer_type not in ['text', 'textarea', 'number', 'integer']:
-                raise Invalid(_('Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Decimal number, Whole number.'))
-
-    @invariant
-    def placeholder_invariant(data):
-        if data.placeholder:
-            if data.answer_type not in ['text', 'textarea']:
-                raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea.'))
-
-    @invariant
-    def unit_invariant(data):
-        if data.unit:
-            if data.answer_type not in ['number', 'integer']:
-                raise Invalid(_('Unit is only a valid option for the following answer types: Decimal Number, Whole Number.'))
-
-
-# helptext = schema.Text(title='Unformatierte Hilfestellung zur Übergabe ans JSON-Schema', required=False)
-
-    # tipp = RichText(title=u'Hinweis oder Hilfe zur Fragestellung',
-    #                      required=False)
-
-    # fieldset(
-    #         'validations',
-    #         label=u'Validierungen',
-    #         fields=('pattern_choice', 'pattern', 'patternlist', 'minLength', 'maxLength', 'minimum', 'exclusiveMinimum', 'maximum', 'exclusiveMaximum'),
-    #     )
-    # pattern_choice = schema.Choice(title=u'Auswahl eines Validators für ein Textfeld (Text oder Textzeile)',
-#                               source=Validatoren,
-#                               required=False)
-#
-#     pattern = schema.TextLine(title='Regulärer Ausdruck für die Validierung eines Textfeldes (Text oder Textzeile).',
-#                               description='Eine Eingabe in diesem Feld überschreibt eine vorher getroffene Auswahl',
-#                               constraint=check_regex, required=False)
-#
-#     patternlist = schema.List(title='Weitere reguläre Ausdrücke für die Validierung des Textfeldes (Text oder Textzeile) - ODER verknüpft.',
-#                               value_type = schema.TextLine(),
-#                               constraint=check_regexlist, required=False)
-#
-#     minLength = schema.Int(title='Minimale Länge (minLength) eines Textfeldes (Text oder Textzeile)',
-#                               required = False)
-#
-#     maxLength = schema.Int(title='Maximale Länge (maxLength) eines Textfeldes (Text oder Textzeile)',
-#                               required = False)
-#
-#     exclusiveMinimum = schema.Bool(title='Wenn ausgewählt wird das Minimum als > interpretiert',
-#                               required = False)
-#
-#     exclusiveMaximum = schema.Bool(title='Wenn ausgewählt wird das Maximum als < interpretiert',
-#                               required = False)
+    # @invariant
+    # def min_max_invariant(data):
+    #     if data.minimum or data.maximum:
+    #         import pdb; pdb.set_trace()
+    #         if data.answer_type not in ['text', 'textarea', 'number', 'integer', 'password']:
+    #             raise Invalid(_('Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number.'))
     #
     # @invariant
-    # def pattern_invariant(data):
-    #     if data.pattern or data.pattern_choice:
-    #         if data.antworttyp not in ['text', 'textarea']:
-    #             raise Invalid(u'Für den ausgewählten Antworttyp kann keine Validierung mittels regulärem Ausdruck durchgeführt werden.')
-    #
+    # def placeholder_invariant(data):
+    #     if data.placeholder:
+    #         if data.answer_type not in ['text', 'textarea']:
+    #             raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password.'))
     #
     # @invariant
-    # def antworttyp_relation(data):
-    #     if data.antworttyp == 'custom':
-    #         if not data.rel_antworttyp:
-    #             raise Invalid(u'Es muss ein Verweis auf einen XUV/JUV Datentypen angegeben werden.')
-    #
+    # def unit_invariant(data):
+    #     if data.unit:
+    #         if data.answer_type not in ['number', 'integer']:
+    #             raise Invalid(_('Unit is only a valid option for the following answer types: Decimal Number, Whole Number.'))
+
+    fieldset(
+        'additional-information',
+        label=_('Additional Information'),
+        fields=['intern_information', 'user_helptext']
+    )
+
+    # previously helptext
+    intern_information = schema.Text(title=_('Unformatted intern information for the JSON-Schema'),
+                                     required=False)
+
+    # previously tipp
+    user_helptext = RichText(title=_('Tipp or helptext for the user'),
+                             required=False)
 
 
 @implementer(IField)
