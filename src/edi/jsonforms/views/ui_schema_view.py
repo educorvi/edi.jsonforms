@@ -155,38 +155,40 @@ class UiSchemaView(BrowserView):
 
         return group_schema
 
+    def get_scope(self, object):
+        obj_id = create_id(object)
+        if object.portal_type not in ['Option', 'Field']:
+            return {}
+        elif object.portal_type == 'Option':
+            parent = object.aq_parent
+            obj_id = create_id(parent)
+
+        scope = self.lookup_scopes.get(obj_id)
+
+        if scope is None:
+            scope = obj_id
+            parent = dep.aq_parent
+            if dep.portal_type == 'Option':
+                parent = parent.aq_parent
+            while parent.portal_type != 'Form':
+                if parent.portal_type != 'Fieldset':
+                    scope = create_id(parent) + '/properties/' + scope
+                parent = parent.aq_parent
+            scope = '/properties/' + scope
+
+        return scope
+
     def create_showon_properties(self, child):
-        showOn = {
-            'type': 'EQUALS',
-            'scope': '',
-            'referenceValue': ''
-        }
-
         dependencies = child.dependencies
-        for dep in dependencies:
-            dep = dep.to_object
-            dep_id = create_id(dep)
-            if dep.portal_type not in ['Option', 'Field']:
-                return {}
-            elif dep.portal_type == 'Option':
-                parent = dep.aq_parent
-                dep_id = create_id(parent)
 
-            scope = self.lookup_scopes.get(dep_id)
-            if scope is None:
-                scope = dep_id
-                parent = dep.aq_parent
-                if dep.portal_type == 'Option':
-                    parent = parent.aq_parent
-
-                while parent.portal_type != 'Form':
-                    if parent.portal_type != 'Fieldset':
-                        scope = create_id(parent) + '/properties/' + scope
-                    parent = parent.aq_parent
-
-                scope = '/properties/' + scope
-
-            showOn['scope'] = scope
+        if len(dependencies) == 1:
+            showOn = {
+                'type': 'EQUALS',
+                'scope': '',
+                'referenceValue': ''
+            }
+            dep = dependencies[0].to_object
+            showOn['scope'] = self.get_scope(dep)
 
             if dep.portal_type == 'Field':
                 if dep.answer_type == 'boolean':
@@ -196,7 +198,45 @@ class UiSchemaView(BrowserView):
             elif dep.portal_type == 'Option':
                 showOn['referenceValue'] = dep.title
 
-            # TODO remove
             return showOn
+        else:
+            conn = 'or'
+            if child.connection_type:
+                conn = 'and'
 
-        return showOn
+            showOn = {
+                'id': 'ritaRule-' + create_id(child),
+                'rule': {
+                    'type': conn,
+                    'arguments': []
+                }
+            }
+
+            for dep in dependencies:
+                dep = dep.to_object
+                dep_argument = {
+                    'type': 'comparison',
+                    'operation': 'equal',
+                    'arguments': [
+                        {
+                            'type': 'atom',
+                            'path': self.get_scope(dep)
+                        }
+                    ]
+                }
+
+                if dep.portal_type == 'Field':
+                    if dep.answer_type == 'boolean':
+                        dep_argument['arguments'].append(True)
+                    else:
+                        dep_argument['arguments'].append('')
+                        dep_argument = {
+                            'type': 'not',
+                            'arguments': [dep_argument]
+                        }
+                elif dep.portal_type == 'Option':
+                    dep_argument['arguments'].append(dep.title)
+
+                showOn['rule']['arguments'].append(dep_argument)
+
+            return showOn
