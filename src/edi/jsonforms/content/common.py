@@ -105,7 +105,7 @@ class IDependent(model.Schema):
         },
     )
 
-class IDependentBase(IDependent):
+class IDependentExtended(IDependent):
     title = schema.TextLine(title=_('Title of the field/question'), required=True)
 
     description = schema.Text(title=_('Description of the field/question'), required=False)

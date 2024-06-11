@@ -6,14 +6,12 @@ from plone.autoform import directives
 from plone.dexterity.content import Item
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
-
+from z3c.relationfield.schema import RelationChoice
 from zope import schema
 from zope.interface import implementer, Invalid, invariant
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
-from z3c.relationfield.schema import RelationChoice
-
-from edi.jsonforms.content.common import IDependentBase, check_dependencies
+from edi.jsonforms.content.common import IDependentExtended, check_dependencies
 from edi.jsonforms import _
 
 
@@ -41,7 +39,7 @@ def check_regex(value):
     except re.error:
         raise Invalid(_('The provided regular expression isn\'t valid.'))
 
-class IField(IDependentBase):
+class IField(IDependentExtended):
 #class IField(model.Schema):
     """ Marker interface and Dexterity Python Schema for Field
     """
