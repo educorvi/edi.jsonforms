@@ -72,16 +72,22 @@ class IDependent(model.Schema):
     fieldset(
         'dependencies',
         label=_('Dependencies'),
-        fields=['dependencies']
+        fields=['dependencies', 'connection_type']
     )
 
     dependencies = RelationList(
         title=_('Dependent from this answer option:'),
         description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
         value_type=RelationChoice(
-            vocabulary="plone.app.vocabularies.Catalog",
+            vocabulary='plone.app.vocabularies.Catalog',
         ),
         required=False)
+
+    connection_type = schema.Bool(title=_('The dependencies have an AND-connection (default: (inklusive) OR). '
+                                          'This option is ignored if less than two dependencies are given.'),
+                                  required=False,
+                                  default=False)
+
     # dependencies = RelationChoice(
     #     title=_('Dependent from this answer option:'),
     #     description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
