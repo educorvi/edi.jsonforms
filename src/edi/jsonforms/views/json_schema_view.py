@@ -60,6 +60,8 @@ class JsonSchemaView(BrowserView):
             return self.get_schema_for_field(child)
         elif type == 'SelectionField':
             return self.get_schema_for_selectionfield(child)
+        elif type == 'UploadField':
+            return self.get_schema_for_uploadfield(child)
         elif type == 'Array':
             return self.get_schema_for_array(child)
         elif type == 'Complex':
@@ -119,21 +121,26 @@ class JsonSchemaView(BrowserView):
         elif answer_type == 'checkbox' or answer_type == 'selectmultiple':
             selectionfield_schema['type'] = 'array'
             selectionfield_schema['enum'] = []
-        elif answer_type == 'file':
-            selectionfield_schema['type'] = 'string'
-            selectionfield_schema['format'] = 'uri'
-        elif answer_type == 'file-multi':
-            selectionfield_schema['type'] = 'array'
-            selectionfield_schema['items'] = {
-                'type': 'string',
-                'format': 'uri'
-            }
 
         if answer_type in ['radio', 'checkbox']:
             options = selectionfield.getFolderContents()
             for o in options:
                 selectionfield_schema['enum'].append(o.Title)
         return selectionfield_schema
+
+    def get_schema_for_uploadfield(self, uploadfield):
+        uploadfield_schema = add_title_and_description({}, uploadfield.title, uploadfield.description)
+        answer_type = uploadfield.answer_type
+        if answer_type == 'file':
+            uploadfield_schema['type'] = 'string'
+            uploadfield_schema['format'] = 'uri'
+        elif answer_type == 'file-multi':
+            uploadfield_schema['type'] = 'array'
+            uploadfield_schema['items'] = {
+                'type': 'string',
+                'format': 'uri'
+            }
+        return uploadfield_schema
 
     def get_schema_for_array(self, array):
         array_schema = add_title_and_description({'type': 'array'}, array.title, array.description)

@@ -38,6 +38,8 @@ class UiSchemaView(BrowserView):
             return self.get_schema_for_field(child, scope)
         elif type == 'SelectionField':
             return self.get_schema_for_selectionfield(child, scope)
+        elif type == 'UploadField':
+            return self.get_schema_for_uploadfield(child, scope)
         elif type == 'Array':
             return self.get_schema_for_array(child, scope)
         elif type == 'Complex':
@@ -90,16 +92,22 @@ class UiSchemaView(BrowserView):
             selectionfield_schema['options'] = {'stacked': True}
         elif answer_type == 'select':
             pass # nothing
-        elif answer_type in ['file', 'file-multi']:
-            if selectionfield.accepted_file_types:
-                selectionfield_schema['options'] = {'acceptedFileType': selectionfield.accepted_file_types}
-            else:
-                selectionfield_schema['options'] = {'acceptedFileType': '*'}
-
-            if answer_type == 'file-multi':
-                selectionfield_schema['options']['allowMultipleFiles'] = True
 
         return selectionfield_schema
+
+    def get_schema_for_uploadfield(self, uploadfield, scope):
+        uploadfield_schema = self.get_base_schema(uploadfield, scope)
+
+        if uploadfield.accepted_file_types:
+            uploadfield_schema['options'] = {'acceptedFileType': uploadfield.accepted_file_types}
+        else:
+            uploadfield_schema['options'] = {'acceptedFileType': '*'}
+
+        if uploadfield.answer_type == 'file-multi':
+            uploadfield_schema['options']['allowMultipleFiles'] = True
+
+        return uploadfield_schema
+
 
     def get_schema_for_array(self, array, scope):
         # TODO elements? and compute scope properly
