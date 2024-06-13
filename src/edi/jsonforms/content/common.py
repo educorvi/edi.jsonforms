@@ -1,3 +1,4 @@
+from plone.app.textfield import RichText
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.supermodel import model
@@ -5,7 +6,7 @@ from plone.supermodel.directives import fieldset
 from plone.autoform import directives
 from zope import schema
 from zope.globalrequest import getRequest
-from zope.interface import Invalid
+from zope.interface import Invalid, invariant
 from zope.interface import provider
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
@@ -40,40 +41,14 @@ def get_base_path_parent(context):
     return "/".join(basePath.getPhysicalPath())
 
 
-def check_dependencies(data):
-    import pdb;pdb.set_trace()
-    try:
-        # editing process, object already exists and has a context
-        context = data.context
-        self_base_path = get_base_path(context)
-        self_path = "/".join(context.getPhysicalPath())
-    except:
-        # adding process, object doesn't exist yet and has no context attribute
-        context = getRequest().PUBLISHED.context
-        self_base_path = get_base_path_parent(context)
-        self_path = ""  # irrelevant, cannot depend on itself because it doesn't exist yet
-
-    if data.dependencies:
-        dependencies = data.dependencies
-        for dep in dependencies:
-            # check that self and object on which dependent are in the same group (complex, array or fieldset. Or Form)
-            dep_base_path = get_base_path(dep)
-            if not dep_base_path.startswith(self_base_path):
-                raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
-
-            dep_path = "/".join(dep.getPhysicalPath())
-            # check that self isn't dependent from itself
-            if dep_path == self_path:
-                raise Invalid(_("Cannot be dependent from itself."))
-
 
 class IDependent(model.Schema):
 
-    fieldset(
-        'dependencies',
-        label=_('Dependencies'),
-        fields=['dependencies', 'connection_type']
-    )
+    # fieldset(
+    #     'dependencies',
+    #     label=_('Dependencies'),
+    #     fields=['dependencies', 'connection_type']
+    # )
 
     dependencies = RelationList(
         title=_('Dependent from this answer option:'),
@@ -81,7 +56,36 @@ class IDependent(model.Schema):
         value_type=RelationChoice(
             vocabulary='plone.app.vocabularies.Catalog',
         ),
+        default=[],
         required=False)
+
+    @invariant
+    def check_dependencies(data):
+        if data.dependencies:
+            dependencies = data.dependencies
+            import pdb;pdb.set_trace()
+            try:
+                # editing process, object already exists and has a context
+                context = data.context
+                self_base_path = get_base_path(context)
+                self_path = "/".join(context.getPhysicalPath())
+            except:
+                # adding process, object doesn't exist yet and has no context attribute
+                context = getRequest().PUBLISHED.context
+                self_base_path = get_base_path_parent(context)
+                self_path = ""  # irrelevant, cannot depend on itself because it doesn't exist yet
+
+            for dep in dependencies:
+                # check that self and object on which dependent are in the same group (complex, array or fieldset. Or Form)
+                dep_base_path = get_base_path(dep)
+                if not dep_base_path.startswith(self_base_path):
+                    raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
+
+                dep_path = "/".join(dep.getPhysicalPath())
+                # check that self isn't dependent from itself
+                if dep_path == self_path:
+                    raise Invalid(_("Cannot be dependent from itself."))
+
 
     connection_type = schema.Bool(title=_('The dependencies have an AND-connection (default: (inklusive) OR). '
                                           'This option is ignored if less than two dependencies are given.'),
@@ -105,6 +109,17 @@ class IDependent(model.Schema):
         },
     )
 
+    fieldset(
+        'additional-information',
+        label=_('Additional Information'),
+        fields=['intern_information']
+    )
+
+    # previously helptext
+    intern_information = schema.Text(title=_('Unformatted intern information for the JSON-Schema'),
+                                     description=_('Here you can provide additional information that the Software-Team should to take into account while creating the Form.'),
+                                     required=False)
+
 class IDependentExtended(IDependent):
     title = schema.TextLine(title=_('Title of the field/question'), required=True)
 
@@ -115,4 +130,19 @@ class IDependentExtended(IDependent):
                                     source=Required_categories,
                                     default='optional',
                                     required=True)
+
+    fieldset(
+        'additional-information',
+        label=_('Additional Information'),
+        fields=['user_helptext']
+    )
+
+    # # previously helptext
+    # intern_information = schema.Text(title=_('Unformatted intern information for the JSON-Schema'),
+    #                                  description=_('Here you can provide additional information that the Software-Team should to take into account while creating the Form.'),
+    #                                  required=False)
+
+    # previously tipp
+    user_helptext = schema.TextLine(title=_('Tipp or helptext for the user'),
+                             required=False)
 

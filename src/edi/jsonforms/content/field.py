@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import re
-from plone.app.textfield import RichText
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.autoform import directives
 from plone.dexterity.content import Item
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
-from z3c.relationfield.schema import RelationChoice
+from z3c.relationfield.schema import RelationChoice, RelationList
 from zope import schema
 from zope.interface import implementer, Invalid, invariant
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
-from edi.jsonforms.content.common import IDependentExtended, check_dependencies
+from edi.jsonforms.content.common import IDependentExtended#, check_dependencies
 from edi.jsonforms import _
 
 
@@ -47,12 +46,6 @@ class IField(IDependentExtended):
                                source=Answer_types,
                                default='text',
                                required=True)
-
-    # @invariant
-    # def check_dependencies(self):
-    #     #import pdb; pdb.set_trace()
-    #     #check_dependencies(self)
-    #     pass
 
     fieldset(
         'advanced-options',
@@ -94,20 +87,6 @@ class IField(IDependentExtended):
     #     if data.unit:
     #         if data.answer_type not in ['number', 'integer']:
     #             raise Invalid(_('Unit is only a valid option for the following answer types: Decimal Number, Whole Number.'))
-
-    fieldset(
-        'additional-information',
-        label=_('Additional Information'),
-        fields=['intern_information', 'user_helptext']
-    )
-
-    # previously helptext
-    intern_information = schema.Text(title=_('Unformatted intern information for the JSON-Schema'),
-                                     required=False)
-
-    # previously tipp
-    user_helptext = RichText(title=_('Tipp or helptext for the user'),
-                             required=False)
 
 
 @implementer(IField)

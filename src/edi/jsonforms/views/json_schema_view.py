@@ -14,7 +14,7 @@ class JsonSchemaView(BrowserView):
     def __call__(self):
         form = self.context
         self.jsonschema['type'] = 'object'
-        self.jsonschema = add_title_and_description(self.jsonschema, form.title, form.description)
+        self.jsonschema = add_title_and_description(self.jsonschema, form)
 
         children = form.getFolderContents()
         self.jsonschema['properties'] = {}
@@ -69,7 +69,7 @@ class JsonSchemaView(BrowserView):
         return {}
 
     def get_schema_for_field(self, field):
-        field_schema = add_title_and_description({}, field.title, field.description)
+        field_schema = create_base_schema__field({}, field)
         answer_type = field.answer_type
         if answer_type in ['text', 'textarea']:
             field_schema['type'] = 'string'
@@ -113,7 +113,7 @@ class JsonSchemaView(BrowserView):
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield):
-        selectionfield_schema = add_title_and_description({}, selectionfield.title, selectionfield.description)
+        selectionfield_schema = create_base_schema__field({}, selectionfield)
         answer_type = selectionfield.answer_type
         if answer_type == 'radio' or answer_type == 'select':
             selectionfield_schema['type'] = 'string'
@@ -129,7 +129,7 @@ class JsonSchemaView(BrowserView):
         return selectionfield_schema
 
     def get_schema_for_uploadfield(self, uploadfield):
-        uploadfield_schema = add_title_and_description({}, uploadfield.title, uploadfield.description)
+        uploadfield_schema = create_base_schema__field({}, uploadfield)
         answer_type = uploadfield.answer_type
         if answer_type == 'file':
             uploadfield_schema['type'] = 'string'
@@ -143,7 +143,7 @@ class JsonSchemaView(BrowserView):
         return uploadfield_schema
 
     def get_schema_for_array(self, array):
-        array_schema = add_title_and_description({'type': 'array'}, array.title, array.description)
+        array_schema = add_title_and_description({'type': 'array'}, array)
         if array.required_choice == 'required':
             array_schema['minItems'] = 1
         array_schema['items'] = self.get_schema_for_object(array)
@@ -181,11 +181,26 @@ class JsonSchemaView(BrowserView):
         return complex_schema
 
 
+def create_base_schema__field(schema, child):
+    base_schema = add_title_and_description(schema, child)
+    base_schema = add_userhelptext(base_schema, child)
+    base_schema = add_interninformation(base_schema, child)
+    return base_schema
 
-def add_title_and_description(schema, title, description):
-    schema['title'] = title
-    if description:
-        schema['description'] = description
+def add_title_and_description(schema, child):
+    schema['title'] = child.title
+    if child.description:
+        schema['description'] = child.description
+    return schema
+
+def add_userhelptext(schema, child):
+    if child.user_helptext:
+        schema['description'] = child.user_helptext
+    return schema
+
+def add_interninformation(schema, child):
+    if child.intern_information:
+        schema['comment'] = child.intern_information
     return schema
 
 def add_dependent_required(schema, child_object, child_id):
