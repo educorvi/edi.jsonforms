@@ -178,6 +178,9 @@ class JsonSchemaView(BrowserView):
         return complex_schema
 
 
+"""
+create base schema for a field, selectionfield or an uploadfield
+"""
 def create_base_schema__field(schema, child):
     base_schema = add_title_and_description(schema, child)
     base_schema = add_userhelptext(base_schema, child)

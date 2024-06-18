@@ -5,6 +5,7 @@ from Products.Five.browser import BrowserView
 import json
 
 from edi.jsonforms.views.common import possibly_required_types, create_id
+from edi.jsonforms.views.showOn_properties import create_showon_properties
 
 
 
@@ -142,7 +143,7 @@ class UiSchemaView(BrowserView):
 
         # add showOn dependencies
         if child.dependencies:
-            base_schema['showOn'] = self.create_showon_properties(child)
+            base_schema['showOn'] = create_showon_properties(child, self.lookup_scopes)
 
         return base_schema
 
@@ -153,7 +154,7 @@ class UiSchemaView(BrowserView):
         }
 
         if group.dependencies:
-            group_schema['showOn'] = self.create_showon_properties(group)
+            group_schema['showOn'] = create_showon_properties(group, self.lookup_scopes)
 
         group_schema['elements'] = []
         children = group.getFolderContents()
@@ -162,89 +163,3 @@ class UiSchemaView(BrowserView):
             group_schema['elements'].append(self.get_schema_for_child(child_object, scope))
 
         return group_schema
-
-    def get_scope(self, object):
-        obj_id = create_id(object)
-        if object.portal_type not in ['Option', 'Field']:
-            return {}
-        elif object.portal_type == 'Option':
-            parent = object.aq_parent
-            obj_id = create_id(parent)
-
-        scope = self.lookup_scopes.get(obj_id)
-
-        if scope is None:
-            scope = obj_id
-            parent = dep.aq_parent
-            if dep.portal_type == 'Option':
-                parent = parent.aq_parent
-            while parent.portal_type != 'Form':
-                if parent.portal_type != 'Fieldset':
-                    scope = create_id(parent) + '/properties/' + scope
-                parent = parent.aq_parent
-            scope = '/properties/' + scope
-
-        return scope
-
-    def create_showon_properties(self, child):
-        dependencies = child.dependencies
-
-        if len(dependencies) == 1:
-            showOn = {
-                'type': 'EQUALS',
-                'scope': '',
-                'referenceValue': ''
-            }
-            dep = dependencies[0].to_object
-            showOn['scope'] = self.get_scope(dep)
-
-            if dep.portal_type == 'Field':
-                if dep.answer_type == 'boolean':
-                    showOn['referenceValue'] = True
-                else:
-                    showOn['type'] = 'NOT_EQUALS'
-            elif dep.portal_type == 'Option':
-                showOn['referenceValue'] = dep.title
-
-            return showOn
-        else:
-            conn = 'or'
-            if child.connection_type:
-                conn = 'and'
-
-            showOn = {
-                'id': 'ritaRule-' + create_id(child),
-                'rule': {
-                    'type': conn,
-                    'arguments': []
-                }
-            }
-
-            for dep in dependencies:
-                dep = dep.to_object
-                dep_argument = {
-                    'type': 'comparison',
-                    'operation': 'equal',
-                    'arguments': [
-                        {
-                            'type': 'atom',
-                            'path': self.get_scope(dep)
-                        }
-                    ]
-                }
-
-                if dep.portal_type == 'Field':
-                    if dep.answer_type == 'boolean':
-                        dep_argument['arguments'].append(True)
-                    else:
-                        dep_argument['arguments'].append('')
-                        dep_argument = {
-                            'type': 'not',
-                            'arguments': [dep_argument]
-                        }
-                elif dep.portal_type == 'Option':
-                    dep_argument['arguments'].append(dep.title)
-
-                showOn['rule']['arguments'].append(dep_argument)
-
-            return showOn
