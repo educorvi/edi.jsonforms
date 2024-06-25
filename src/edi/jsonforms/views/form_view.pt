@@ -15,10 +15,8 @@
         return-data-as-scopes="true"
     ></vue-json-form>-->
   <vue-json-form
-    json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
-    ui-schema=''
-    return-data-as-scopes="true"
-    ></vue-json-form>
+    tal:attributes="json-schema context/@@json-schema-view; ui-schema context/@@ui-schema-view"
+    return-data-as-scopes="true"></vue-json-form>
   <p>hallo2</p>
 </div>
     <script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>

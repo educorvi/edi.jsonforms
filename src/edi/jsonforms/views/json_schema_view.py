@@ -37,8 +37,7 @@ class JsonSchemaView(BrowserView):
                 else:
                     self.jsonschema['required'].append(child_id)
 
-        self.msg = json.dumps(self.jsonschema)
-        return self.index()
+        return json.dumps(self.jsonschema)
 
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()
