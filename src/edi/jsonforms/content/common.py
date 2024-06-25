@@ -44,11 +44,11 @@ def get_base_path_parent(context):
 
 class IDependent(model.Schema):
 
-    # fieldset(
-    #     'dependencies',
-    #     label=_('Dependencies'),
-    #     fields=['dependencies', 'connection_type']
-    # )
+    fieldset(
+        'dependencies',
+        label=_('Dependencies'),
+        fields=['dependencies', 'connection_type']
+    )
 
     dependencies = RelationList(
         title=_('Dependent from this answer option:'),
@@ -63,7 +63,6 @@ class IDependent(model.Schema):
     def check_dependencies(data):
         if data.dependencies:
             dependencies = data.dependencies
-            import pdb;pdb.set_trace()
             try:
                 # editing process, object already exists and has a context
                 context = data.context
