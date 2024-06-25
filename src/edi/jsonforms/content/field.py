@@ -54,17 +54,25 @@ class IField(IDependentExtended):
     )
 
     minimum = schema.Int(title=_('Minimum'),
-                         description=_('For a number/integer this is the minimal value it must have. For a Textline/-area/Password this is the minimal length the text must have. For other answer types this options is ignored. (>=)'),
+                         description=_('For a number/integer this is the minimal value it must have. \
+                                       For a Textline/-area/Password this is the minimal length the \
+                                       text must have. For other answer types this options is ignored. (> =)'),
                          required = False)
+    
     maximum = schema.Int(title=_('Maximum'),
-                         description=_('For a number/integer this is the maximal value it can have. For a Textline/-area/Password this is the maximal length the text can have. For other answer types this options is ignored. (<=)'),
+                         description=_('For a number/integer this is the maximal value it can have.\
+                                       For a Textline/-area/Password this is the maximal length the \
+                                       text can have. For other answer types this options is ignored. (< =)'),
                          required = False)
+    
     unit = schema.TextLine(title=_('Unit of the answer.'),
                            description=_('Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt). For other answer types this options is ignored.'),
                            required=False)
+    
     placeholder = schema.TextLine(title=_('Placeholder'),
                                   description=_('Only use this for the answer types Textline/-area or Password. For other answer types this options is ignored.'),
                                   required=False)
+    
     pattern = schema.TextLine(title=_('Regular expression to validate a Textline/-area field.'),
                               description='Only use this for the answer types Textline and Textarea. For other answer types this options is ignored. Example: ',
                               constraint=check_regex, required=False)
