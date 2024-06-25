@@ -56,13 +56,13 @@ class IField(IDependentExtended):
     minimum = schema.Int(title=_('Minimum'),
                          description=_('For a number/integer this is the minimal value it must have. \
                                        For a Textline/-area/Password this is the minimal length the \
-                                       text must have. For other answer types this options is ignored. (> =)'),
+                                       text must have. For other answer types this options is ignored. (>=)'),
                          required = False)
     
     maximum = schema.Int(title=_('Maximum'),
                          description=_('For a number/integer this is the maximal value it can have.\
                                        For a Textline/-area/Password this is the maximal length the \
-                                       text can have. For other answer types this options is ignored. (< =)'),
+                                       text can have. For other answer types this options is ignored.'),
                          required = False)
     
     unit = schema.TextLine(title=_('Unit of the answer.'),
