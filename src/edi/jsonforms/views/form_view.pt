@@ -7,16 +7,23 @@
 <body>
   <metal:block fill-slot="content-core">
       <h2 i18n:translate="">Sample View</h2>
-      <p tal:content="view/msg">this gets replaced</p>
-<div class="m-3">
-<!--json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'-->
+<div class="m-3" >
+<!--json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
     <vue-json-form
-        json-schema="${view/json-schema-view}"
-        ui-schema="${view/ui-schema-view}"
+        json-schema="${view/json_schema_view}"
+        ui-schema="${view/ui_schema_view}"
         return-data-as-scopes="true"
+    ></vue-json-form>-->
+  <vue-json-form
+    json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
+    ui-schema=''
+    return-data-as-scopes="true"
     ></vue-json-form>
+  <p>hallo2</p>
 </div>
-    <script src="pfad to vue-json-form-umd.js"></script>
+    <script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>
+    <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+
   </metal:block>
 </body>
 </html>

@@ -2,6 +2,9 @@
 
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
+#from Products.CMFPlone.resources import add_resource_on_request
+
+
 
 # from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
@@ -13,5 +16,14 @@ class FormView(BrowserView):
 
     def __call__(self):
         # Implement your own actions:
-        self.msg = _(u'A small message')
+        #add_resource_on_request(self.request, 'edi.jsonforms')
         return self.index()
+
+    def json_schema_view(self):
+        import pdb; pdb.set_trace()
+        context = self.context
+        request = self.request
+
+        #json_schema = getMultiAdapter((context, request), name="json-schema-view")
+
+        #return json_schema()
