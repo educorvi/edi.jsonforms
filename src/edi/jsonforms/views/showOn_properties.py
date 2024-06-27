@@ -63,7 +63,8 @@ def create_rule_for_num(scope):
         'arguments': [
             {
                 'type': 'comparison',
-                'operation': 'greaterOrEqual',
+                'allowDifferentTypes': True,
+                'operation': 'greater',
                 'arguments': [
                     {
                         'type': 'atom',
@@ -74,6 +75,7 @@ def create_rule_for_num(scope):
             },
             {
                 'type': 'comparison',
+                'allowDifferentTypes': True,
                 'operation': 'smaller',
                 'arguments': [
                     {

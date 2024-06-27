@@ -52,7 +52,7 @@ class IDependent(model.Schema):
 
     dependencies = RelationList(
         title=_('Dependent from this answer option:'),
-        description=_("If this field(set) is only shown when a specific question is answered or an option from another question is chosen, please choose from which (option or field) it is dependent."),
+        description=_("If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."),
         value_type=RelationChoice(
             vocabulary='plone.app.vocabularies.Catalog',
         ),
