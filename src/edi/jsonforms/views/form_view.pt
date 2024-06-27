@@ -17,9 +17,8 @@
   <vue-json-form
     tal:attributes="json-schema context/@@json-schema-view; ui-schema context/@@ui-schema-view"
     return-data-as-scopes="true"></vue-json-form>
-  <p>hallo2</p>
 </div>
-    <script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>
+    <!--<script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>-->
     <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
 
   </metal:block>

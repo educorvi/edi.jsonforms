@@ -84,7 +84,7 @@ class UiSchemaView(BrowserView):
         answer_type = selectionfield.answer_type
         if answer_type == 'radio':
             selectionfield_schema['options'] = {
-                'radiobuttons': True,
+                'displayAs': 'radiobuttons',
                 'stacked': True
             }
         elif answer_type in ['checkbox', 'selectmultiple']:
