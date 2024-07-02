@@ -133,9 +133,15 @@ class JsonSchemaView(BrowserView):
     def get_schema_for_uploadfield(self, uploadfield):
         uploadfield_schema = create_base_schema__field({}, uploadfield)
         answer_type = uploadfield.answer_type
-        if answer_type in ['file', 'file-multi']:
+        if answer_type == 'file':
             uploadfield_schema['type'] = 'string'
             uploadfield_schema['format'] = 'uri'
+        elif answer_type == 'file-multi':
+            uploadfield_schema['type'] = 'array'
+            uploadfield_schema['items'] = {
+                'type': 'string',
+                'format': 'uri'
+            }
         return uploadfield_schema
 
     def get_schema_for_array(self, array):
