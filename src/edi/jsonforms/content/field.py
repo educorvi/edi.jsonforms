@@ -77,24 +77,23 @@ class IField(IDependentExtended):
                               description='Only use this for the answer types Textline and Textarea. For other answer types this options is ignored. Example: ',
                               constraint=check_regex, required=False)
 
-    # @invariant
-    # def min_max_invariant(data):
-    #     if data.minimum or data.maximum:
-    #         import pdb; pdb.set_trace()
-    #         if data.answer_type not in ['text', 'textarea', 'number', 'integer', 'password']:
-    #             raise Invalid(_('Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number.'))
-    #
-    # @invariant
-    # def placeholder_invariant(data):
-    #     if data.placeholder:
-    #         if data.answer_type not in ['text', 'textarea']:
-    #             raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password.'))
-    #
-    # @invariant
-    # def unit_invariant(data):
-    #     if data.unit:
-    #         if data.answer_type not in ['number', 'integer']:
-    #             raise Invalid(_('Unit is only a valid option for the following answer types: Decimal Number, Whole Number.'))
+    @invariant
+    def min_max_invariant(data):
+        if data.minimum or data.maximum:
+            if data.answer_type not in ['text', 'textarea', 'number', 'integer', 'password']:
+                raise Invalid(_('Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number.'))
+    
+    @invariant
+    def placeholder_invariant(data):
+        if data.placeholder:
+            if data.answer_type not in ['text', 'textarea', 'password']:
+                raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password.'))
+    
+    @invariant
+    def unit_invariant(data):
+        if data.unit:
+            if data.answer_type not in ['number', 'integer']:
+                raise Invalid(_('Unit is only a valid option for the following answer types: Decimal Number, Whole Number.'))
 
 
 @implementer(IField)
