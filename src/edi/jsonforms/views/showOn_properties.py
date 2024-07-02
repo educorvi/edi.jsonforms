@@ -18,8 +18,8 @@ def get_scope(lookup_scopes, object):
     # scope wasn't saved yet, has to be computed manually
     if scope is None:
         scope = obj_id
-        parent = dep.aq_parent
-        if dep.portal_type == 'Option':
+        parent = object.aq_parent
+        if object.portal_type == 'Option':
             parent = parent.aq_parent
         while parent.portal_type != 'Form':
             if parent.portal_type != 'Fieldset':
@@ -29,7 +29,7 @@ def get_scope(lookup_scopes, object):
 
     return scope
 
-def create_rule_for_select_option(scope, title):
+def create_rule_for_single_select_option(scope, title):
     rule = {
         'type': 'comparison',
         'operation': 'equal',
@@ -41,6 +41,31 @@ def create_rule_for_select_option(scope, title):
             title
         ]
     }
+
+    return rule
+
+def create_rule_for_multi_select_option(scope, title):
+    #import pdb; pdb.set_trace()
+    rule = {
+        "type": "exists",
+        "array":{
+            "type": "atom",
+            "path": scope
+        },
+        "placeholder": "current_option",
+        "rule": {
+            "type": "comparison",
+            "operation": "equal",
+            "arguments": [
+                {
+                    "type": "atom",
+                    "path": "current_option"
+                },
+                title
+            ]
+        }
+    }
+
     return rule
 
 def create_rule_for_bool(scope):
@@ -113,7 +138,10 @@ def create_rule_for_text(scope):
 def create_rule(scope, object):
     rule = {}
     if object.portal_type == 'Option':
-        rule = create_rule_for_select_option(scope, object.title)
+        if object.aq_parent.answer_type in ['radio', 'select']:
+            rule = create_rule_for_single_select_option(scope, object.title)
+        elif object.aq_parent.answer_type in ['checkbox', 'selectmultiple']:
+            rule = create_rule_for_multi_select_option(scope, object.title)
     elif object.portal_type == 'Field':
         if object.answer_type == 'boolean':
             rule = create_rule_for_bool(scope)
