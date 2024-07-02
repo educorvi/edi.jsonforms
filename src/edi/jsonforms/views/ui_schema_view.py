@@ -76,6 +76,12 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'boolean':
             pass
             # TODO
+
+        if field.placeholder and field.answer_type in ['text', 'textarea', 'password']:
+            if 'options' in field_schema:
+                field_schema['options']['placeholder'] = field.placeholder
+            else:
+                field_schema['options'] = {'placeholder': field.placeholder}
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield, scope):
