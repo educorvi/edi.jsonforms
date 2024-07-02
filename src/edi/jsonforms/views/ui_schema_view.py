@@ -28,6 +28,28 @@ class UiSchemaView(BrowserView):
             # add children to the schema
             layout['elements'].append(self.get_schema_for_child(child_object, '/properties/'))
 
+        buttons = {
+            "type": "Buttongroup",
+            "buttons": [
+                {
+                    "type": "Button",
+                    "buttonType": "submit",
+                    "text": "Submit",
+                    "options": {
+                        "variant": "primary"
+                    }
+                },
+                {
+                    "type": "Button",
+                    "buttonType": "reset",
+                    "text": "Reset this form",
+                    "options": {
+                        "variant": "danger"
+                    }
+                }
+            ]
+        }
+        layout['elements'].append(buttons)
         self.uischema['layout'] = layout
         return json.dumps(self.uischema)
 
@@ -77,7 +99,7 @@ class UiSchemaView(BrowserView):
             pass
             # TODO
 
-        if field.placeholder and field.answer_type in ['text', 'textarea', 'password']:
+        if field.placeholder and field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
             if 'options' in field_schema:
                 field_schema['options']['placeholder'] = field.placeholder
             else:

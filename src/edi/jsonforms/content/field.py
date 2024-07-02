@@ -70,7 +70,7 @@ class IField(IDependentExtended):
                            required=False)
     
     placeholder = schema.TextLine(title=_('Placeholder'),
-                                  description=_('Only use this for the answer types Textline/-area or Password. For other answer types this options is ignored.'),
+                                  description=_('Only use this for the answer types Textline/-area, Password, Telephone, URL, Email. For other answer types this options is ignored.'),
                                   required=False)
     
     pattern = schema.TextLine(title=_('Regular expression to validate a Textline/-area field.'),
@@ -86,8 +86,8 @@ class IField(IDependentExtended):
     @invariant
     def placeholder_invariant(data):
         if data.placeholder:
-            if data.answer_type not in ['text', 'textarea', 'password']:
-                raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password.'))
+            if data.answer_type not in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
+                raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email.'))
     
     @invariant
     def unit_invariant(data):
