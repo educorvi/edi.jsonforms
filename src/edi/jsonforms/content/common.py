@@ -65,7 +65,7 @@ class IDependent(model.Schema):
             dependencies = data.dependencies
             try:
                 # editing process, object already exists and has a context
-                context = data.context
+                context = data.__context__
                 self_base_path = get_base_path(context)
                 self_path = "/".join(context.getPhysicalPath())
             except:
@@ -84,7 +84,6 @@ class IDependent(model.Schema):
                 # check that self isn't dependent from itself
                 if dep_path == self_path:
                     raise Invalid(_("Cannot be dependent from itself."))
-
 
     connection_type = schema.Bool(title=_('The dependencies have an AND-connection (default: (inklusive) OR). '
                                           'This option is ignored if less than two dependencies are given.'),
