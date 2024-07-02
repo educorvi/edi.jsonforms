@@ -188,7 +188,7 @@ create base schema for a field, selectionfield or an uploadfield
 """
 def create_base_schema__field(schema, child):
     base_schema = add_title_and_description(schema, child)
-    base_schema = add_userhelptext(base_schema, child)
+    # base_schema = add_userhelptext(base_schema, child)
     base_schema = add_interninformation(base_schema, child)
     return base_schema
 
@@ -198,10 +198,10 @@ def add_title_and_description(schema, child):
         schema['description'] = child.description
     return schema
 
-def add_userhelptext(schema, child):
-    if child.user_helptext:
-        schema['description'] = child.user_helptext
-    return schema
+# def add_userhelptext(schema, child):
+#     if child.user_helptext:
+#         schema['???'] = child.user_helptext
+#     return schema
 
 def add_interninformation(schema, child):
     if child.intern_information:
