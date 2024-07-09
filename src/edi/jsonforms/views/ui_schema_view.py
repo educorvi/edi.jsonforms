@@ -139,8 +139,6 @@ class UiSchemaView(BrowserView):
 
 
     def get_schema_for_array(self, array, scope):
-        # TODO elements? and compute scope properly
-
         # save scope in lookup_scopes
         array_id = array.id + array.UID()
         array_scope = scope + array_id
@@ -162,6 +160,9 @@ class UiSchemaView(BrowserView):
                 }
             }
         }
+
+        if array.dependencies:
+            array_schema['showOn'] = create_showon_properties(array, self.lookup_scopes)
 
         children = array.getFolderContents()
         for child in children:
