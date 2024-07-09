@@ -85,7 +85,7 @@ class IDependent(model.Schema):
                 dep_path = "/".join(dep.getPhysicalPath())
                 # check that self isn't dependent from itself and that self isn't dependent from a child (in case of an Array, Fieldset, Complex)
                 if dep_path == self_path or (self_path != "" and dep_path.startswith(self_path)):
-                    raise Invalid(_("Cannot be dependent from itself or a child form itself."))
+                    raise Invalid(_("Cannot be dependent from itself or a child from itself."))
 
     connection_type = schema.Bool(title=_('The dependencies have an AND-connection (default: (inklusive) OR). '
                                           'This option is ignored if less than two dependencies are given.'),
@@ -143,6 +143,6 @@ class IDependentExtended(IDependent):
     #                                  required=False)
 
     # previously tipp
-    user_helptext = schema.TextLine(title=_('Tipp or helptext for the user'),
+    user_helptext = schema.TextLine(title=_('Hint or helptext for the user'),
                              required=False)
 

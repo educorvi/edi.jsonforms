@@ -40,7 +40,7 @@ class IUploadField(IDependentExtended):
         fields=['accepted_file_types']
     )
 
-    accepted_file_types = schema.List(title=_('Accepted file types for file upload.'),
+    accepted_file_types = schema.List(title=_('Accepted file types for file upload'),
                                       description=_(
                                           'If no file type is selected, the default is * (all file types are accepted).'),
                                       value_type=schema.Choice(
