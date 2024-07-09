@@ -45,7 +45,7 @@ class JsonSchemaView(BrowserView):
             child_object = child.getObject()
             child_id = create_id(child_object)
             if child_object.portal_type == 'Fieldset':
-                schema = modify_schema_for_fieldset(self, schema, child_object)
+                schema = self.modify_schema_for_fieldset(schema, child_object)
             else:
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
                 if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
