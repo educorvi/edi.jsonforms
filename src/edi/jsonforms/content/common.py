@@ -30,6 +30,8 @@ def get_base_path(context):
     #     basePath = basePath.aq_parent
     #
     # return "/".join(basePath.aq_parent.getPhysicalPath())
+    # if context.portal_type in ['Complex', 'Array', 'Fieldset']:
+    #     return "/".join(context.getPhysicalPath())
     return get_base_path_parent(context.aq_parent)
 
 def get_base_path_parent(context):
@@ -81,9 +83,9 @@ class IDependent(model.Schema):
                     raise Invalid(_("Object from which is dependent must be in the same Complex, Array, Fieldset or Form."))
 
                 dep_path = "/".join(dep.getPhysicalPath())
-                # check that self isn't dependent from itself
-                if dep_path == self_path:
-                    raise Invalid(_("Cannot be dependent from itself."))
+                # check that self isn't dependent from itself and that self isn't dependent from a child (in case of an Array, Fieldset, Complex)
+                if dep_path == self_path or (self_path != "" and dep_path.startswith(self_path)):
+                    raise Invalid(_("Cannot be dependent from itself or a child form itself."))
 
     connection_type = schema.Bool(title=_('The dependencies have an AND-connection (default: (inklusive) OR). '
                                           'This option is ignored if less than two dependencies are given.'),
