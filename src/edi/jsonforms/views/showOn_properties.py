@@ -45,7 +45,6 @@ def create_rule_for_single_select_option(scope, title):
     return rule
 
 def create_rule_for_multi_select_option(scope, title):
-    #import pdb; pdb.set_trace()
     rule = {
         "type": "exists",
         "array":{
@@ -154,7 +153,6 @@ def create_rule(scope, object):
 
 def create_showon_properties(child, lookup_scopes):
     dependencies = child.dependencies
-    # die doppelabhängige frage nicht auftaucht, wenn bei selection field 1 option 234 auswählt, sondern nur dezimal zahl
     if len(dependencies) == 1:
         dep = dependencies[0].to_object
         scope = get_scope(lookup_scopes, dep)

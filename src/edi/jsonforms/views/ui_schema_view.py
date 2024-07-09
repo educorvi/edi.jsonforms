@@ -4,6 +4,7 @@ from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
 
+from edi.jsonforms import _
 from edi.jsonforms.views.common import possibly_required_types, create_id
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 
@@ -34,7 +35,7 @@ class UiSchemaView(BrowserView):
                 {
                     "type": "Button",
                     "buttonType": "submit",
-                    "text": "Submit",
+                    "text": _("Submit"),
                     "options": {
                         "variant": "primary"
                     }
@@ -42,7 +43,7 @@ class UiSchemaView(BrowserView):
                 {
                     "type": "Button",
                     "buttonType": "reset",
-                    "text": "Reset this form",
+                    "text": _("Reset this form"),
                     "options": {
                         "variant": "danger"
                     }
@@ -143,19 +144,48 @@ class UiSchemaView(BrowserView):
         # save scope in lookup_scopes
         array_id = array.id + array.UID()
         array_scope = scope + array_id
-        self.lookup_scopes[array_id] = array_scope
+        # self.lookup_scopes[array_id] = array_scope
 
-        return self.create_group(array, array_scope + '/properties/')
+        #return self.create_group(array, array_scope + '/properties/')
+        array_schema = {
+            'type': 'Control',
+            'scope': array_scope,
+            'options': {
+                'childUiSchema': {
+                    'type': 'Control',
+                    'scope': array_scope + '/items',
+                    'options': {
+                        'placeholder': _('Enter an array element'),
+                        'label': False
+                    },
+                    'elements': []
+                }
+            }
+        }
+
+        children = array.getFolderContents()
+        for child in children:
+            child_object = child.getObject()
+
+            # add children to the schema
+            array_schema['options']['childUiSchema']['elements'].append(self.get_schema_for_child(child_object, array_scope + '/items/'))
+
+        return array_schema
 
     def get_schema_for_object(self, complex, scope):
         # save scope in lookup_scopes
         complex_id = complex.id + complex.UID()
         complex_scope = scope + complex_id
-        self.lookup_scopes[complex_id] = complex_scope
+        # self.lookup_scopes[complex_id] = complex_scope
 
         return self.create_group(complex, complex_scope + '/properties/')
 
     def get_schema_for_fieldset(self, fieldset, scope):
+        # save scope in lookup_scopes
+        # fieldset_id = fieldset.id + fieldset.UID()
+        # fieldset_scope = scope + fieldset_id
+        # self.lookup_scopes[fieldset_id] = fieldset_scope
+
         return self.create_group(fieldset, scope)
 
 
