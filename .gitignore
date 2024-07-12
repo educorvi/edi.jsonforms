@@ -22,6 +22,11 @@ parts/
 dist/*
 test.plone_addon/
 var/
+.vscode/
+.tox/
+reports/
+venv/
+*/static/js/old/
 # files
 .installed.cfg
 .mr.developer.cfg
@@ -33,8 +38,4 @@ output.xml
 pip-selfcheck.json
 pyvenv.cfg
 report.html
-.vscode/
-.tox/
-reports/
-venv/
 # excludes

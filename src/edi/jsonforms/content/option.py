@@ -14,13 +14,6 @@ from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from edi.jsonforms import _
 
 
-field_types = [
-    SimpleTerm('text', 'text', _('Textline')),
-    SimpleTerm('textarea', 'textarea', _('Textarea')),
-    SimpleTerm('number', 'number', _('Number'))
-]
-Field_types = SimpleVocabulary(field_types)
-
 class IOption(model.Schema):
     """ Marker interface and Dexterity Python Schema for Option
     """

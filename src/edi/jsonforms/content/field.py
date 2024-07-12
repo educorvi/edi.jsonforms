@@ -74,7 +74,7 @@ class IField(IDependentExtended):
                                   required=False)
     
     pattern = schema.TextLine(title=_('Regular expression to validate a Textline/-area field.'),
-                              description='Only use this for the answer types Textline and Textarea.',
+                              description=_('Only use this for the answer types Textline and Textarea.'),
                               constraint=check_regex, required=False)
 
     @invariant

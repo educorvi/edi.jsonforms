@@ -17,11 +17,11 @@ upload_answer_types = [
 Upload_answer_types = SimpleVocabulary(upload_answer_types)
 
 possible_file_types = [
-    SimpleTerm('jpg', 'jpg', _('.jpg')),
-    SimpleTerm('png', 'png', _('.png')),
-    SimpleTerm('pdf', 'pdf', _('.pdf')),
-    SimpleTerm('gif', 'gif', _('.gif')),
-    SimpleTerm('docx', 'docx', _('.docx'))
+    SimpleTerm('jpg', 'jpg', '.jpg'),
+    SimpleTerm('png', 'png', '.png'),
+    SimpleTerm('pdf', 'pdf', '.pdf'),
+    SimpleTerm('gif', 'gif', '.gif'),
+    SimpleTerm('docx', 'docx', '.docx')
 ]
 Possible_file_types = SimpleVocabulary(possible_file_types)
 
