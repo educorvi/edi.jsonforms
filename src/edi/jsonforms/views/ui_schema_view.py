@@ -162,7 +162,9 @@ class UiSchemaView(BrowserView):
         }
 
         if array.dependencies:
-            array_schema['showOn'] = create_showon_properties(array, self.lookup_scopes)
+            showOn = create_showon_properties(array, self.lookup_scopes)
+            if showOn != {}:
+                array_schema['showOn'] = showOn
 
         children = array.getFolderContents()
         for child in children:
@@ -201,7 +203,9 @@ class UiSchemaView(BrowserView):
 
         # add showOn dependencies
         if child.dependencies:
-            base_schema['showOn'] = create_showon_properties(child, self.lookup_scopes)
+            showOn = create_showon_properties(child, self.lookup_scopes)
+            if showOn != {}:
+                base_schema['showOn'] = showOn
 
         return base_schema
 
@@ -212,7 +216,9 @@ class UiSchemaView(BrowserView):
         }
 
         if group.dependencies:
-            group_schema['showOn'] = create_showon_properties(group, self.lookup_scopes)
+            showOn = create_showon_properties(group, self.lookup_scopes)
+            if showOn != {}:
+                group_schema['showOn'] = showOn
 
         group_schema['elements'] = []
         children = group.getFolderContents()

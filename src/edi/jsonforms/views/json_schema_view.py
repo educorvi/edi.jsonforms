@@ -211,27 +211,31 @@ def add_interninformation(schema, child):
 def add_dependent_required(schema, child_object, child_id):
     dependencies = child_object.dependencies
     for dep in dependencies:
-        dep = dep.to_object
-        dep_id = create_id(dep)
-        if dep.portal_type == 'Option':
-            selection_parent = dep.aq_parent
-            if_then = {
-                'if': {
-                    'properties': {
-                        create_id(selection_parent): {'const': dep.title}
+        try:
+            dep = dep.to_object
+            dep_id = create_id(dep)
+            if dep.portal_type == 'Option':
+                selection_parent = dep.aq_parent
+                if_then = {
+                    'if': {
+                        'properties': {
+                            create_id(selection_parent): {'const': dep.title}
+                        }
+                    },
+                    'then': {
+                        'required': child_id
                     }
-                },
-                'then': {
-                    'required': child_id
                 }
-            }
-            if 'allOf' in schema:
-                schema['allOf'].append(if_then)
+                if 'allOf' in schema:
+                    schema['allOf'].append(if_then)
+                else:
+                    schema['allOf'] = [if_then]
             else:
-                schema['allOf'] = [if_then]
-        else:
-            if dep_id in schema['dependentRequired']:
-                schema['dependentRequired'][dep_id].append(child_id)
-            else:
-                schema['dependentRequired'][dep_id] = [child_id]
+                if dep_id in schema['dependentRequired']:
+                    schema['dependentRequired'][dep_id].append(child_id)
+                else:
+                    schema['dependentRequired'][dep_id] = [child_id]
+        except:
+            # dependency got deleted, plone error
+            continue
     return schema

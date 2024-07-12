@@ -154,12 +154,15 @@ def create_rule(scope, object):
 def create_showon_properties(child, lookup_scopes):
     dependencies = child.dependencies
     if len(dependencies) == 1:
-        dep = dependencies[0].to_object
-        scope = get_scope(lookup_scopes, dep)
-        showOn = {
-            'id': 'ritaRule-' + create_id(child),
-            'rule': create_rule(scope, dep)
-        }
+        try:
+            dep = dependencies[0].to_object
+            scope = get_scope(lookup_scopes, dep)
+            showOn = {
+                'id': 'ritaRule-' + create_id(child),
+                'rule': create_rule(scope, dep)
+            }
+        except:
+            return {}
     else:
         conn = 'or'
         if child.connection_type:
@@ -174,10 +177,22 @@ def create_showon_properties(child, lookup_scopes):
         }
 
         for dep in dependencies:
-            dep = dep.to_object
-            scope = get_scope(lookup_scopes, dep)
-            dep_rule = create_rule(scope, dep)
+            try:
+                dep = dep.to_object
+                scope = get_scope(lookup_scopes, dep)
+                dep_rule = create_rule(scope, dep)
 
-            showOn['rule']['arguments'].append(dep_rule)
+                showOn['rule']['arguments'].append(dep_rule)
+            except:
+                # dependency got deleted, plone error
+                continue
+
+        # check that arguments isn't empty (would mean every dependency was deleted)
+        if len(showOn['rule']['arguments']) == 0:
+            return {}
+        # only one dependency wasn't deleted, transform list of rules to one rule
+        elif len(showOn['rule']['arguments']) == 1:
+            return {'id': 'ritaRule-' + create_id(child),
+                    'rule': showOn['rule']['arguments']}
 
     return showOn
