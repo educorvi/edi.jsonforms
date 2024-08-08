@@ -19,24 +19,15 @@ msgstr ""
 
 #: ./profiles/default/types/Complex.xml
 msgid "A Complex is used to group fields together that are connected. Unlike normal fieldsets, a complex doesn't only group to enhance clarity and structure but to encapsulate related data or concepts. A Complex (including all contained fields, fieldsets, arrays, ...) can be dependent from the option of another field but a normal fieldset not."
-msgstr ""
-
-
-
+msgstr "Ein Objekt wird genutzt, um Felder zu gruppieren, die in Beziehung stehen. Anders als normale Feldgruppen, gruppiert ein Objekt nicht nur, um die Struktur zu verbessern, sondern kapselt verwandte Daten oder Konzepte. Ein Objekt (inklusive der beinhalteten Felder, Feldgruppen, Arrays, ...) kann abhängig von einem anderen Feld sein, eine normale Feldgruppe nicht."
 
 #: ./profiles/default/types/Field.xml
 msgid "A Field represents a specific data entry point within a Form where users input information. Various types are possible, such as textline, number, email and more."
-msgstr ""
-
-
-
+msgstr "Ein Feld repräsentiert ein spezifisches Eingabefeld innerhalb eines Fragebogens, in das der Nutzer Informationen eingeben kann. Einer von verschiedenen Typen kann ausgewählt werden, wie Textzeile, Dezimalzahl, Email, etc."
 
 #: ./profiles/default/types/Fieldset.xml
 msgid "A Fieldset is used to logically group fields inside a Form, allowing users to organize related fields together. By encapsulating fields within a fieldset, users can enhance the clarity and structure of their questionnaires or forms. Fieldsets provide a means to categorize and visually organize fields, improving the usability."
-msgstr ""
-
-
-
+msgstr "Eine Feldgruppe wird verwendet, um Felder innerhalb eines Fragebogens zu gruppieren und verwandte Felder zu ordnen. Durch die Kapselung / Kategorisierung der Felder kann die Struktur des Fragebogens oder Formulars visuell verbessert werden."
 
 #: ./content/field.py:90
 msgid "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
@@ -44,10 +35,7 @@ msgstr "Ein Platzhalter ist nur möglich, wenn der Antworttyp einer der folgende
 
 #: ./profiles/default/types/SelectionField.xml
 msgid "A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible."
-msgstr ""
-
-
-
+msgstr "Ein Auswahlfeld bietet dem Nutzer eine Reihe von Antwortmöglichkeiten, aus denen er auswählen kann. Die Optionen sind vordefinierte Werte und können als Radioboxen, Checkboxen oder Dropdown-Listen angezeigt werden."
 
 #: ./content/upload_field.py:43
 msgid "Accepted file types for file upload"
@@ -64,25 +52,15 @@ msgstr "Erweiterte Optionen"
 
 #: ./profiles/default/types/Array.xml
 msgid "An Array is a structured element that allows the repeated entry of related information by providing a template for a set of fields. It allows users to dynamically add additional sets of the same fields as needed. Arrays are particularly useful for capturing repetitive data entries, such as multiple contact or items in a list. An Array can be dependent from another field."
-msgstr ""
-
-
-
-
+msgstr "Ein Array ist ein strukturiertes Element, das die wiederholte Eingabe verwandter Informationen ermöglicht, indem es ein Template für eine Reihe von Feldern bietet. Es erlaubt dem Nutzer dynamisch die Anzahl der Array-Elemente, die jeweils gleich aufgebaut sind, auszuwählen. Arrays sind besonders nützlich, um wiederholte Daten zu speichern, z. B. mehrere Kontaktinformationen oder Elemente einer Liste. Arrays können von anderen Feldern abhängen."
 
 #: ./profiles/default/types/Option.xml
 msgid "An Option represents a specific choice available to users within a Form. Options define the predefined values that users can select from, such as specific items, categories, or responses."
-msgstr ""
-
-
-
+msgstr "Eine Option repräsentiert eine spezifische Auswahlmöglichkeit. Über sie kann ein Wert vordefiniert werden, wie Kategorien oder Antwortmöglichkeiten, die der Nutzer auswählen kann."
 
 #: ./profiles/default/types/Array.xml
 msgid "Array"
-msgstr ""
-
-
-
+msgstr "Array"
 
 #: ./content/common.py:88
 msgid "Cannot be dependent from itself or a child from itself."
@@ -104,10 +82,7 @@ msgstr "Auswahl des Antworttypen"
 
 #: ./profiles/default/types/Complex.xml
 msgid "Complex"
-msgstr ""
-
-
-
+msgstr "Objekt"
 
 #: ./content/field.py:25
 msgid "Date"
@@ -137,10 +112,7 @@ msgstr "Beschreibung des Feldes / der Fragestellung"
 #: ./profiles/default/types/Complex.xml
 #: ./profiles/default/types/Field.xml
 msgid "Edit"
-msgstr ""
-
-
-
+msgstr "Bearbeiten"
 
 #: ./content/field.py:24
 msgid "Email"
@@ -152,17 +124,11 @@ msgstr "Geben Sie ein Array-Element an"
 
 #: ./profiles/default/types/Field.xml
 msgid "Field"
-msgstr ""
-
-
-
+msgstr "Feld"
 
 #: ./profiles/default/types/Fieldset.xml
 msgid "Fieldset"
-msgstr ""
-
-
-
+msgstr "Feldgruppe"
 
 #: ./content/upload_field.py:15
 msgid "File upload (multi-upload)"
@@ -182,10 +148,7 @@ msgstr "Für eine Dezimal-/Ganzzahl ist dies der minimale Wert, den sie haben mu
 
 #: ./profiles/default/types/Form.xml
 msgid "Form"
-msgstr ""
-
-
-
+msgstr "Fragebogen"
 
 #: ./content/common.py:120
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
@@ -205,17 +168,11 @@ msgstr "Wenn dieses Feld (oder diese Feldgruppe) nur basierend auf der Antwort a
 
 #: ./profiles/default/types/UploadField.xml
 msgid "In an UploadField an user can upload one or multiple files."
-msgstr ""
-
-
-
+msgstr "In einem Upload-Feld können ein oder mehrere Dateien hochgeladen werden."
 
 #: ./configure.zcml:29
 msgid "Installs the edi.jsonforms add-on."
-msgstr ""
-
-
-
+msgstr "Installiert das edi.jsonforms Addon."
 
 #: ./views/json_schema_view.pt:9
 msgid "JSON-Schema"
@@ -255,10 +212,7 @@ msgstr "Diese Option gilt nur für die Antworttypen Textzeile/-feld, Passwort, T
 
 #: ./profiles/default/types/Option.xml
 msgid "Option"
-msgstr ""
-
-
-
+msgstr "Option"
 
 #: ./content/common.py:20
 msgid "Optional"
@@ -303,10 +257,7 @@ msgstr "Auswahl zwischen optionalem und Pflichtfeld"
 
 #: ./profiles/default/types/SelectionField.xml
 msgid "SelectionField"
-msgstr ""
-
-
-
+msgstr "Auswahlfeld"
 
 #: ./views/ui_schema_view.py:38
 msgid "Submit"
@@ -319,7 +270,7 @@ msgstr "Telefonnummer"
 #: ./content/field.py:20
 #: ./content/option.py:19
 msgid "Textarea"
-msgstr Textfeld"
+msgstr "Textfeld"
 
 #: ./content/field.py:19
 #: ./content/option.py:18
@@ -328,10 +279,7 @@ msgstr "Textzeile"
 
 #: ./profiles/default/types/Form.xml
 msgid "The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets."
-msgstr ""
-
-
-
+msgstr "Der Fragebogen ermöglicht es Felder / Fragestellungen zu erstellen und in Feldgruppen, Arrays oder Objekten zu organisieren. "
 
 #: ./content/common.py:90
 msgid "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
@@ -363,10 +311,7 @@ msgstr "Unformatierte interne Information für das JSON-Schema"
 
 #: ./configure.zcml:38
 msgid "Uninstalls the edi.jsonforms add-on."
-msgstr ""
-
-
-
+msgstr "Deinstalliert das edi.jsonforms Addon."
 
 #: ./content/field.py:96
 msgid "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
@@ -378,19 +323,13 @@ msgstr "Einheit der Antwort"
 
 #: ./profiles/default/types/UploadField.xml
 msgid "UploadField"
-msgstr ""
-
-
-
+msgstr "Upload-Feld"
 
 #: ./profiles/default/types/Array.xml
 #: ./profiles/default/types/Complex.xml
 #: ./profiles/default/types/Field.xml
 msgid "View"
-msgstr ""
-
-
-
+msgstr "View"
 
 #: ./content/field.py:29
 msgid "Whole number"
@@ -398,11 +337,8 @@ msgstr "Ganzzahl"
 
 #: ./configure.zcml:29
 msgid "edi.jsonforms"
-msgstr ""
-
-
-
+msgstr "edi.jsonforms"
 
 #: ./configure.zcml:38
 msgid "edi.jsonforms (uninstall)"
-msgstr ""
+msgstr "edi.jsonforms (deinstallieren)"
