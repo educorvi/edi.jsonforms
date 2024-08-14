@@ -23,10 +23,10 @@ class ViewsIntegrationTest(unittest.TestCase):
         setUpTests(self)
 
     def test_json_schema_view_is_registered(self):
-        test_json_schema_view_is_registered(self, 'json-schema-view')
+        test_json_schema_view_is_registered(self, "json-schema-view")
 
     def test_json_schema_view_not_matching_interface(self):
-        test_json_schema_view_not_matching_interface(self, 'json-schema-view')
+        test_json_schema_view_not_matching_interface(self, "json-schema-view")
 
 class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
 
@@ -36,11 +36,11 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        api.content.create(self.portal, 'Form', 'Fragebogen')
+        api.content.create(self.portal, "Form", "Fragebogen")
 
     def test_plain_form(self):
         view = api.content.get_view(
-            name='json-schema-view',
+            name="json-schema-view",
             context=self.portal['Fragebogen'],
             request=self.request,
         )
@@ -50,7 +50,7 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
         self.portal['Fragebogen'].title = "A Title"
         self.portal['Fragebogen'].description = "A Description"
         view = api.content.get_view(
-            name='json-schema-view',
+            name="json-schema-view",
             context=self.portal['Fragebogen'],
             request=self.request,
         )
@@ -62,19 +62,20 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
     field = None
     view = None
 
-    def load_field_schema(self):
-        return json.loads(self.view())['properties']
+    def _test_field_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(str(computed_schema), str(ref_schema))
 
     def setUp(self):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        form = api.content.create(self.portal, 'Form', 'Fragebogen')
-        self.field = api.content.create(type='Field', title='a field', container=form)
+        form = api.content.create(self.portal, "Form", "Fragebogen")
+        self.field = api.content.create(type="Field", title="a field", container=form)
         # field_id = str(field.id)
         # field_uid = str(field.UID())
         self.view = api.content.get_view(
-            name='json-schema-view',
+            name="json-schema-view",
             context=self.portal['Fragebogen'],
             request=self.request,
         )
@@ -83,55 +84,107 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         # should not change the schema
         self.field.placeholder = "a placeholder"
 
-        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string"}}
-        self.assertEqual(str(computed_schema), str(ref_schema))
+        self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
-        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "minLength": 3}}
-        self.assertEqual(str(computed_schema), str(ref_schema))
+        self._test_field_schema(ref_schema)
 
         self.field.minimum = None
         self.field.maximum = 5
-        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "maxLength": 5}}
-        self.assertEqual(str(computed_schema), str(ref_schema))
+        self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
-        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "minLength": 3, "maxLength": 5}}
-        self.assertEqual(str(computed_schema), str(ref_schema))
+        self._test_field_schema(ref_schema)
+
+    def _test_numberlike_fields(self, type):
+        # should not change the schema
+        self.field.unit = "a unit"
+
+        ref_schema = {create_id(self.field): {"title": "a field", "type": type}}
+        self._test_field_schema(ref_schema)
+
+        self.field.minimum = 3
+        ref_schema = {create_id(self.field): {"title": "a field", "type": type, "minimum": 3}}
+        self._test_field_schema(ref_schema)
+
+        self.field.minimum = None
+        self.field.maximum = 5
+        ref_schema = {create_id(self.field): {"title": "a field", "type": type, "maximum": 5}}
+        self._test_field_schema(ref_schema)
+
+        self.field.minimum = 3
+        ref_schema = {create_id(self.field): {"title": "a field", "type": type, "minimum": 3, "maximum": 5}}
+        self._test_field_schema(ref_schema)
+
 
     def test_text_field(self):
-        self.field.answer_type = 'text'
+        self.field.answer_type = "text"
         self._test_textlike_fields()
 
     def test_textarea_field(self):
-        self.field.answer_type = 'textarea'
+        self.field.answer_type = "textarea"
         self._test_textlike_fields()
 
     def test_password_field(self):
-        self.field.answer_type = 'password'
+        self.field.answer_type = "password"
         self._test_textlike_fields()
 
     def test_tel_field(self):
-        self.field.answer_type = 'tel'
+        self.field.answer_type = "tel"
         self.field.placeholder = "a placeholder phone number"   # should not change the schema
 
-        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"}}
-        self.assertEqual(str(computed_schema), str(ref_schema))
+        self._test_field_schema(ref_schema)
 
     def test_url_field(self):
-        self.field.answer_type = 'url'
-        self.field.placeholder = 'a placeholder url'        # should not change the schema
+        self.field.answer_type = "url"
+        self.field.placeholder = "a placeholder url"        # should not change the schema
 
-        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "hostname"}}
-        self.assertEqual(str(computed_schema), str(ref_schema))
+        self._test_field_schema(ref_schema)
 
+    def test_email_field(self):
+        self.field.answer_type = "email"
+        self.field.placeholder = "a placeholder email"        # should not change the schema
 
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "email"}}
+        self._test_field_schema(ref_schema)
+
+    def test_date_field(self):
+        self.field.answer_type = "date"
+        
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "date"}}
+        self._test_field_schema(ref_schema)
+
+    def test_datetimelocal_field(self):
+        self.field.answer_type = "datetime-local"
+
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "date-time"}}
+        self._test_field_schema(ref_schema)
+
+    def test_time_field(self):
+        self.field.answer_type = "time"
+
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "time"}}
+        self._test_field_schema(ref_schema)
+
+    def test_number_field(self):
+        self.field.answer_type = "number"
+        self._test_numberlike_fields("number")
+
+    def test_integer_field(self):
+        self.field.answer_type = "integer"
+        self._test_numberlike_fields("integer")
+
+    def test_boolean_field(self):
+        self.field.answer_type = "boolean"
+
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "boolean"}}
+        self._test_field_schema(ref_schema)
 
 
 
