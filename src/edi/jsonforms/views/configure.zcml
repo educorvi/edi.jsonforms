@@ -8,7 +8,7 @@
 
   <browser:page
     name="form-view"
-    for="Products.CMFCore.interfaces.IFolderish"
+    for="edi.jsonforms.content.form.IForm"
     class=".form_view.FormView"
     template="form_view.pt"
     permission="zope2.View"
@@ -16,14 +16,14 @@
 
   <browser:page
     name="ui-schema-view"
-    for="Products.CMFCore.interfaces.IFolderish"
+    for="edi.jsonforms.content.form.IForm"
     class=".ui_schema_view.UiSchemaView"
     permission="zope2.View"
     />
 
   <browser:page
     name="json-schema-view"
-    for="Products.CMFCore.interfaces.IFolderish"
+    for="edi.jsonforms.content.form.IForm"
     class=".json_schema_view.JsonSchemaView"
     permission="zope2.View"
     />
