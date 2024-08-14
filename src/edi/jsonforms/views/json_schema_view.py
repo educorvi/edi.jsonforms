@@ -175,7 +175,7 @@ class JsonSchemaView(BrowserView):
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if child_object.dependencies_object is not None:
+                if child_object.dependencies is not None:
                     complex_schema = add_dependent_required(complex_schema, child_object, child_id)
                 else:
                     complex_schema['required'].append(child_id)

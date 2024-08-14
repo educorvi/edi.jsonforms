@@ -153,7 +153,6 @@ class UiSchemaView(BrowserView):
                     'type': 'Control',
                     'scope': array_scope + '/items',
                     'options': {
-                        'placeholder': _('Enter an array element'),
                         'label': False
                     },
                     'elements': []
