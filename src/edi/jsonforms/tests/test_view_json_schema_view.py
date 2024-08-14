@@ -60,6 +60,10 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     field = None
+    view = None
+
+    def load_field_schema(self):
+        return json.loads(self.view())['properties']
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -69,33 +73,67 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         self.field = api.content.create(type='Field', title='a field', container=form)
         # field_id = str(field.id)
         # field_uid = str(field.UID())
-
-    def test_text_field(self):
-        view = api.content.get_view(
+        self.view = api.content.get_view(
             name='json-schema-view',
             context=self.portal['Fragebogen'],
             request=self.request,
         )
-        computed_schema = json.loads(view())['properties']
+
+    def _test_textlike_fields(self):
+        # should not change the schema
+        self.field.placeholder = "a placeholder"
+
+        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string"}}
         self.assertEqual(str(computed_schema), str(ref_schema))
 
         self.field.minimum = 3
-        computed_schema = json.loads(view())['properties']
+        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "minLength": 3}}
         self.assertEqual(str(computed_schema), str(ref_schema))
 
         self.field.minimum = None
         self.field.maximum = 5
-        computed_schema = json.loads(view())['properties']
+        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "maxLength": 5}}
         self.assertEqual(str(computed_schema), str(ref_schema))
 
         self.field.minimum = 3
-        print(view())
-        computed_schema = json.loads(view())['properties']
+        computed_schema = self.load_field_schema()
         ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "minLength": 3, "maxLength": 5}}
         self.assertEqual(str(computed_schema), str(ref_schema))
+
+    def test_text_field(self):
+        self.field.answer_type = 'text'
+        self._test_textlike_fields()
+
+    def test_textarea_field(self):
+        self.field.answer_type = 'textarea'
+        self._test_textlike_fields()
+
+    def test_password_field(self):
+        self.field.answer_type = 'password'
+        self._test_textlike_fields()
+
+    def test_tel_field(self):
+        self.field.answer_type = 'tel'
+        self.field.placeholder = "a placeholder phone number"   # should not change the schema
+
+        computed_schema = self.load_field_schema()
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"}}
+        self.assertEqual(str(computed_schema), str(ref_schema))
+
+    def test_url_field(self):
+        self.field.answer_type = 'url'
+        self.field.placeholder = 'a placeholder url'        # should not change the schema
+
+        computed_schema = self.load_field_schema()
+        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "hostname"}}
+        self.assertEqual(str(computed_schema), str(ref_schema))
+
+
+
+
 
 
 

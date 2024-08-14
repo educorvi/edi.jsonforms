@@ -70,14 +70,12 @@ class JsonSchemaView(BrowserView):
     def get_schema_for_field(self, field):
         field_schema = create_base_schema__field({}, field)
         answer_type = field.answer_type
-        if answer_type in ['text', 'textarea']:
+        if answer_type in ['text', 'textarea', 'password']:
             field_schema['type'] = 'string'
             if field.minimum:
                 field_schema['minLength'] = field.minimum
             if field.maximum:
                 field_schema['maxLength'] = field.maximum
-        elif answer_type == 'password':
-            field_schema['type'] = 'string'
         elif answer_type == 'tel':
             field_schema['type'] = 'string'
             field_schema['pattern'] = '^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}\)?)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$'
