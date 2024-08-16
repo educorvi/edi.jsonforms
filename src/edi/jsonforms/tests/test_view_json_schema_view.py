@@ -11,6 +11,7 @@ import json
 import unittest
 
 from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp as setUpTests
+from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.views.common import create_id
 
 
@@ -64,21 +65,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     def _test_field_schema(self, ref_schema):
         computed_schema = json.loads(self.view())['properties']
-        self.assertEqual(str(computed_schema), str(ref_schema))
-
-    def setUp(self):
-        self.portal = self.layer['portal']
-        self.request = self.layer['request']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        form = api.content.create(self.portal, "Form", "Fragebogen")
-        self.field = api.content.create(type="Field", title="a field", container=form)
-        # field_id = str(field.id)
-        # field_uid = str(field.UID())
-        self.view = api.content.get_view(
-            name="json-schema-view",
-            context=self.portal['Fragebogen'],
-            request=self.request,
-        )
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
 
     def _test_textlike_fields(self):
         # should not change the schema
@@ -119,6 +106,20 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         self.field.minimum = 3
         ref_schema = {create_id(self.field): {"title": "a field", "type": type, "minimum": 3, "maximum": 5}}
         self._test_field_schema(ref_schema)
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.request = self.layer['request']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        form = api.content.create(self.portal, "Form", "Fragebogen")
+        self.field = api.content.create(type="Field", title="a field", container=form)
+        # field_id = str(field.id)
+        # field_uid = str(field.UID())
+        self.view = api.content.get_view(
+            name="json-schema-view",
+            context=self.portal['Fragebogen'],
+            request=self.request,
+        )
 
 
     def test_text_field(self):
@@ -185,6 +186,66 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
         ref_schema = {create_id(self.field): {"title": "a field", "type": "boolean"}}
         self._test_field_schema(ref_schema)
+
+    def test_additional_attributes(self):
+        # should not change the schema
+        self.field.user_helptext = "a tipp"
+        field_id = create_id(self.field)
+
+        for type in Answer_types:
+            ref_schema = {"title": "a field", "type": "string"}
+            self.field.answer_type = type.value
+
+            if type.value == "tel":
+                ref_schema["pattern"] = "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"
+            elif type.value == "url":
+                ref_schema["format"] = "hostname"
+            elif type.value == "email":
+                ref_schema["format"] = "email"
+            elif type.value == "date":
+                ref_schema["format"] = "date"
+            elif type.value == "datetime-local":
+                ref_schema["format"] = "date-time"
+            elif type.value == "time":
+                ref_schema["format"] = "time"
+            elif type.value == "number":
+                ref_schema["type"] = "number"
+            elif type.value == "integer":
+                ref_schema["type"] = "integer"
+            elif type.value in "boolean":
+                ref_schema["type"] = "boolean"
+            elif type.value not in ["text", "textarea", "password"]:
+                assert False
+
+            ref_schema = {field_id: ref_schema}
+
+            self.field.description = "a description"
+            ref_schema[field_id]["description"] = "a description"
+            self._test_field_schema(ref_schema)
+
+            self.field.intern_information = "an extra info"
+            ref_schema[field_id]["comment"] = "an extra info"
+            self._test_field_schema(ref_schema)
+
+            self.field.description = None
+            del ref_schema[field_id]['description']
+            self._test_field_schema(ref_schema)
+
+            self.field.intern_information = None
+
+
+class ViewsJsonSchemaFormRequiredTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    view = None
+    form = None
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.request = self.layer['request']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.form = api.content.create(self.portal, "Form", "Fragebogen")
+        self.field = api.content.create(type="Field", title="a field", container=self.form)
+
 
 
 
