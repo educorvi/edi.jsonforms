@@ -6,7 +6,11 @@ import json
 
 from edi.jsonforms.views.common import possibly_required_types, create_id
 
-
+def check_for_dependencies(child_object):
+    if child_object.dependencies is not None and child_object.dependencies != []:
+        return True
+    else:
+        return False
 
 class JsonSchemaView(BrowserView):
     jsonschema = {}
@@ -32,7 +36,7 @@ class JsonSchemaView(BrowserView):
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if child_object.dependencies is not None:
+                if check_for_dependencies(child_object):
                     self.jsonschema = add_dependent_required(self.jsonschema, child_object, child_id)
                 else:
                     self.jsonschema['required'].append(child_id)
@@ -49,7 +53,10 @@ class JsonSchemaView(BrowserView):
             else:
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
                 if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                    schema['required'].append(child_id)
+                    if check_for_dependencies(child_object):
+                        schema = add_dependent_required(schema, child_object, child_id)
+                    else:
+                        schema['required'].append(child_id)
         return schema
 
     def get_schema_for_child(self, child):
@@ -173,7 +180,7 @@ class JsonSchemaView(BrowserView):
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if child_object.dependencies is not None:
+                if check_for_dependencies(child_object):
                     complex_schema = add_dependent_required(complex_schema, child_object, child_id)
                 else:
                     complex_schema['required'].append(child_id)
@@ -208,6 +215,8 @@ def add_interninformation(schema, child):
 
 def add_dependent_required(schema, child_object, child_id):
     dependencies = child_object.dependencies
+    schema_allof_copy = schema['allOf']
+    schema_dependenrequired_copy = schema['dependentRequired']
     for dep in dependencies:
         try:
             dep = dep.to_object
@@ -236,4 +245,8 @@ def add_dependent_required(schema, child_object, child_id):
         except:
             # dependency got deleted, plone error
             continue
+    
+    # Check that at least one dependency wasn't deleted. Otherwise add child_object to required-list of the schema
+    if schema_allof_copy == schema['allOf'] and schema_dependenrequired_copy == schema['dependentRequired']:
+        schema['required'].append(child_id)
     return schema
