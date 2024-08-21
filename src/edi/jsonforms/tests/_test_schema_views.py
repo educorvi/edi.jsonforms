@@ -11,7 +11,7 @@ import unittest
 
 layer = EDI_JSONFORMS_INTEGRATION_TESTING
 
-def setUp(self):
+def setUp_integration_test(self):
     self.portal = self.layer['portal']
     setRoles(self.portal, TEST_USER_ID, ['Manager'])
     api.content.create(self.portal, 'Folder', 'other-folder')
@@ -87,3 +87,20 @@ def test_json_schema_view_not_matching_interface(self, view_name):
             (self.portal['Fragebogen'][self.ids['Feldgruppe']], self.portal.REQUEST),
             name=view_name
         )
+
+
+# set up a test, that needs a form and a view
+def setUp_json_schema_test(self):
+    self.portal = self.layer['portal']
+    self.request = self.layer['request']
+    setRoles(self.portal, TEST_USER_ID, ['Manager'])
+    self.form = api.content.create(self.portal, "Form", "Fragebogen")
+    self.view = api.content.get_view(
+        name="json-schema-view",
+        context=self.portal['Fragebogen'],
+        request=self.request,
+    )
+
+
+def setUp_ui_schema_test(self):
+    pass

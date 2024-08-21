@@ -9,7 +9,7 @@ from zope.interface.interfaces import ComponentLookupError
 
 import unittest
 
-from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp as setUpTests
+from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test
 
 
 class ViewsIntegrationTest(unittest.TestCase):
@@ -18,7 +18,7 @@ class ViewsIntegrationTest(unittest.TestCase):
     ids = {}
 
     def setUp(self):
-        setUpTests(self)
+        setUp_integration_test(self)
 
     def test_form_view_is_registered(self):
         test_json_schema_view_is_registered(self, 'form-view')  
