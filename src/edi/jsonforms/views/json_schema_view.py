@@ -13,9 +13,13 @@ def check_for_dependencies(child_object):
         return False
 
 class JsonSchemaView(BrowserView):
-    jsonschema = {}
+
+    def __init__(self, context, request):
+        super().__init__(context, request)
+        self.jsonschema = {}
 
     def __call__(self):
+        # self.jsonschema = {}
         form = self.context
         self.jsonschema['type'] = 'object'
         self.jsonschema = add_title_and_description(self.jsonschema, form)
@@ -201,6 +205,7 @@ def add_title_and_description(schema, child):
     schema['title'] = child.title
     if child.description:
         schema['description'] = child.description
+
     return schema
 
 # def add_userhelptext(schema, child):

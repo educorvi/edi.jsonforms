@@ -10,6 +10,7 @@ from plone.app.testing import TEST_USER_ID
 import json
 import unittest
 
+from edi.jsonforms.tests._test_required_choice import test_required_choices
 from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
@@ -45,7 +46,9 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
     def test_plain_form2(self):
         self.portal['Fragebogen'].title = "A Title"
         self.portal['Fragebogen'].description = "A Description"
-        self.assertEqual('{"type": "object", "title": "A Title", "properties": {}, "required": [], "dependentRequired": {}, "description": "A Description"}', self.view())
+        ref_schema = {"type": "object", "title": "A Title", "properties": {}, "required": [], "dependentRequired": {}, "description": "A Description"}
+        computed_schema = json.loads(self.view())
+        self.assertEqual(ref_schema, dict(computed_schema))
 
 class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
@@ -172,29 +175,30 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         field_id = create_id(self.field)
 
         for type in Answer_types:
+            type = type.value
             ref_schema = {"title": "a field", "type": "string"}
-            self.field.answer_type = type.value
+            self.field.answer_type = type
 
-            if type.value == "tel":
+            if type == "tel":
                 ref_schema["pattern"] = "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"
-            elif type.value == "url":
+            elif type == "url":
                 ref_schema["format"] = "hostname"
-            elif type.value == "email":
+            elif type == "email":
                 ref_schema["format"] = "email"
-            elif type.value == "date":
+            elif type == "date":
                 ref_schema["format"] = "date"
-            elif type.value == "datetime-local":
+            elif type == "datetime-local":
                 ref_schema["format"] = "date-time"
-            elif type.value == "time":
+            elif type == "time":
                 ref_schema["format"] = "time"
-            elif type.value == "number":
+            elif type == "number":
                 ref_schema["type"] = "number"
-            elif type.value == "integer":
+            elif type == "integer":
                 ref_schema["type"] = "integer"
-            elif type.value in "boolean":
+            elif type in "boolean":
                 ref_schema["type"] = "boolean"
-            elif type.value not in ["text", "textarea", "password"]:
-                assert False
+            else:
+                self.assertIn(type, ["text", "textarea", "password"])
 
             ref_schema = {field_id: ref_schema}
 
@@ -229,82 +233,6 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
-    layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    view = None
-    form = None
-    field = []
-    selectionfield = []
-
-    def _test_required(self, ref_required):
-        computed_schema = {'required': json.loads(self.view())['required']}
-        ref_schema = {'required': ref_required}
-        self.assertEqual(dict(computed_schema), dict(ref_schema))
-
-    def setUp(self):
-        setUp_json_schema_test(self)
-        answer_type = ["text", "number", "boolean"]
-        self.field = []
-        # self.selectionfield = []
-        for i in range(3):
-            self.field.append(api.content.create(type="Field", title="field" + str(i), container=self.form))
-            self.field[i].answer_type = answer_type[i]
-
-            # self.selectionfield.append(api.content.create(type="SelectionField", title="selectionfield" + str(i), container=self.form))
-
-    def test_schema(self):
-        computed_schema = json.loads(self.view())
-        ref_schema = {"type": "object", "title": "", "properties": {create_id(self.field[0]): {"title": "field0", "type": "string"}, create_id(self.field[1]): {"title": "field1", "type": "number"}, create_id(self.field[2]): {"title": "field2", "type": "boolean"}}, "required": [], "dependentRequired": {}}
-
-        self.assertEqual(dict(computed_schema), dict(ref_schema))
-
-    def test_zero_field_required_choice(self):
-        ref_required = []
-        self._test_required(ref_required)
-
-    def test_one_field_required_choice(self):
-        self.field[0].required_choice = "required"
-        ref_required = [create_id(self.field[0])]
-        self._test_required(ref_required)
-
-        self.field[0].required_choice = "optional"
-        self.field[1].required_choice = "required"
-        ref_required = [create_id(self.field[1])]
-        self._test_required(ref_required)
-
-        self.field[1].required_choice = "optional"
-        self.field[2].required_choice = "required"
-        ref_required = [create_id(self.field[2])]
-        self._test_required(ref_required)
-
-    def test_two_fields_required_choices(self):
-        self.field[0].required_choice = "required"
-        self.field[1].required_choice = "required"
-        create_id(self.field[0])
-        create_id(self.field[1])
-        ref_required = [create_id(self.field[0]), create_id(self.field[1])]
-        self._test_required(ref_required)
-
-        self.field[0].required_choice = "optional"
-        self.field[1].required_choice = "required"
-        self.field[2].required_choice = "required"
-        ref_required = [create_id(self.field[1]), create_id(self.field[2])]
-        self._test_required(ref_required)
-
-        self.field[1].required_choice = "optional"
-        self.field[2].required_choice = "required"
-        self.field[0].required_choice = "required"
-        ref_required = [create_id(self.field[0]), create_id(self.field[2])]
-        self._test_required(ref_required)
-
-    def test_three_fields_required_choices(self):
-        self.field[0].required_choice = "required"
-        self.field[1].required_choice = "required"
-        self.field[2].required_choice = "required"
-        ref_required = [create_id(self.field[0]), create_id(self.field[1]), create_id(self.field[2])]
-        self._test_required(ref_required)
-
-
 class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     view = None
@@ -320,7 +248,6 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
         self.selectionfield = api.content.create(type="SelectionField", title="a selectionfield", container=self.form)
 
     def test_radio_selectionfield(self):
-        f_id = create_id(self.selectionfield)
         self.selectionfield.answer_type = "radio"
         ref_schema = {create_id(self.selectionfield): {"title": "a selectionfield", "type": "string", "enum": []}}
         self._test_selectionfield_schema(ref_schema)
@@ -341,10 +268,131 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
         self._test_selectionfield_schema(ref_schema)
 
 
+    def _test_option_enum(self, ref_enum_list, id):
+        computed_list = None
+        type = self.selectionfield.answer_type
+        if type in ["radio", "select"]:
+            computed_list = json.loads(self.view())['properties'][id]['enum']
+        elif type in ["checkbox", "selectmultiple"]:
+            computed_list = json.loads(self.view())['properties'][id]['items']['enum']
+        else:
+            self.assertNotIn(type, ["radio", "select", "checkbox", "selectmultiple"])
+        self.assertEqual(computed_list, ref_enum_list)
+
+    def test_options_selectionfield(self):
+        id = create_id(self.selectionfield)
+
+        def test_options_for_answer_types(ref_enum_list):
+            for type in Selection_answer_types:
+                self.selectionfield.answer_type = type.value
+                self._test_option_enum(ref_enum_list, id)
+
+        test_options_for_answer_types([])
+
+        api.content.create(type="Option", title="option 1", container=self.selectionfield)
+        test_options_for_answer_types(["option 1"])
+        
+        api.content.create(type="Option", title="option 2", container=self.selectionfield)
+        test_options_for_answer_types(["option 1", "option 2"])
+
+        api.content.create(type="Option", title="option 3", container=self.selectionfield)
+        test_options_for_answer_types(["option 1", "option 2", "option 3"])
+        
+    def test_additional_information(self):
+        # should not change the schema
+        self.selectionfield.user_helptext = "a tipp"
+        field_id = create_id(self.selectionfield)
+
+        for type in Selection_answer_types:
+            type = type.value
+            ref_schema = {"title": "a selectionfield"}
+            self.selectionfield.answer_type = type
+
+            if type in ["radio", "select"]:
+                ref_schema['type'] = "string"
+                ref_schema['enum'] = []
+            elif type in ["checkbox", "selectmultiple"]:
+                ref_schema['type'] = "array"
+                ref_schema['items'] = {'enum': [], 'type': 'string'}
+            else:
+                self.assertIn(type, ["radio", "checkbox", "select", "selectmultiple"])
+
+            ref_schema = {field_id: ref_schema}
+
+            self.selectionfield.description = "a description"
+            ref_schema[field_id]["description"] = "a description"
+            self._test_selectionfield_schema(ref_schema)
+
+            self.selectionfield.intern_information = "an extra info"
+            ref_schema[field_id]["comment"] = "an extra info"
+            self._test_selectionfield_schema(ref_schema)
+
+            self.selectionfield.description = None
+            del ref_schema[field_id]['description']
+            self._test_selectionfield_schema(ref_schema)
+
+            self.selectionfield.intern_information = None
 
 
 
-            
+
+class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    view = None
+    form = None
+    field = []        
+
+    def setUp(self):
+        setUp_json_schema_test(self)
+        answer_type = ["text", "number", "boolean"]
+        self.field = []
+        for i in range(3):
+            self.field.append(api.content.create(type="Field", title="field" + str(i), container=self.form))
+            self.field[i].answer_type = answer_type[i]
+
+    def test_schema(self):
+        computed_schema = json.loads(self.view())
+        ref_schema = {"type": "object", "title": "", "properties": {
+            create_id(self.field[0]): {"title": "field0", "type": "string"},
+            create_id(self.field[1]): {"title": "field1", "type": "number"},
+            create_id(self.field[2]): {"title": "field2", "type": "boolean"}},
+            "required": [], "dependentRequired": {}
+        }
+
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def test_required_choices(self):
+        test_required_choices(self)
+
+class ViewsJsonSchemaSelectionfieldsRequiredTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    view = None
+    form = None
+    field = []
+
+    def setUp(self):
+        setUp_json_schema_test(self)
+        selection_answer_type = ["radio", "checkbox", "selectmultiple"]
+        self.field = []
+        for i in range(3):
+            self.field.append(api.content.create(type="SelectionField", title="selectionfield" + str(i), container=self.form))
+            self.field[i].answer_type = selection_answer_type[i]
+
+    def test_schema(self):
+        computed_schema = json.loads(self.view())
+        ref_schema = {"type": "object", "title": "", "properties": {
+            create_id(self.field[0]): {"title": "selectionfield0", "type": "string", "enum": []},
+            create_id(self.field[1]): {"title": "selectionfield1", "type": "array", "items": {"enum": [], "type": "string"}},
+            create_id(self.field[2]): {"title": "selectionfield2", "type": "array", "items": {"enum": [], "type": "string"}}},
+            "required": [], "dependentRequired": {}
+        }
+        print(computed_schema)
+        print(ref_schema)
+
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def test_required_choices(self):
+        test_required_choices(self)
 
 
 class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
