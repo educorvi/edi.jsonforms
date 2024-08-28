@@ -19,7 +19,7 @@ class JsonSchemaView(BrowserView):
         self.jsonschema = {}
 
     def __call__(self):
-        # self.jsonschema = {}
+        self.jsonschema = {}
         form = self.context
         self.jsonschema['type'] = 'object'
         self.jsonschema = add_title_and_description(self.jsonschema, form)

@@ -14,6 +14,7 @@ from edi.jsonforms.tests._test_required_choice import test_required_choices
 from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
+from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
 
 
@@ -333,7 +334,67 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
 
             self.selectionfield.intern_information = None
 
+class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    view = None
+    form = None
+    uploadfield = None
 
+    file_schema = {"title": "an uploadfield", "type": "string", "format": "uri"}
+    filemulti_schema = {"title": "an uploadfield", "type": "array", "items": {"type": "string", "format": "uri"}}
+
+    def _test_uploadfield_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def setUp(self):
+        setUp_json_schema_test(self)
+        self.uploadfield = api.content.create(type="UploadField", title="an uploadfield", container=self.form)
+
+    def test_file_uploadfield(self):
+        self.uploadfield.answer_type = "file"
+        ref_schema = {create_id(self.uploadfield): self.file_schema}
+        self._test_uploadfield_schema(ref_schema)
+
+    def test_filemulti_uploadfield(self):
+        self.uploadfield.answer_type = "file-multi"
+        ref_schema = {create_id(self.uploadfield): self.filemulti_schema}
+        self._test_uploadfield_schema(ref_schema)
+
+    def test_additional_information(self):
+        # should not change the schema
+        self.uploadfield.user_helptext = "a tipp"
+        field_id = create_id(self.uploadfield)
+
+        for type in Upload_answer_types:
+            type = type.value
+            self.uploadfield.answer_type = type
+
+            if type in ["file"]:
+                ref_schema = self.file_schema
+            elif type in ["file-multi"]:
+                ref_schema = self.filemulti_schema
+            else:
+                self.assertIn(type, ["file", "file-multi"])
+
+            ref_schema = {field_id: ref_schema}
+
+            self.uploadfield.description = "a description"
+            ref_schema[field_id]["description"] = "a description"
+            self._test_uploadfield_schema(ref_schema)
+
+            self.uploadfield.intern_information = "an extra info"
+            ref_schema[field_id]["comment"] = "an extra info"
+            #self.view()
+            self._test_uploadfield_schema(ref_schema)
+
+            self.uploadfield.description = None
+            del ref_schema[field_id]['description']
+            self._test_uploadfield_schema(ref_schema)
+
+            self.uploadfield.intern_information = None
+            del ref_schema[field_id]['comment']
+        
 
 
 class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
@@ -386,29 +447,36 @@ class ViewsJsonSchemaSelectionfieldsRequiredTest(unittest.TestCase):
             create_id(self.field[2]): {"title": "selectionfield2", "type": "array", "items": {"enum": [], "type": "string"}}},
             "required": [], "dependentRequired": {}
         }
-        print(computed_schema)
-        print(ref_schema)
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
     def test_required_choices(self):
         test_required_choices(self)
 
+class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    view = None
+    form = None
+    field = []
 
-class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
-    pass
+    def setUp(self):
+        setUp_json_schema_test(self)
+        selection_answer_type = ["file", "file-multi", "file-multi"]
+        self.field = []
+        for i in range(3):
+            self.field.append(api.content.create(type="SelectionField", title="selectionfield" + str(i), container=self.form))
+            self.field[i].answer_type = selection_answer_type[i]
+
+# class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
+#     pass
 
 
-class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
-    pass
+# class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
+#     pass
 
 
-class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
-    pass
-
-
-class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
-    pass
+# class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
+#     pass
 
 
 
