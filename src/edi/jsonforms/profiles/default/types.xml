@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object name="portal_types" meta_type="Plone Types Tool">
+  <property name="title">Controls the available contenttypes in your portal</property>
+  <!--<object name="example_ct" meta_type="Dexterity FTI"/>-->
+  <object name="Form" meta_type="Dexterity FTI"/>
+  <object name="Fieldset" meta_type="Dexterity FTI"/>
+  <object name="Field" meta_type="Dexterity FTI"/>
+  <object name="SelectionField" meta_type="Dexterity FTI"/>
+  <object name="Option" meta_type="Dexterity FTI"/>
+  <object name="Array" meta_type="Dexterity FTI"/>
+  <object name="Complex" meta_type="Dexterity FTI"/>
+  <object name="UploadField" meta_type="Dexterity FTI"/>
+</object>

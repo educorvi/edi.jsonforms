@@ -1,0 +1,32 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="edi.jsonforms">
+
+  -*- extra stuff goes here -*-
+
+  <browser:page
+    name="form-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".form_view.FormView"
+    template="form_view.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="ui-schema-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".ui_schema_view.UiSchemaView"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="json-schema-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".json_schema_view.JsonSchemaView"
+    permission="zope2.View"
+    />
+
+
+</configure>

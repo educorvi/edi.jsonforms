@@ -6,6 +6,54 @@
   <configure zcml:condition="installed AccessControl.security">
   <!-- -*- extra stuff goes here -*- -->
 
+    <permission
+        id="edi.jsonforms.AddUploadField"
+        title="edi.jsonforms: Add UploadField"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddComplex"
+        title="edi.jsonforms: Add Complex"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddArray"
+        title="edi.jsonforms: Add Array"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddOption"
+        title="edi.jsonforms: Add Option"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddSelectionField"
+        title="edi.jsonforms: Add SelectionField"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddField"
+        title="edi.jsonforms: Add Field"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddFieldset"
+        title="edi.jsonforms: Add Fieldset"
+    />
+
+
+    <permission
+        id="edi.jsonforms.AddForm"
+        title="edi.jsonforms: Add Form"
+    />
+
+
 
   </configure>
 

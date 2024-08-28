@@ -1,0 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:domain="edi.jsonforms" metal:use-macro="context/main_template/macros/master">
+  <body>
+    <metal:block fill-slot="content-core">
+      <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-view">
+        <!--json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
+    <vue-json-form json-schema="${view/json_schema_view}" ui-schema="${view/ui_schema_view}" return-data-as-scopes="true"></vue-json-form>-->
+        <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="true"></vue-json-form>
+        <h2>JSON-Schema</h2>
+        <p tal:content="json" />
+        <h2>UI-Schema</h2>
+        <p tal:content="ui" />
+      </div>
+      <!--<script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>-->
+      <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+
+    </metal:block>
+  </body>
+</html>
