@@ -2,6 +2,8 @@
 
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
+
+import copy
 import json
 
 from edi.jsonforms.views.common import possibly_required_types, create_id
@@ -28,6 +30,7 @@ class JsonSchemaView(BrowserView):
         self.jsonschema['properties'] = {}
         self.jsonschema['required'] = []
         self.jsonschema['dependentRequired'] = {}
+        self.jsonschema['allOf'] = []
         for child in children:
             child_object = child.getObject()
             child_id = create_id(child_object)
@@ -220,8 +223,11 @@ def add_interninformation(schema, child):
 
 def add_dependent_required(schema, child_object, child_id):
     dependencies = child_object.dependencies
-    schema_allof_copy = schema['allOf']
-    schema_dependenrequired_copy = schema['dependentRequired']
+
+    # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
+    schema_allof_copy = copy.deepcopy(schema['allOf'])
+    schema_dependentrequired_copy = copy.deepcopy(schema['dependentRequired'])
+
     for dep in dependencies:
         try:
             dep = dep.to_object
@@ -238,20 +244,22 @@ def add_dependent_required(schema, child_object, child_id):
                         'required': child_id
                     }
                 }
-                if 'allOf' in schema:
-                    schema['allOf'].append(if_then)
-                else:
-                    schema['allOf'] = [if_then]
+                # if 'allOf' in schema:
+                #     schema['allOf'].append(if_then)
+                # else:
+                #     schema['allOf'] = [if_then]
+                schema['allOf'].append(if_then)
             else:
                 if dep_id in schema['dependentRequired']:
                     schema['dependentRequired'][dep_id].append(child_id)
                 else:
                     schema['dependentRequired'][dep_id] = [child_id]
         except:
-            # dependency got deleted, plone error
+            # dependency got deleted, plone error, ignore this dependency
             continue
     
-    # Check that at least one dependency wasn't deleted. Otherwise add child_object to required-list of the schema
-    if schema_allof_copy == schema['allOf'] and schema_dependenrequired_copy == schema['dependentRequired']:
+    # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
+    # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
+    if schema_allof_copy == schema['allOf'] and schema_dependentrequired_copy == schema['dependentRequired']:
         schema['required'].append(child_id)
     return schema
