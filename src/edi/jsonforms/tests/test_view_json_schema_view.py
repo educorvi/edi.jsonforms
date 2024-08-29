@@ -42,12 +42,12 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
         setUp_json_schema_test(self)
 
     def test_plain_form(self):
-        self.assertEqual('{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}}', self.view())
+        self.assertEqual('{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}, "allOf": []}', self.view())
 
     def test_plain_form2(self):
         self.portal['Fragebogen'].title = "A Title"
         self.portal['Fragebogen'].description = "A Description"
-        ref_schema = {"type": "object", "title": "A Title", "properties": {}, "required": [], "dependentRequired": {}, "description": "A Description"}
+        ref_schema = {"type": "object", "title": "A Title", "properties": {}, "required": [], "dependentRequired": {}, "allOf": [], "description": "A Description"}
         computed_schema = json.loads(self.view())
         self.assertEqual(ref_schema, dict(computed_schema))
 
@@ -229,7 +229,34 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
             f.answer_type = type.value
             self.field.append(f)
         
-        ref_schema = {"type": "object", "title": "", "properties": {field_id: {"title": "a field", "type": "string"}, create_id(self.field[0]): {"title": "textfield0", "type": "string"}, create_id(self.field[1]): {"title": "textfield1", "type": "string"}, create_id(self.field[2]): {"title": "textareafield0", "type": "string"}, create_id(self.field[3]): {"title": "textareafield1", "type": "string"}, create_id(self.field[4]): {"title": "passwordfield0", "type": "string"}, create_id(self.field[5]): {"title": "passwordfield1", "type": "string"}, create_id(self.field[6]): {"title": "telfield0", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"}, create_id(self.field[7]): {"title": "telfield1", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"}, create_id(self.field[8]): {"title": "urlfield0", "type": "string", "format": "hostname"}, create_id(self.field[9]): {"title": "urlfield1", "type": "string", "format": "hostname"}, create_id(self.field[10]): {"title": "emailfield0", "type": "string", "format": "email"}, create_id(self.field[11]): {"title": "emailfield1", "type": "string", "format": "email"}, create_id(self.field[12]): {"title": "datefield0", "type": "string", "format": "date"}, create_id(self.field[13]): {"title": "datefield1", "type": "string", "format": "date"}, create_id(self.field[14]): {"title": "datetime-localfield0", "type": "string", "format": "date-time"}, create_id(self.field[15]): {"title": "datetime-localfield1", "type": "string", "format": "date-time"}, create_id(self.field[16]): {"title": "timefield0", "type": "string", "format": "time"}, create_id(self.field[17]): {"title": "timefield1", "type": "string", "format": "time"}, create_id(self.field[18]): {"title": "numberfield0", "type": "number"}, create_id(self.field[19]): {"title": "numberfield1", "type": "number"}, create_id(self.field[20]): {"title": "integerfield0", "type": "integer"}, create_id(self.field[21]): {"title": "integerfield1", "type": "integer"}, create_id(self.field[22]): {"title": "booleanfield0", "type": "boolean"}, create_id(self.field[23]): {"title": "booleanfield1", "type": "boolean"}}, "required": [], "dependentRequired": {}}
+        ref_schema = {"type": "object", "title": "",
+                "properties": {
+                    field_id: {"title": "a field", "type": "string"},
+                    create_id(self.field[0]): {"title": "textfield0", "type": "string"},
+                    create_id(self.field[1]): {"title": "textfield1", "type": "string"},
+                    create_id(self.field[2]): {"title": "textareafield0", "type": "string"},
+                    create_id(self.field[3]): {"title": "textareafield1", "type": "string"},
+                    create_id(self.field[4]): {"title": "passwordfield0", "type": "string"},
+                    create_id(self.field[5]): {"title": "passwordfield1", "type": "string"},
+                    create_id(self.field[6]): {"title": "telfield0", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"},
+                    create_id(self.field[7]): {"title": "telfield1", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"},
+                    create_id(self.field[8]): {"title": "urlfield0", "type": "string", "format": "hostname"},
+                    create_id(self.field[9]): {"title": "urlfield1", "type": "string", "format": "hostname"},
+                    create_id(self.field[10]): {"title": "emailfield0", "type": "string", "format": "email"},
+                    create_id(self.field[11]): {"title": "emailfield1", "type": "string", "format": "email"},
+                    create_id(self.field[12]): {"title": "datefield0", "type": "string", "format": "date"},
+                    create_id(self.field[13]): {"title": "datefield1", "type": "string", "format": "date"},
+                    create_id(self.field[14]): {"title": "datetime-localfield0", "type": "string", "format": "date-time"},
+                    create_id(self.field[15]): {"title": "datetime-localfield1", "type": "string", "format": "date-time"},
+                    create_id(self.field[16]): {"title": "timefield0", "type": "string", "format": "time"},
+                    create_id(self.field[17]): {"title": "timefield1", "type": "string", "format": "time"},
+                    create_id(self.field[18]): {"title": "numberfield0", "type": "number"},
+                    create_id(self.field[19]): {"title": "numberfield1", "type": "number"},
+                    create_id(self.field[20]): {"title": "integerfield0", "type": "integer"},
+                    create_id(self.field[21]): {"title": "integerfield1", "type": "integer"},
+                    create_id(self.field[22]): {"title": "booleanfield0", "type": "boolean"},
+                    create_id(self.field[23]): {"title": "booleanfield1", "type": "boolean"}
+                }, "required": [], "dependentRequired": {}, "allOf": []}
 
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
@@ -417,7 +444,7 @@ class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
             create_id(self.field[0]): {"title": "field0", "type": "string"},
             create_id(self.field[1]): {"title": "field1", "type": "number"},
             create_id(self.field[2]): {"title": "field2", "type": "boolean"}},
-            "required": [], "dependentRequired": {}
+            "required": [], "dependentRequired": {}, "allOf": []
         }
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
@@ -445,7 +472,7 @@ class ViewsJsonSchemaSelectionfieldsRequiredTest(unittest.TestCase):
             create_id(self.field[0]): {"title": "selectionfield0", "type": "string", "enum": []},
             create_id(self.field[1]): {"title": "selectionfield1", "type": "array", "items": {"enum": [], "type": "string"}},
             create_id(self.field[2]): {"title": "selectionfield2", "type": "array", "items": {"enum": [], "type": "string"}}},
-            "required": [], "dependentRequired": {}
+            "required": [], "dependentRequired": {}, "allOf": []
         }
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
