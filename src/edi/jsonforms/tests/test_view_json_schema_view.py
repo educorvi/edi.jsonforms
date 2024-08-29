@@ -7,6 +7,7 @@ from plone.app.testing import TEST_USER_ID
 # from zope.component import getMultiAdapter
 # from zope.interface.interfaces import ComponentLookupError
 
+import copy
 import json
 import unittest
 
@@ -104,6 +105,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
     def setUp(self):
         setUp_json_schema_test(self)
         self.field = api.content.create(type="Field", title="a field", container=self.form)
+
 
     def test_text_field(self):
         self.field.answer_type = "text"
@@ -216,6 +218,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
             self._test_field_schema(ref_schema)
 
             self.field.intern_information = None
+            del ref_schema[field_id]['comment']
 
     def test_multiple_fields(self):
         field_id = create_id(self.field)
@@ -511,8 +514,126 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
     def test_required_choices(self):
         test_required_choices(self)
 
-# class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
-#     pass
+
+
+class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    maxDiff = None
+    form = None
+    view = None
+    array = None
+    array_schema = {"type": "array", "title": "an array", "items": {"type": "object", "properties": {}, "required": [], "dependentRequired": {}, "allOf": []}}
+
+    def _test_array_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def setUp(self):
+        setUp_json_schema_test(self)
+        self.array = api.content.create(type="Array", title="an array", container=self.form)
+        print()
+
+    def test_basic_array(self):
+        ref_schema = {create_id(self.array): self.array_schema}
+        self._test_array_schema(ref_schema)
+
+    def test_additional_information(self):
+        array_id = create_id(self.array)
+        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+
+        self.array.description = "a description"
+        ref_schema[array_id]['description'] = "a description"
+        self._test_array_schema(ref_schema)
+
+        self.array.intern_information = "an extra info"
+        ref_schema[array_id]['comment'] = "an extra info"
+        self._test_array_schema(ref_schema)
+
+        self.array.description = None
+        del ref_schema[array_id]['description']
+        self._test_array_schema(ref_schema)
+
+        self.array.intern_information = None
+        del ref_schema[array_id]['comment']
+
+
+    def test_array_with_fields(self):
+        array_id = create_id(self.array)
+        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+
+        child_1 = api.content.create(type="Field", title="a field 1", container=self.array)
+        child_1.answer_type = "text"
+        child1_ref_schema = {'title': 'a field 1', 'type': 'string'}
+        ref_schema[array_id]['items']['properties'][create_id(child_1)] = child1_ref_schema
+        self._test_array_schema(ref_schema)
+
+        child_2 = api.content.create(type="Field", title="a field 2", container=self.array)
+        child_2.answer_type = "email"
+        child2_ref_schema = {"title": "a field 2", "type": "string", "format": "email"}
+        ref_schema[array_id]['items']['properties'][create_id(child_2)] = child2_ref_schema
+        self._test_array_schema(ref_schema)
+
+        child_3 = api.content.create(type="Field", title="a field 3", container=self.array)
+        child_3.answer_type = "number"
+        child3_ref_schema = {"title": "a field 3", "type": "number"}
+        ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
+        self._test_array_schema(ref_schema)
+
+    def test_array_with_selectionfields(self):
+        array_id = create_id(self.array)
+        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+
+        child_1 = api.content.create(type="SelectionField", title="a field 1", container=self.array)
+        child_1.answer_type = "radio"
+        child1_ref_schema = {"title": "a field 1", "type": "string", "enum": []}
+        ref_schema[array_id]['items']['properties'][create_id(child_1)] = child1_ref_schema
+        self._test_array_schema(ref_schema)
+
+        child_2 = api.content.create(type="SelectionField", title="a field 2", container=self.array)
+        child_2.answer_type = "checkbox"
+        child2_ref_schema = {"title": "a field 2", "type": "array", "items": {"enum": [], "type": "string"}}
+        ref_schema[array_id]['items']['properties'][create_id(child_2)] = child2_ref_schema
+        self._test_array_schema(ref_schema)
+
+        child_3 = api.content.create(type="SelectionField", title="a field 3", container=self.array)
+        child_3.answer_type = "select"
+        child3_ref_schema = {"title": "a field 3", "type": "string", "enum": []}
+        ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
+        self._test_array_schema(ref_schema)
+
+        for child in self.array.getFolderContents():
+            child = child.getObject()
+            api.content.create(type="Option", title="yes", container=child)
+            api.content.create(type="Option", title="no", container=child)
+            if 'enum' in ref_schema[array_id]['items']['properties'][create_id(child)]:
+                ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
+            else:
+                ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
+        self._test_array_schema(ref_schema)
+
+    def test_array_with_uploadfields(self):
+        array_id = create_id(self.array)
+        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+
+        child_1 = api.content.create(type="UploadField", title="a field 1", container=self.array)
+        child_1.answer_type = "file"
+        child1_ref_schema = {"title": "a field 1", "type": "string", "format": "uri"}
+        ref_schema[array_id]['items']['properties'][create_id(child_1)] = child1_ref_schema
+        self._test_array_schema(ref_schema)
+
+        child_2 = api.content.create(type="UploadField", title="a field 2", container=self.array)
+        child_2.answer_type = "file-multi"
+        child2_ref_schema = {"title": "a field 2", "type": "array", "items": {"type": "string", "format": "uri"}}
+        ref_schema[array_id]['items']['properties'][create_id(child_2)] = child2_ref_schema
+        self._test_array_schema(ref_schema)
+
+        child_3 = api.content.create(type="UploadField", title="a field 3", container=self.array)
+        child_3.answer_type = "file"
+        child3_ref_schema = {"title": "a field 3", "type": "string", "format": "uri"}
+        ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
+        self._test_array_schema(ref_schema)
+
+    
 
 
 # class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
