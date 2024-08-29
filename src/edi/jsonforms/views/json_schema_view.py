@@ -158,6 +158,7 @@ class JsonSchemaView(BrowserView):
 
     def get_schema_for_array(self, array):
         array_schema = add_title_and_description({'type': 'array'}, array)
+        array_schema = add_interninformation(array_schema, array)
         if array.required_choice == 'required':
             array_schema['minItems'] = 1
         array_schema['items'] = self.get_schema_for_object(array)
@@ -167,12 +168,15 @@ class JsonSchemaView(BrowserView):
         complex_schema = {}
         complex_schema['type'] = 'object'
         if object.portal_type != 'Array':
-            complex_schema['title'] = object.title
-            if object.description:
-                complex_schema['description'] = object.description
+            # complex_schema['title'] = object.title
+            # if object.description:
+            #     complex_schema['description'] = object.description
+            complex_schema = add_title_and_description(complex_schema, object)
+            complex_schema = add_interninformation(complex_schema, object)
         complex_schema['properties'] = {}
         complex_schema['required'] = []
         complex_schema['dependentRequired'] = {}
+        complex_schema['allOf'] = []
 
         children = object.getFolderContents()
         for child in children:
