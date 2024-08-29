@@ -18,6 +18,9 @@ from edi.jsonforms.content.selection_field import Selection_answer_types
 from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
 
+# from edi.jsonforms.tests.reference_schemata import *
+import edi.jsonforms.tests.reference_schemata as reference_schemata
+
 
 
 class ViewsIntegrationTest(unittest.TestCase):
@@ -633,7 +636,42 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
         self._test_array_schema(ref_schema)
 
-    
+    def test_array_with_children(self):
+        array_id = create_id(self.array)
+        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+
+        # Fields
+        for type in Answer_types:
+            type = type.value
+            title = str(type) + "-field-"
+            child = api.content.create(type="Field", title=title, container=self.array)
+            child.answer_type = type
+            child_ref_schema = reference_schemata.get_field_reference_schema(type, title)
+            ref_schema[array_id]['items']['properties'][create_id(child)] = copy.deepcopy(child_ref_schema)
+
+        # SelectionFields
+        for type in Selection_answer_types:
+            type = type.value
+            title = str(type) + "-selectionfield-"
+            child = api.content.create(type="SelectionField", title=title, container=self.array)
+            child.answer_type = type
+            child_ref_schema = reference_schemata.get_selectionfield_reference_schema(type, title)
+            ref_schema[array_id]['items']['properties'][create_id(child)] = copy.deepcopy(child_ref_schema)
+
+            # Options
+            api.content.create(type="Option", title="yes", container=child)
+            api.content.create(type="Option", title="no", container=child)
+            if type in ["radio", "select"]:
+                ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
+            elif type in ["checkbox", "selectmultiple"]:
+                ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
+
+        self._test_array_schema(ref_schema)
+
+
+
+
+        
 
 
 # class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
