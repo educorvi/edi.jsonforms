@@ -488,11 +488,28 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
 
     def setUp(self):
         setUp_json_schema_test(self)
-        selection_answer_type = ["file", "file-multi", "file-multi"]
+        upload_answer_type = ["file", "file-multi", "file-multi"]
         self.field = []
         for i in range(3):
-            self.field.append(api.content.create(type="SelectionField", title="selectionfield" + str(i), container=self.form))
-            self.field[i].answer_type = selection_answer_type[i]
+            self.field.append(api.content.create(type="UploadField", title="uploadfield" + str(i), container=self.form))
+            self.field[i].answer_type = upload_answer_type[i]
+
+
+#  file_schema = {"title": "an uploadfield", "type": "string", "format": "uri"}
+#     filemulti_schema = {"title": "an uploadfield", "type": "array", "items": {"type": "string", "format": "uri"}}
+    def test_schema(self):
+        computed_schema = json.loads(self.view())
+        ref_schema = {"type": "object", "title": "", "properties": {
+            create_id(self.field[0]): {"title": "uploadfield0", "type": "string", "format": "uri"},
+            create_id(self.field[1]): {"title": "uploadfield1", "type": "array", "items": {"type": "string", "format": "uri"}},
+            create_id(self.field[2]): {"title": "uploadfield2", "type": "array", "items": {"type": "string", "format": "uri"}}},
+            "required": [], "dependentRequired": {}, "allOf": []
+        }
+
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def test_required_choices(self):
+        test_required_choices(self)
 
 # class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
 #     pass
