@@ -46,12 +46,15 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
         setUp_json_schema_test(self)
 
     def test_plain_form(self):
-        self.assertEqual('{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}, "allOf": []}', self.view())
+        ref_schema = reference_schemata.get_form_ref_schema("")
+        computed_schema = json.loads(self.view())
+        self.assertEqual(ref_schema, dict(computed_schema))
 
     def test_plain_form2(self):
-        self.portal['Fragebogen'].title = "A Title"
-        self.portal['Fragebogen'].description = "A Description"
-        ref_schema = {"type": "object", "title": "A Title", "properties": {}, "required": [], "dependentRequired": {}, "allOf": [], "description": "A Description"}
+        self.portal['Fragebogen'].title = "a form"
+        self.portal['Fragebogen'].description = "a description"
+        ref_schema = reference_schemata.get_form_ref_schema()
+        ref_schema['description'] = "a description"
         computed_schema = json.loads(self.view())
         self.assertEqual(ref_schema, dict(computed_schema))
 
@@ -65,44 +68,48 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         computed_schema = json.loads(self.view())['properties']
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-    def _test_textlike_fields(self):
+    def _test_textlike_fields(self, type):
         # should not change the schema
         self.field.placeholder = "a placeholder"
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string"}}
+        field_id = create_id(self.field)
+        ref_schema = {field_id: reference_schemata.get_field_ref_schema(type)}
         self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "minLength": 3}}
+        ref_schema[field_id]['minLength'] = 3
         self._test_field_schema(ref_schema)
 
         self.field.minimum = None
         self.field.maximum = 5
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "maxLength": 5}}
+        del ref_schema[field_id]['minLength']
+        ref_schema[field_id]['maxLength'] = 5
         self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "minLength": 3, "maxLength": 5}}
+        ref_schema[field_id]['minLength'] = 3
         self._test_field_schema(ref_schema)
 
     def _test_numberlike_fields(self, type):
         # should not change the schema
         self.field.unit = "a unit"
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": type}}
+        field_id = create_id(self.field)
+        ref_schema = {field_id: reference_schemata.get_field_ref_schema(type)}
         self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
-        ref_schema = {create_id(self.field): {"title": "a field", "type": type, "minimum": 3}}
+        ref_schema[field_id]['minimum'] = 3
         self._test_field_schema(ref_schema)
 
         self.field.minimum = None
         self.field.maximum = 5
-        ref_schema = {create_id(self.field): {"title": "a field", "type": type, "maximum": 5}}
+        del ref_schema[field_id]['minimum']
+        ref_schema[field_id]['maximum'] = 5
         self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
-        ref_schema = {create_id(self.field): {"title": "a field", "type": type, "minimum": 3, "maximum": 5}}
+        ref_schema[field_id]['minimum'] = 3
         self._test_field_schema(ref_schema)
 
     def setUp(self):
@@ -112,53 +119,53 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     def test_text_field(self):
         self.field.answer_type = "text"
-        self._test_textlike_fields()
+        self._test_textlike_fields("text")
 
     def test_textarea_field(self):
         self.field.answer_type = "textarea"
-        self._test_textlike_fields()
+        self._test_textlike_fields("textarea")
 
     def test_password_field(self):
         self.field.answer_type = "password"
-        self._test_textlike_fields()
+        self._test_textlike_fields("password")
 
     def test_tel_field(self):
         self.field.answer_type = "tel"
         self.field.placeholder = "a placeholder phone number"   # should not change the schema
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("tel")}
         self._test_field_schema(ref_schema)
 
     def test_url_field(self):
         self.field.answer_type = "url"
         self.field.placeholder = "a placeholder url"        # should not change the schema
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "hostname"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("url")}
         self._test_field_schema(ref_schema)
 
     def test_email_field(self):
         self.field.answer_type = "email"
         self.field.placeholder = "a placeholder email"        # should not change the schema
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "email"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("email")}
         self._test_field_schema(ref_schema)
 
     def test_date_field(self):
         self.field.answer_type = "date"
         
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "date"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("date")}
         self._test_field_schema(ref_schema)
 
     def test_datetimelocal_field(self):
         self.field.answer_type = "datetime-local"
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "date-time"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("datetime-local")}
         self._test_field_schema(ref_schema)
 
     def test_time_field(self):
         self.field.answer_type = "time"
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "string", "format": "time"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("time")}
         self._test_field_schema(ref_schema)
 
     def test_number_field(self):
@@ -172,7 +179,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
     def test_boolean_field(self):
         self.field.answer_type = "boolean"
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": "boolean"}}
+        ref_schema = {create_id(self.field): reference_schemata.get_field_ref_schema("boolean")}
         self._test_field_schema(ref_schema)
 
     def test_additional_attributes(self):
@@ -182,31 +189,9 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
         for type in Answer_types:
             type = type.value
-            ref_schema = {"title": "a field", "type": "string"}
             self.field.answer_type = type
 
-            if type == "tel":
-                ref_schema["pattern"] = "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"
-            elif type == "url":
-                ref_schema["format"] = "hostname"
-            elif type == "email":
-                ref_schema["format"] = "email"
-            elif type == "date":
-                ref_schema["format"] = "date"
-            elif type == "datetime-local":
-                ref_schema["format"] = "date-time"
-            elif type == "time":
-                ref_schema["format"] = "time"
-            elif type == "number":
-                ref_schema["type"] = "number"
-            elif type == "integer":
-                ref_schema["type"] = "integer"
-            elif type in "boolean":
-                ref_schema["type"] = "boolean"
-            else:
-                self.assertIn(type, ["text", "textarea", "password"])
-
-            ref_schema = {field_id: ref_schema}
+            ref_schema = {field_id: reference_schemata.get_field_ref_schema(type)}
 
             self.field.description = "a description"
             ref_schema[field_id]["description"] = "a description"
@@ -225,44 +210,20 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     def test_multiple_fields(self):
         field_id = create_id(self.field)
+        ref_schema = reference_schemata.get_form_ref_schema("")
+        ref_schema['properties'][create_id(self.field)] = reference_schemata.get_field_ref_schema(self.field.answer_type)
         self.field = []
+        
         for type in Answer_types:
             f = api.content.create(type="Field", title=type.value + "field" + "0", container=self.form)
             f.answer_type = type.value
             self.field.append(f)
+            ref_schema['properties'][create_id(f)] = reference_schemata.get_field_ref_schema(f.answer_type, f.title)
 
             f = api.content.create(type="Field", title=type.value + "field" + "1", container=self.form)
             f.answer_type = type.value
             self.field.append(f)
-        
-        ref_schema = {"type": "object", "title": "",
-                "properties": {
-                    field_id: {"title": "a field", "type": "string"},
-                    create_id(self.field[0]): {"title": "textfield0", "type": "string"},
-                    create_id(self.field[1]): {"title": "textfield1", "type": "string"},
-                    create_id(self.field[2]): {"title": "textareafield0", "type": "string"},
-                    create_id(self.field[3]): {"title": "textareafield1", "type": "string"},
-                    create_id(self.field[4]): {"title": "passwordfield0", "type": "string"},
-                    create_id(self.field[5]): {"title": "passwordfield1", "type": "string"},
-                    create_id(self.field[6]): {"title": "telfield0", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"},
-                    create_id(self.field[7]): {"title": "telfield1", "type": "string", "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"},
-                    create_id(self.field[8]): {"title": "urlfield0", "type": "string", "format": "hostname"},
-                    create_id(self.field[9]): {"title": "urlfield1", "type": "string", "format": "hostname"},
-                    create_id(self.field[10]): {"title": "emailfield0", "type": "string", "format": "email"},
-                    create_id(self.field[11]): {"title": "emailfield1", "type": "string", "format": "email"},
-                    create_id(self.field[12]): {"title": "datefield0", "type": "string", "format": "date"},
-                    create_id(self.field[13]): {"title": "datefield1", "type": "string", "format": "date"},
-                    create_id(self.field[14]): {"title": "datetime-localfield0", "type": "string", "format": "date-time"},
-                    create_id(self.field[15]): {"title": "datetime-localfield1", "type": "string", "format": "date-time"},
-                    create_id(self.field[16]): {"title": "timefield0", "type": "string", "format": "time"},
-                    create_id(self.field[17]): {"title": "timefield1", "type": "string", "format": "time"},
-                    create_id(self.field[18]): {"title": "numberfield0", "type": "number"},
-                    create_id(self.field[19]): {"title": "numberfield1", "type": "number"},
-                    create_id(self.field[20]): {"title": "integerfield0", "type": "integer"},
-                    create_id(self.field[21]): {"title": "integerfield1", "type": "integer"},
-                    create_id(self.field[22]): {"title": "booleanfield0", "type": "boolean"},
-                    create_id(self.field[23]): {"title": "booleanfield1", "type": "boolean"}
-                }, "required": [], "dependentRequired": {}, "allOf": []}
+            ref_schema['properties'][create_id(f)] = reference_schemata.get_field_ref_schema(f.answer_type, f.title)
 
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
@@ -283,22 +244,22 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
 
     def test_radio_selectionfield(self):
         self.selectionfield.answer_type = "radio"
-        ref_schema = {create_id(self.selectionfield): {"title": "a selectionfield", "type": "string", "enum": []}}
+        ref_schema = {create_id(self.selectionfield): reference_schemata.get_selectionfield_ref_schema("radio")}
         self._test_selectionfield_schema(ref_schema)
 
     def test_checkbox_selectionfield(self):
         self.selectionfield.answer_type = "checkbox"
-        ref_schema = {create_id(self.selectionfield): {"title": "a selectionfield", "type": "array", "items": {"enum": [], "type": "string"}}}
+        ref_schema = {create_id(self.selectionfield): reference_schemata.get_selectionfield_ref_schema("checkbox")}
         self._test_selectionfield_schema(ref_schema)
 
     def test_select_selectionfield(self):
         self.selectionfield.answer_type = "select"
-        ref_schema = {create_id(self.selectionfield): {"title": "a selectionfield", "type": "string", "enum": []}}
+        ref_schema = {create_id(self.selectionfield): reference_schemata.get_selectionfield_ref_schema("select")}
         self._test_selectionfield_schema(ref_schema)
 
     def test_selectmultiple_selectionfield(self):
         self.selectionfield.answer_type = "selectmultiple"
-        ref_schema = {create_id(self.selectionfield): {"title": "a selectionfield", "type": "array", "items": {"enum": [], "type": "string"}}}
+        ref_schema = {create_id(self.selectionfield): reference_schemata.get_selectionfield_ref_schema("selectmultiple")}
         self._test_selectionfield_schema(ref_schema)
 
 
@@ -339,19 +300,8 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
 
         for type in Selection_answer_types:
             type = type.value
-            ref_schema = {"title": "a selectionfield"}
             self.selectionfield.answer_type = type
-
-            if type in ["radio", "select"]:
-                ref_schema['type'] = "string"
-                ref_schema['enum'] = []
-            elif type in ["checkbox", "selectmultiple"]:
-                ref_schema['type'] = "array"
-                ref_schema['items'] = {'enum': [], 'type': 'string'}
-            else:
-                self.assertIn(type, ["radio", "checkbox", "select", "selectmultiple"])
-
-            ref_schema = {field_id: ref_schema}
+            ref_schema = {field_id: reference_schemata.get_selectionfield_ref_schema(type)}
 
             self.selectionfield.description = "a description"
             ref_schema[field_id]["description"] = "a description"
@@ -373,9 +323,6 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
     form = None
     uploadfield = None
 
-    file_schema = {"title": "an uploadfield", "type": "string", "format": "uri"}
-    filemulti_schema = {"title": "an uploadfield", "type": "array", "items": {"type": "string", "format": "uri"}}
-
     def _test_uploadfield_schema(self, ref_schema):
         computed_schema = json.loads(self.view())['properties']
         self.assertEqual(dict(computed_schema), dict(ref_schema))
@@ -386,12 +333,12 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
 
     def test_file_uploadfield(self):
         self.uploadfield.answer_type = "file"
-        ref_schema = {create_id(self.uploadfield): self.file_schema}
+        ref_schema = {create_id(self.uploadfield): reference_schemata.get_uploadfield_ref_schema("file")}
         self._test_uploadfield_schema(ref_schema)
 
     def test_filemulti_uploadfield(self):
         self.uploadfield.answer_type = "file-multi"
-        ref_schema = {create_id(self.uploadfield): self.filemulti_schema}
+        ref_schema = {create_id(self.uploadfield): reference_schemata.get_uploadfield_ref_schema("file-multi")}
         self._test_uploadfield_schema(ref_schema)
 
     def test_additional_information(self):
@@ -402,15 +349,7 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
         for type in Upload_answer_types:
             type = type.value
             self.uploadfield.answer_type = type
-
-            if type in ["file"]:
-                ref_schema = self.file_schema
-            elif type in ["file-multi"]:
-                ref_schema = self.filemulti_schema
-            else:
-                self.assertIn(type, ["file", "file-multi"])
-
-            ref_schema = {field_id: ref_schema}
+            ref_schema = {field_id: reference_schemata.get_uploadfield_ref_schema(type)}
 
             self.uploadfield.description = "a description"
             ref_schema[field_id]["description"] = "a description"
@@ -418,7 +357,6 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
 
             self.uploadfield.intern_information = "an extra info"
             ref_schema[field_id]["comment"] = "an extra info"
-            #self.view()
             self._test_uploadfield_schema(ref_schema)
 
             self.uploadfield.description = None
@@ -446,12 +384,9 @@ class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
 
     def test_schema(self):
         computed_schema = json.loads(self.view())
-        ref_schema = {"type": "object", "title": "", "properties": {
-            create_id(self.field[0]): {"title": "field0", "type": "string"},
-            create_id(self.field[1]): {"title": "field1", "type": "number"},
-            create_id(self.field[2]): {"title": "field2", "type": "boolean"}},
-            "required": [], "dependentRequired": {}, "allOf": []
-        }
+        ref_schema = reference_schemata.get_form_ref_schema("")
+        for f in self.field:
+            ref_schema['properties'][create_id(f)] = reference_schemata.get_field_ref_schema(f.answer_type, f.title)
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
@@ -474,12 +409,9 @@ class ViewsJsonSchemaSelectionfieldsRequiredTest(unittest.TestCase):
 
     def test_schema(self):
         computed_schema = json.loads(self.view())
-        ref_schema = {"type": "object", "title": "", "properties": {
-            create_id(self.field[0]): {"title": "selectionfield0", "type": "string", "enum": []},
-            create_id(self.field[1]): {"title": "selectionfield1", "type": "array", "items": {"enum": [], "type": "string"}},
-            create_id(self.field[2]): {"title": "selectionfield2", "type": "array", "items": {"enum": [], "type": "string"}}},
-            "required": [], "dependentRequired": {}, "allOf": []
-        }
+        ref_schema = reference_schemata.get_form_ref_schema("")
+        for f in self.field:
+            ref_schema['properties'][create_id(f)] = reference_schemata.get_selectionfield_ref_schema(f.answer_type, f.title)
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
@@ -500,17 +432,11 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
             self.field.append(api.content.create(type="UploadField", title="uploadfield" + str(i), container=self.form))
             self.field[i].answer_type = upload_answer_type[i]
 
-
-#  file_schema = {"title": "an uploadfield", "type": "string", "format": "uri"}
-#     filemulti_schema = {"title": "an uploadfield", "type": "array", "items": {"type": "string", "format": "uri"}}
     def test_schema(self):
         computed_schema = json.loads(self.view())
-        ref_schema = {"type": "object", "title": "", "properties": {
-            create_id(self.field[0]): {"title": "uploadfield0", "type": "string", "format": "uri"},
-            create_id(self.field[1]): {"title": "uploadfield1", "type": "array", "items": {"type": "string", "format": "uri"}},
-            create_id(self.field[2]): {"title": "uploadfield2", "type": "array", "items": {"type": "string", "format": "uri"}}},
-            "required": [], "dependentRequired": {}, "allOf": []
-        }
+        ref_schema = reference_schemata.get_form_ref_schema("")
+        for f in self.field:
+            ref_schema['properties'][create_id(f)] = reference_schemata.get_uploadfield_ref_schema(f.answer_type, f.title)
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
@@ -525,7 +451,6 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
     form = None
     view = None
     array = None
-    array_schema = {"type": "array", "title": "an array", "items": {"type": "object", "properties": {}, "required": [], "dependentRequired": {}, "allOf": []}}
 
     def _test_array_schema(self, ref_schema):
         computed_schema = json.loads(self.view())['properties']
@@ -534,15 +459,14 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
     def setUp(self):
         setUp_json_schema_test(self)
         self.array = api.content.create(type="Array", title="an array", container=self.form)
-        print()
 
     def test_basic_array(self):
-        ref_schema = {create_id(self.array): self.array_schema}
+        ref_schema = {create_id(self.array): reference_schemata.get_array_ref_schema()}
         self._test_array_schema(ref_schema)
 
     def test_additional_information(self):
         array_id = create_id(self.array)
-        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
         self.array.description = "a description"
         ref_schema[array_id]['description'] = "a description"
@@ -560,49 +484,30 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         del ref_schema[array_id]['comment']
 
 
-    def test_array_with_fields(self):
+    def _create_child(self, ref_schema, type, answer_type):
+        child = api.content.create(type=type, title="title_" + str(answer_type), container=self.array)
+        child.answer_type = answer_type
+        child_ref_schema = reference_schemata.get_child_ref_schema(child.answer_type, child.title)
+        ref_schema[create_id(self.array)]['items']['properties'][create_id(child)] = child_ref_schema
+        return ref_schema
+
+    def _test_array_with_children(self, type, answer_types, ref_schema={}):
         array_id = create_id(self.array)
-        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+        if ref_schema == {}:
+            ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
-        child_1 = api.content.create(type="Field", title="a field 1", container=self.array)
-        child_1.answer_type = "text"
-        child1_ref_schema = {'title': 'a field 1', 'type': 'string'}
-        ref_schema[array_id]['items']['properties'][create_id(child_1)] = child1_ref_schema
-        self._test_array_schema(ref_schema)
+        for at in answer_types:
+            ref_schema = self._create_child(ref_schema, type, at)
+            self._test_array_schema(ref_schema)
 
-        child_2 = api.content.create(type="Field", title="a field 2", container=self.array)
-        child_2.answer_type = "email"
-        child2_ref_schema = {"title": "a field 2", "type": "string", "format": "email"}
-        ref_schema[array_id]['items']['properties'][create_id(child_2)] = child2_ref_schema
-        self._test_array_schema(ref_schema)
 
-        child_3 = api.content.create(type="Field", title="a field 3", container=self.array)
-        child_3.answer_type = "number"
-        child3_ref_schema = {"title": "a field 3", "type": "number"}
-        ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
-        self._test_array_schema(ref_schema)
+    def test_array_with_fields(self):
+        self._test_array_with_children("Field", ["text", "email", "number"])
 
     def test_array_with_selectionfields(self):
         array_id = create_id(self.array)
-        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
-
-        child_1 = api.content.create(type="SelectionField", title="a field 1", container=self.array)
-        child_1.answer_type = "radio"
-        child1_ref_schema = {"title": "a field 1", "type": "string", "enum": []}
-        ref_schema[array_id]['items']['properties'][create_id(child_1)] = child1_ref_schema
-        self._test_array_schema(ref_schema)
-
-        child_2 = api.content.create(type="SelectionField", title="a field 2", container=self.array)
-        child_2.answer_type = "checkbox"
-        child2_ref_schema = {"title": "a field 2", "type": "array", "items": {"enum": [], "type": "string"}}
-        ref_schema[array_id]['items']['properties'][create_id(child_2)] = child2_ref_schema
-        self._test_array_schema(ref_schema)
-
-        child_3 = api.content.create(type="SelectionField", title="a field 3", container=self.array)
-        child_3.answer_type = "select"
-        child3_ref_schema = {"title": "a field 3", "type": "string", "enum": []}
-        ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
-        self._test_array_schema(ref_schema)
+        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
+        self._test_array_with_children("SelectionField", ["radio", "checkbox", "select"], ref_schema)
 
         for child in self.array.getFolderContents():
             child = child.getObject()
@@ -615,56 +520,34 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
     def test_array_with_uploadfields(self):
+        self._test_array_with_children("UploadField", ["file", "file-multi", "file"])
         array_id = create_id(self.array)
-        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
-
-        child_1 = api.content.create(type="UploadField", title="a field 1", container=self.array)
-        child_1.answer_type = "file"
-        child1_ref_schema = {"title": "a field 1", "type": "string", "format": "uri"}
-        ref_schema[array_id]['items']['properties'][create_id(child_1)] = child1_ref_schema
-        self._test_array_schema(ref_schema)
-
-        child_2 = api.content.create(type="UploadField", title="a field 2", container=self.array)
-        child_2.answer_type = "file-multi"
-        child2_ref_schema = {"title": "a field 2", "type": "array", "items": {"type": "string", "format": "uri"}}
-        ref_schema[array_id]['items']['properties'][create_id(child_2)] = child2_ref_schema
-        self._test_array_schema(ref_schema)
-
-        child_3 = api.content.create(type="UploadField", title="a field 3", container=self.array)
-        child_3.answer_type = "file"
-        child3_ref_schema = {"title": "a field 3", "type": "string", "format": "uri"}
-        ref_schema[array_id]['items']['properties'][create_id(child_3)] = child3_ref_schema
-        self._test_array_schema(ref_schema)
+        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
     def test_array_with_children(self):
         array_id = create_id(self.array)
-        ref_schema = {array_id: copy.deepcopy(self.array_schema)}
+        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
         # Fields
         for type in Answer_types:
             type = type.value
-            title = str(type) + "-field-"
-            child = api.content.create(type="Field", title=title, container=self.array)
-            child.answer_type = type
-            child_ref_schema = reference_schemata.get_field_reference_schema(type, title)
-            ref_schema[array_id]['items']['properties'][create_id(child)] = copy.deepcopy(child_ref_schema)
+            ref_schema = self._create_child(ref_schema, "Field", type)
 
         # SelectionFields
         for type in Selection_answer_types:
             type = type.value
-            title = str(type) + "-selectionfield-"
-            child = api.content.create(type="SelectionField", title=title, container=self.array)
-            child.answer_type = type
-            child_ref_schema = reference_schemata.get_selectionfield_reference_schema(type, title)
-            ref_schema[array_id]['items']['properties'][create_id(child)] = copy.deepcopy(child_ref_schema)
+            ref_schema = self._create_child(ref_schema, "SelectionField", type)
 
             # Options
+            child = self.array.getFolderContents()[-1].getObject()
             api.content.create(type="Option", title="yes", container=child)
             api.content.create(type="Option", title="no", container=child)
             if type in ["radio", "select"]:
                 ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
             elif type in ["checkbox", "selectmultiple"]:
                 ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
+
+        
 
         self._test_array_schema(ref_schema)
 
