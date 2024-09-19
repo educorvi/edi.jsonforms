@@ -484,11 +484,13 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         del ref_schema[array_id]['comment']
 
 
-    def _create_child(self, ref_schema, type, answer_type):
-        child = api.content.create(type=type, title="title_" + str(answer_type), container=self.array)
+    def _create_child(self, ref_schema, type, answer_type, container={}):
+        if container == {}:
+            container = self.array
+        child = api.content.create(type=type, title="title_" + str(answer_type), container=container)
         child.answer_type = answer_type
         child_ref_schema = reference_schemata.get_child_ref_schema(child.answer_type, child.title)
-        ref_schema[create_id(self.array)]['items']['properties'][create_id(child)] = child_ref_schema
+        ref_schema[create_id(container)]['items']['properties'][create_id(child)] = child_ref_schema
         return ref_schema
 
     def _test_array_with_children(self, type, answer_types, ref_schema={}):
@@ -499,6 +501,35 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         for at in answer_types:
             ref_schema = self._create_child(ref_schema, type, at)
             self._test_array_schema(ref_schema)
+
+    def _create_all_child_types(self, ref_schema, container):
+        array_id = create_id(container)
+
+        # Fields
+        for type in Answer_types:
+            type = type.value
+            ref_schema = self._create_child(ref_schema, "Field", type, container)
+
+        # SelectionFields
+        for type in Selection_answer_types:
+            type = type.value
+            ref_schema = self._create_child(ref_schema, "SelectionField", type, container)
+
+            # Options
+            child = self.array.getFolderContents()[-1].getObject()
+            api.content.create(type="Option", title="yes", container=child)
+            api.content.create(type="Option", title="no", container=child)
+            if type in ["radio", "select"]:
+                ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
+            elif type in ["checkbox", "selectmultiple"]:
+                ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
+
+        # UploadFields
+        for type in Upload_answer_types:
+            type = type.value
+            ref_schema = self._create_child(ref_schema, "UploadField", type, container)
+
+        return ref_schema
 
 
     def test_array_with_fields(self):
@@ -528,29 +559,25 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         array_id = create_id(self.array)
         ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
-        # Fields
-        for type in Answer_types:
-            type = type.value
-            ref_schema = self._create_child(ref_schema, "Field", type)
-
-        # SelectionFields
-        for type in Selection_answer_types:
-            type = type.value
-            ref_schema = self._create_child(ref_schema, "SelectionField", type)
-
-            # Options
-            child = self.array.getFolderContents()[-1].getObject()
-            api.content.create(type="Option", title="yes", container=child)
-            api.content.create(type="Option", title="no", container=child)
-            if type in ["radio", "select"]:
-                ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
-            elif type in ["checkbox", "selectmultiple"]:
-                ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
-
-        
+        ref_schema = self._create_all_child_types(ref_schema, self.array)
 
         self._test_array_schema(ref_schema)
 
+    def test_array_with_array(self):
+        array_id = create_id(self.array)
+        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
+
+        # test array with empty array
+        child_array = api.content.create(type="Array", title="child array", container=self.array)
+        child_array_id = create_id(child_array)
+        child_ref_schema = reference_schemata.get_array_ref_schema(child_array.title)
+        ref_schema[array_id]['items']['properties'][child_array_id] = child_ref_schema
+        self._test_array_schema(ref_schema)
+
+        # test array with non-empty array
+        import pdb; pdb.set_trace()
+        child_ref_schema = self._create_all_child_types({child_array_id:child_ref_schema}, child_array)[child_array_id]
+        self._test_array_schema(ref_schema)
 
 
 
