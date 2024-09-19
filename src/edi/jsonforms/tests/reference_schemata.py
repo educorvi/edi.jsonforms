@@ -1,6 +1,27 @@
 
 
-def get_field_reference_schema(type, title="a field"):
+def get_child_ref_schema(type, title):
+    if type in ["radio", "checkbox", "select", "selectmultiple"]:
+        return get_selectionfield_ref_schema(type, title)
+    elif type in ["file", "file-multi"]:
+        return get_uploadfield_ref_schema(type, title)
+    elif type == "array":
+        return get_array_ref_schema(title)
+    else:
+        return get_field_ref_schema(type, title)
+
+def get_form_ref_schema(title="a form"):
+    form_reference_schema = {
+        "type": "object",
+        "title": title,
+        "properties": {},
+        "required": [],
+        "dependentRequired": {},
+        "allOf": []
+    }
+    return form_reference_schema
+
+def get_field_ref_schema(type, title="a field"):
     field_reference_schemata = {
         "text": {"title": title, "type": "string"},
         "textarea": {"title": title, "type": "string"},
@@ -17,7 +38,7 @@ def get_field_reference_schema(type, title="a field"):
     }
     return field_reference_schemata[type]
 
-def get_selectionfield_reference_schema(type, title="a selectionfield"):
+def get_selectionfield_ref_schema(type, title="a selectionfield"):
     selectionfield_reference_schemata = {
         "radio": {"title": title, "type": "string", "enum": []},
         "checkbox": {"title": title, "type": "array", "items": {"enum": [], "type": "string"}},
@@ -26,11 +47,23 @@ def get_selectionfield_reference_schema(type, title="a selectionfield"):
     }
     return selectionfield_reference_schemata[type]
 
-def get_uploadfield_reference_schema(type, title="an uploadfield"):
+def get_uploadfield_ref_schema(type, title="an uploadfield"):
     uploadfield_reference_schemata = {
         "file": {"title": title, "type": "string", "format": "uri"},
         "file-multi": {"title": title, "type": "array", "items": {"type": "string", "format": "uri"}}
     }
     return uploadfield_reference_schemata[type]
 
-
+def get_array_ref_schema(title="an array"):
+    array_reference_schema = {
+        "type": "array",
+        "title": title,
+        "items": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "dependentRequired": {},
+            "allOf": []
+        }
+    }
+    return array_reference_schema
