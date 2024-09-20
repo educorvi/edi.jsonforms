@@ -11,15 +11,15 @@ import copy
 import json
 import unittest
 
-from edi.jsonforms.tests._test_required_choice import test_required_choices
-from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
+from edi.jsonforms.tests.utils._test_required_choice import test_required_choices
+from edi.jsonforms.tests.utils._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
 from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
 
-# from edi.jsonforms.tests.reference_schemata import *
-import edi.jsonforms.tests.reference_schemata as reference_schemata
+import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
+import edi.jsonforms.tests.utils.create_content as test_content
 
 
 
@@ -271,7 +271,7 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
         elif type in ["checkbox", "selectmultiple"]:
             computed_list = json.loads(self.view())['properties'][id]['items']['enum']
         else:
-            self.assertNotIn(type, ["radio", "select", "checkbox", "selectmultiple"])
+            self.assertIn(type, ["radio", "select", "checkbox", "selectmultiple"])
         self.assertEqual(computed_list, ref_enum_list)
 
     def test_options_selectionfield(self):
@@ -456,6 +456,15 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         computed_schema = json.loads(self.view())['properties']
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
+    def _test_array_with_children(self, type, answer_types, ref_schema={}):
+        array_id = create_id(self.array)
+        if ref_schema == {}: 
+            ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
+
+        for at in answer_types:
+            ref_schema = test_content.create_child_in_array(ref_schema, type, at, self.array)
+            self._test_array_schema(ref_schema)
+
     def setUp(self):
         setUp_json_schema_test(self)
         self.array = api.content.create(type="Array", title="an array", container=self.form)
@@ -483,55 +492,6 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         self.array.intern_information = None
         del ref_schema[array_id]['comment']
 
-
-    def _create_child(self, ref_schema, type, answer_type, container={}):
-        if container == {}:
-            container = self.array
-        child = api.content.create(type=type, title="title_" + str(answer_type), container=container)
-        child.answer_type = answer_type
-        child_ref_schema = reference_schemata.get_child_ref_schema(child.answer_type, child.title)
-        ref_schema[create_id(container)]['items']['properties'][create_id(child)] = child_ref_schema
-        return ref_schema
-
-    def _test_array_with_children(self, type, answer_types, ref_schema={}):
-        array_id = create_id(self.array)
-        if ref_schema == {}:
-            ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
-
-        for at in answer_types:
-            ref_schema = self._create_child(ref_schema, type, at)
-            self._test_array_schema(ref_schema)
-
-    def _create_all_child_types(self, ref_schema, container):
-        container_id = create_id(container)
-
-        # Fields
-        for type in Answer_types:
-            type = type.value
-            ref_schema = self._create_child(ref_schema, "Field", type, container)
-
-        # SelectionFields
-        for type in Selection_answer_types:
-            type = type.value
-            ref_schema = self._create_child(ref_schema, "SelectionField", type, container)
-
-            # Options
-            child = container.getFolderContents()[-1].getObject()
-            api.content.create(type="Option", title="yes", container=child)
-            api.content.create(type="Option", title="no", container=child)
-            if type in ["radio", "select"]:
-                ref_schema[container_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
-            elif type in ["checkbox", "selectmultiple"]:
-                ref_schema[container_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
-
-        # UploadFields
-        for type in Upload_answer_types:
-            type = type.value
-            ref_schema = self._create_child(ref_schema, "UploadField", type, container)
-
-        return ref_schema
-
-
     def test_array_with_fields(self):
         self._test_array_with_children("Field", ["text", "email", "number"])
 
@@ -552,15 +512,12 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
 
     def test_array_with_uploadfields(self):
         self._test_array_with_children("UploadField", ["file", "file-multi", "file"])
-        array_id = create_id(self.array)
-        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
     def test_array_with_children(self):
         array_id = create_id(self.array)
         ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
-        ref_schema = self._create_all_child_types(ref_schema, self.array)
-
+        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
         self._test_array_schema(ref_schema)
 
     def test_array_with_array(self):
@@ -582,15 +539,15 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
         # test array with non-empty array and empty array
-        child_ref_schema = self._create_all_child_types({child_array_id:child_ref_schema}, child_array)[child_array_id]
+        child_ref_schema = test_content.create_all_child_types({child_array_id:child_ref_schema}, child_array)[child_array_id]
         self._test_array_schema(ref_schema)
 
         # test array with two non-empty arrays
-        child_ref_schema2 = self._create_all_child_types({child_array_id2:child_ref_schema2}, child_array2)[child_array_id2]
+        child_ref_schema2 = test_content.create_all_child_types({child_array_id2:child_ref_schema2}, child_array2)[child_array_id2]
         self._test_array_schema(ref_schema)
 
         # test array with children and with two non-empty arrays
-        ref_schema = self._create_all_child_types(ref_schema, self.array)
+        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
         self._test_array_schema(ref_schema)
 
 class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
@@ -599,8 +556,107 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
     form = None
     view = None
     array = None
+    array_id = None
 
+    def setUp(self):
+        setUp_json_schema_test(self)
+        self.array = api.content.create(type="Array", title="an array", container=self.form)
+        self.array_id = create_id(self.array)
 
+    def _test_array_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def _test_array_required(self, array_id, parent_id=None):
+        computed_schema = json.loads(self.view())
+        if parent_id:
+            computed_schema = computed_schema['properties'][parent_id]['items']
+        required_list = computed_schema['required']
+        self.assertIn(array_id, required_list)
+
+    def _test_array_not_required(self, array_id, parent_id=None):
+        computed_schema = json.loads(self.view())
+        if parent_id:
+            computed_schema = computed_schema['properties'][parent_id]['items']
+        required_list = computed_schema['required']
+        self.assertNotIn(array_id, required_list)
+
+    # def _test_array_minItem(self, computed_array_schema):
+    #     self.assertIn("minItems", computed_array_schema)
+    #     self.assertEqual(1, computed_array_schema['minItems'])
+
+    def test_array_required(self):
+        self._test_array_not_required(self.array_id)
+
+        # test that array occurs in required list of the form
+        self.array.required_choice = "required"
+        self._test_array_required(self.array_id)
+        # test that array has minItems and that it is 1
+        ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
+        ref_schema[self.array_id]['minItems'] = 1
+        self._test_array_schema(ref_schema)
+
+    def test_array_children_required(self):
+        ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
+        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+
+        # test that each child is required
+        for child in self.array.getFolderContents():
+            child = child.getObject()
+
+            # test that array is not in required-list
+            self._test_array_not_required(self.array_id)
+
+            # test that child is in the required-list of the array
+            child.required_choice = "required"
+            ref_schema[self.array_id]['items']['required'].append(create_id(child))
+            self._test_array_schema(ref_schema)
+
+            # test that each child and the array are required
+            self.array.required_choice = "required"
+            ref_schema[self.array_id]['minItems'] = 1
+            self._test_array_schema(ref_schema)
+            self._test_array_required(self.array_id)
+
+            # revert required-status
+            child.required_choice = "optional"
+            self.array.required_choice = "optional"
+            ref_schema[self.array_id]['items']['required'] = []
+            del ref_schema[self.array_id]['minItems']
+
+        # test that all children are required
+        for child in self.array.getFolderContents():
+            child = child.getObject()
+
+            # test that array is not in required-list
+            self._test_array_not_required(self.array_id)
+
+            # test that child is in the required-list of the array
+            child.required_choice = "required"
+            ref_schema[self.array_id]['items']['required'].append(create_id(child))
+            self._test_array_schema(ref_schema)
+
+            # test that each child and the array are required
+            self.array.required_choice = "required"
+            ref_schema[self.array_id]['minItems'] = 1
+            self._test_array_schema(ref_schema)
+            self._test_array_required(self.array_id)
+
+            # revert required-status of array
+            self.array.required_choice = "optional"
+            del ref_schema[self.array_id]['minItems']
+
+    def test_array_in_array_required(self):
+        # test empty array in array required
+
+        # test empty array required and other fields optional
+
+        # test empty array required and other fields required
+
+        # test non-empty array required and other fields optional
+
+        # test non-empty array required and other fields required and parent array required
+        pass
         
 
 
