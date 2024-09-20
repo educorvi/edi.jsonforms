@@ -9,7 +9,7 @@ from zope.interface.interfaces import ComponentLookupError
 
 import unittest
 
-from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test
+from edi.jsonforms.tests.utils._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test
 
 
 class ViewsIntegrationTest(unittest.TestCase):
