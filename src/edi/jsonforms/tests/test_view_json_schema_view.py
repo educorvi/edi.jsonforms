@@ -503,7 +503,7 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
             self._test_array_schema(ref_schema)
 
     def _create_all_child_types(self, ref_schema, container):
-        array_id = create_id(container)
+        container_id = create_id(container)
 
         # Fields
         for type in Answer_types:
@@ -516,13 +516,13 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
             ref_schema = self._create_child(ref_schema, "SelectionField", type, container)
 
             # Options
-            child = self.array.getFolderContents()[-1].getObject()
+            child = container.getFolderContents()[-1].getObject()
             api.content.create(type="Option", title="yes", container=child)
             api.content.create(type="Option", title="no", container=child)
             if type in ["radio", "select"]:
-                ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
+                ref_schema[container_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
             elif type in ["checkbox", "selectmultiple"]:
-                ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
+                ref_schema[container_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
 
         # UploadFields
         for type in Upload_answer_types:
@@ -574,11 +574,31 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         ref_schema[array_id]['items']['properties'][child_array_id] = child_ref_schema
         self._test_array_schema(ref_schema)
 
-        # test array with non-empty array
-        import pdb; pdb.set_trace()
+        # test array with two empty arrays
+        child_array2 = api.content.create(type="Array", title="child array 2", container=self.array)
+        child_array_id2 = create_id(child_array2)
+        child_ref_schema2 = reference_schemata.get_array_ref_schema(child_array2.title)
+        ref_schema[array_id]['items']['properties'][child_array_id2] = child_ref_schema2
+        self._test_array_schema(ref_schema)
+
+        # test array with non-empty array and empty array
         child_ref_schema = self._create_all_child_types({child_array_id:child_ref_schema}, child_array)[child_array_id]
         self._test_array_schema(ref_schema)
 
+        # test array with two non-empty arrays
+        child_ref_schema2 = self._create_all_child_types({child_array_id2:child_ref_schema2}, child_array2)[child_array_id2]
+        self._test_array_schema(ref_schema)
+
+        # test array with children and with two non-empty arrays
+        ref_schema = self._create_all_child_types(ref_schema, self.array)
+        self._test_array_schema(ref_schema)
+
+class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    maxDiff = None
+    form = None
+    view = None
+    array = None
 
 
         
