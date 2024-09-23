@@ -82,6 +82,10 @@ class IField(IDependentExtended):
         if data.minimum or data.maximum:
             if data.answer_type not in ['text', 'textarea', 'number', 'integer', 'password']:
                 raise Invalid(_('Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number.'))
+        if data.minimum and data.maximum:
+            if data.maximum < data.minimum:
+                # TODO translate this string
+                raise Invalid(_('Maximum cannot be smaller than Minimum.'))
     
     @invariant
     def placeholder_invariant(data):
