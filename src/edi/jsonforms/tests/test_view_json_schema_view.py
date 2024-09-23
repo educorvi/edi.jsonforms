@@ -563,10 +563,12 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         self.array = api.content.create(type="Array", title="an array", container=self.form)
         self.array_id = create_id(self.array)
 
+    # TODO anpassbar machen, dass nicht nur auf oberstes array testen kann sondern auch auf array in array (indem zb alles hinter json.loads(self.view()) als parameter angibt)
     def _test_array_schema(self, ref_schema):
         computed_schema = json.loads(self.view())['properties']
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
+    # TODO anpassbar machen
     def _test_array_required(self, array_id, parent_id=None):
         computed_schema = json.loads(self.view())
         if parent_id:
@@ -574,6 +576,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         required_list = computed_schema['required']
         self.assertIn(array_id, required_list)
 
+    # TODO anpassbar machen
     def _test_array_not_required(self, array_id, parent_id=None):
         computed_schema = json.loads(self.view())
         if parent_id:
@@ -581,9 +584,55 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         required_list = computed_schema['required']
         self.assertNotIn(array_id, required_list)
 
-    # def _test_array_minItem(self, computed_array_schema):
-    #     self.assertIn("minItems", computed_array_schema)
-    #     self.assertEqual(1, computed_array_schema['minItems'])
+    # TODO Parameter, um zu bestimmen was an die angepassten _test_array_schema, _test_array_required und _test_array_not_required übergibt
+    def _test_array_children_required(self, array, ref_schema):
+        array_id = create_id(array)
+        # test that each child is required
+        for child in array.getFolderContents():
+            child = child.getObject()
+
+            # test that array is not in required-list
+            self._test_array_not_required(array_id)
+
+            # test that child is in the required-list of the array
+            child.required_choice = "required"
+            ref_schema[array_id]['items']['required'].append(create_id(child))
+            self._test_array_schema(ref_schema)
+
+            # test that each child and the array are required
+            array.required_choice = "required"
+            ref_schema[array_id]['minItems'] = 1
+            self._test_array_schema(ref_schema)
+            self._test_array_required(array_id)
+
+            # revert required-status
+            child.required_choice = "optional"
+            array.required_choice = "optional"
+            ref_schema[array_id]['items']['required'] = []
+            del ref_schema[array_id]['minItems']
+
+        # test that all children are required
+        for child in array.getFolderContents():
+            child = child.getObject()
+
+            # test that array is not in required-list
+            self._test_array_not_required(array_id)
+
+            # test that child is in the required-list of the array
+            child.required_choice = "required"
+            ref_schema[array_id]['items']['required'].append(create_id(child))
+            self._test_array_schema(ref_schema)
+
+            # test that each child and the array are required
+            array.required_choice = "required"
+            ref_schema[array_id]['minItems'] = 1
+            self._test_array_schema(ref_schema)
+            self._test_array_required(array_id)
+
+            # revert required-status of array
+            self.array.required_choice = "optional"
+            del ref_schema[array_id]['minItems']
+
 
     def test_array_required(self):
         self._test_array_not_required(self.array_id)
@@ -600,63 +649,34 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
         ref_schema = test_content.create_all_child_types(ref_schema, self.array)
 
-        # test that each child is required
-        for child in self.array.getFolderContents():
-            child = child.getObject()
+        self._test_array_children_required(self.array, ref_schema)
 
-            # test that array is not in required-list
-            self._test_array_not_required(self.array_id)
-
-            # test that child is in the required-list of the array
-            child.required_choice = "required"
-            ref_schema[self.array_id]['items']['required'].append(create_id(child))
-            self._test_array_schema(ref_schema)
-
-            # test that each child and the array are required
-            self.array.required_choice = "required"
-            ref_schema[self.array_id]['minItems'] = 1
-            self._test_array_schema(ref_schema)
-            self._test_array_required(self.array_id)
-
-            # revert required-status
-            child.required_choice = "optional"
-            self.array.required_choice = "optional"
-            ref_schema[self.array_id]['items']['required'] = []
-            del ref_schema[self.array_id]['minItems']
-
-        # test that all children are required
-        for child in self.array.getFolderContents():
-            child = child.getObject()
-
-            # test that array is not in required-list
-            self._test_array_not_required(self.array_id)
-
-            # test that child is in the required-list of the array
-            child.required_choice = "required"
-            ref_schema[self.array_id]['items']['required'].append(create_id(child))
-            self._test_array_schema(ref_schema)
-
-            # test that each child and the array are required
-            self.array.required_choice = "required"
-            ref_schema[self.array_id]['minItems'] = 1
-            self._test_array_schema(ref_schema)
-            self._test_array_required(self.array_id)
-
-            # revert required-status of array
-            self.array.required_choice = "optional"
-            del ref_schema[self.array_id]['minItems']
 
     def test_array_in_array_required(self):
+        ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
+
         # test empty array in array required
+        child_array = api.content.create(type="Array", title="Child Array", container=self.array)
+        child_array_id = create_id(child_array)
+        child_array_schema = reference_schemata.get_array_ref_schema(child_array.title)
+        child_array.required_choice = "required"
+        ref_schema[self.array_id]['items']['required'].append(child_array_id)
+        child_array_schema['minItems'] = 1
+
+        ref_schema[self.array_id]['items']['properties'][child_array_id] = child_array_schema
+        self._test_array_schema(ref_schema)
 
         # test empty array required and other fields optional
+        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        self._test_array_schema(ref_schema)
 
         # test empty array required and other fields required
+        # TODO oben _test_array_children_required verwenden wenn angepasst
 
         # test non-empty array required and other fields optional
 
         # test non-empty array required and other fields required and parent array required
-        pass
+
         
 
 
