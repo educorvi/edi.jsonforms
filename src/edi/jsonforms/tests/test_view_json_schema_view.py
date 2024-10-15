@@ -4,6 +4,7 @@ from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
+from zope.interface.exceptions import Invalid
 # from zope.component import getMultiAdapter
 # from zope.interface.interfaces import ComponentLookupError
 
@@ -11,15 +12,17 @@ import copy
 import json
 import unittest
 
-from edi.jsonforms.tests.utils._test_required_choice import test_required_choices
-from edi.jsonforms.tests.utils._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
 from edi.jsonforms.content.field import Answer_types
+from edi.jsonforms.content.field import IField
 from edi.jsonforms.content.selection_field import Selection_answer_types
 from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
 
 import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
 import edi.jsonforms.tests.utils.create_content as test_content
+from edi.jsonforms.tests.utils._test_required_choice import test_required_choices
+from edi.jsonforms.tests.utils._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
+
 
 
 
@@ -227,6 +230,92 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    ### validate invariants
+
+    def test_validate_min_max_invariant(self):
+        for field_type in Answer_types:
+            field_type = field_type.value
+
+            self.field.answer_type = field_type
+
+            def check_invariant():
+                if self.field.answer_type in ['text', 'textarea', 'number', 'integer', 'password']:
+                    try:
+                        IField.validateInvariants(self.field)
+                    except:
+                        self.fail("Min_max_invariant falsely raised an Invalid for answer_type " + self.field.answer_type)
+                elif self.field.answer_type in ['tel', 'url', 'email', 'date', 'datetime-local', 'time', 'boolean']:
+                    try:
+                        IField.validateInvariants(self.field)
+                        self.fail("Min_max_invariant didn't raise an Invalid for answer_type " + self.field.answer_type)
+                    except Invalid:
+                        pass
+                else:
+                    self.fail("Unknown answer_type: " + self.field.answer_type)
+            
+            self.field.minimum = 2
+            self.field.maximum = 3
+            check_invariant()
+
+            self.field.maximum = 2
+            check_invariant()
+
+            self.field.minimum = 3
+            try:
+                IField.validateInvariants(self.field)
+                self.fail("Min_max_invariant didn't raise an Invalid a minimum bigger than the maximum.")
+            except Invalid:
+                pass
+
+            self.field.maximum = 0
+            try:
+                IField.validateInvariants(self.field)
+                self.fail("Min_max_invariant didn't raise an Invalid for a maximum of 0.")
+            except Invalid:
+                pass
+
+    def test_validate_placeholder_invariant(self):
+        for field_type in Answer_types:
+            field_type = field_type.value
+
+            self.field.answer_type = field_type
+
+            self.field.placeholder = "placeholder"
+            if self.field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
+                try:
+                    IField.validateInvariants(self.field)
+                except:
+                    self.fail("Placeholder_invariant falsely raised an Invalid for answer_type " + self.field.answer_type)
+            elif self.field.answer_type in ['date', 'datetime-local', 'time', 'number', 'integer', 'boolean']:
+                try:
+                    IField.validateInvariants(self.field)
+                    self.fail("Placeholder_invariant didn't raise an Invalid for answer_type " + self.field.answer_type)
+                except Invalid:
+                    pass
+            else:
+                self.fail("Unknown answer_type: " + self.field.answer_type)
+
+    def test_validate_unit_invariant(self):
+        for field_type in Answer_types:
+            field_type = field_type.value
+
+            self.field.answer_type = field_type
+
+            self.field.unit = "unit"
+            if self.field.answer_type in ['number', 'integer']:
+                try:
+                    IField.validateInvariants(self.field)
+                except:
+                    self.fail("Unit_invariant falsely raised an Invalid for answer_type " + self.field.answer_type)
+            elif self.field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email', 'date', 'datetime-local', 'time', 'boolean']:
+                try:
+                    IField.validateInvariants(self.field)
+                    self.fail("Unit_invariant didn't raise an Invalid for answer_type " + self.field.answer_type)
+                except Invalid:
+                    pass
+            else:
+                self.fail("Unknown answer_type: " + self.field.answer_type)
 
 class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
