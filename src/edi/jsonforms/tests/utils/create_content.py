@@ -11,6 +11,7 @@ import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
 
 """
 creates one child of type type (Field or SelectionField or UploadField) with the given answer_type in the given Array-Container
+
 ref_schema has to be of type {id-of-array-container: { ... }, ...}
 """
 def create_child_in_array(ref_schema, type, answer_type, container):

@@ -653,11 +653,15 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         self.array_id = create_id(self.array)
 
     # TODO anpassbar machen, dass nicht nur auf oberstes array testen kann sondern auch auf array in array (indem zb alles hinter json.loads(self.view()) als parameter angibt)
-    def _test_array_schema(self, ref_schema):
+    def _test_array_schema(self, ref_schema, parent_id=None):
         computed_schema = json.loads(self.view())['properties']
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-    # TODO anpassbar machen
+    def _test_array_in_array_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties'][''] # TODO
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    # ?TODO anpassbar machen
     def _test_array_required(self, array_id, parent_id=None):
         computed_schema = json.loads(self.view())
         if parent_id:
@@ -665,7 +669,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         required_list = computed_schema['required']
         self.assertIn(array_id, required_list)
 
-    # TODO anpassbar machen
+    # ?TODO anpassbar machen
     def _test_array_not_required(self, array_id, parent_id=None):
         computed_schema = json.loads(self.view())
         if parent_id:
@@ -755,18 +759,22 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         ref_schema[self.array_id]['items']['properties'][child_array_id] = child_array_schema
         self._test_array_schema(ref_schema)
 
-        # test empty array required and other fields optional
+        # test empty child_array in array required and other fields in array optional
         ref_schema = test_content.create_all_child_types(ref_schema, self.array)
         self._test_array_schema(ref_schema)
 
-        # test empty array required and other fields required
-        # TODO oben _test_array_children_required verwenden wenn angepasst
+        # test empty child_array in array required and other fields in array required
+        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        self._test_array_children_required(self.array, ref_schema)
 
-        # test non-empty array required and other fields optional
+        # test non-empty child_array in array required and other fields in array optional and fields in child_array optional
+        child_array_schema = test_content.create_all_child_types({child_array_id: child_array_schema}, child_array)[child_array_id]
+        self._test_array_schema(ref_schema)
 
-        # test non-empty array required and other fields required and parent array required
+        # test non-empty child_array in array required and other fields in array required and fields in child_array required
+        # TODO
 
-        
+
 
 
 # class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
