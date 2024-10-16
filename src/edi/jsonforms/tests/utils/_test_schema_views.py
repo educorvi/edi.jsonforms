@@ -100,6 +100,7 @@ def setUp_json_schema_test(self):
         context=self.portal['Fragebogen'],
         request=self.request,
     )
+    self.maxDiff = None
 
 
 def setUp_ui_schema_test(self):

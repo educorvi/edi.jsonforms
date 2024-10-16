@@ -8,13 +8,21 @@ def get_child_ref_schema(type, title):
         return get_selectionfield_ref_schema(type, title)
     elif type in ["file", "file-multi"]:
         return get_uploadfield_ref_schema(type, title)
-    elif type == "array":
+    elif type == "Array":
         return get_array_ref_schema(title)
+    elif type == "Complex":
+        return get_complex_ref_schema(title)
     else:
         return get_field_ref_schema(type, title)
 
 def get_form_ref_schema(title="a form"):
-    form_reference_schema = {
+    return get_object_ref_schema(title)
+
+def get_complex_ref_schema(title="a complex object"):
+    return get_object_ref_schema(title)
+
+def get_object_ref_schema(title):
+    object_reference_schema = {
         "type": "object",
         "title": title,
         "properties": {},
@@ -22,7 +30,7 @@ def get_form_ref_schema(title="a form"):
         "dependentRequired": {},
         "allOf": []
     }
-    return form_reference_schema
+    return object_reference_schema
 
 def get_field_ref_schema(type, title="a field"):
     field_reference_schemata = {
@@ -70,9 +78,4 @@ def get_array_ref_schema(title="an array"):
         }
     }
     return array_reference_schema
-
-
-
-
-#### create
 
