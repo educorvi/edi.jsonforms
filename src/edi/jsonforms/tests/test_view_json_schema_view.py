@@ -536,7 +536,6 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
 
 class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    maxDiff = None
     form = None
     view = None
     array = None
@@ -551,8 +550,9 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
             ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
         for at in answer_types:
-            ref_schema = test_content.create_child_in_array(ref_schema, type, at, self.array)
+            ref_schema = test_content.create_child_in_object(ref_schema, type, at, self.array)
             self._test_array_schema(ref_schema)
+        return ref_schema
 
     def setUp(self):
         setUp_json_schema_test(self)
@@ -582,31 +582,23 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         del ref_schema[array_id]['comment']
 
     def test_array_with_fields(self):
-        self._test_array_with_children("Field", ["text", "email", "number"])
+        field_answer_types = [t.value for t in Answer_types]
+        self._test_array_with_children("Field", field_answer_types)
 
     def test_array_with_selectionfields(self):
-        array_id = create_id(self.array)
-        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
-        self._test_array_with_children("SelectionField", ["radio", "checkbox", "select"], ref_schema)
-
-        for child in self.array.getFolderContents():
-            child = child.getObject()
-            api.content.create(type="Option", title="yes", container=child)
-            api.content.create(type="Option", title="no", container=child)
-            if 'enum' in ref_schema[array_id]['items']['properties'][create_id(child)]:
-                ref_schema[array_id]['items']['properties'][create_id(child)]['enum'] = ["yes", "no"]
-            else:
-                ref_schema[array_id]['items']['properties'][create_id(child)]['items']['enum'] = ["yes", "no"]
+        selectionfield_answer_types = [t.value for t in Selection_answer_types]
+        ref_schema = self._test_array_with_children("SelectionField", selectionfield_answer_types)
         self._test_array_schema(ref_schema)
 
     def test_array_with_uploadfields(self):
-        self._test_array_with_children("UploadField", ["file", "file-multi", "file"])
+        uploadfield_answer_types = [t.value for t in Upload_answer_types]
+        self._test_array_with_children("UploadField", uploadfield_answer_types)
 
     def test_array_with_children(self):
         array_id = create_id(self.array)
         ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
 
-        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.array)
         self._test_array_schema(ref_schema)
 
     def test_array_with_array(self):
@@ -628,20 +620,19 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
         # test array with non-empty array and empty array
-        child_ref_schema = test_content.create_all_child_types({child_array_id:child_ref_schema}, child_array)[child_array_id]
+        child_ref_schema = test_content.create_all_child_types_in_object({child_array_id:child_ref_schema}, child_array)[child_array_id]
         self._test_array_schema(ref_schema)
 
         # test array with two non-empty arrays
-        child_ref_schema2 = test_content.create_all_child_types({child_array_id2:child_ref_schema2}, child_array2)[child_array_id2]
+        child_ref_schema2 = test_content.create_all_child_types_in_object({child_array_id2:child_ref_schema2}, child_array2)[child_array_id2]
         self._test_array_schema(ref_schema)
 
         # test array with children and with two non-empty arrays
-        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.array)
         self._test_array_schema(ref_schema)
 
 class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    maxDiff = None
     form = None
     view = None
     array = None
@@ -654,10 +645,6 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
 
     def _test_array_schema(self, ref_schema):
         computed_schema = json.loads(self.view())['properties']
-        self.assertEqual(dict(computed_schema), dict(ref_schema))
-
-    def _test_array_in_array_schema(self, ref_schema):
-        computed_schema = json.loads(self.view())['properties'][''] # TODO
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
     def _test_array_required(self, array_id, parent_id=None):
@@ -755,7 +742,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
 
     def test_array_children_required(self):
         ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
-        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.array)
 
         self._test_array_children_required(self.array, ref_schema)
 
@@ -774,11 +761,11 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
         # test empty child_array in array required and other fields in array optional
-        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.array)
         self._test_array_schema(ref_schema)
 
         # test empty child_array in array required and other fields in array required
-        ref_schema = test_content.create_all_child_types(ref_schema, self.array)
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.array)
         child_array.required_choice = "optional"
         ref_schema[self.array_id]['items']['required'] = []
         del child_array_schema['minItems']
@@ -788,7 +775,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         child_array.required_choice = "required"
         ref_schema[self.array_id]['items']['required'] = [child_array_id]
         child_array_schema['minItems'] = 1
-        child_array_schema = test_content.create_all_child_types({child_array_id: child_array_schema}, child_array)[child_array_id]
+        child_array_schema = test_content.create_all_child_types_in_object({child_array_id: child_array_schema}, child_array)[child_array_id]
         self._test_array_schema(ref_schema)
 
         # test non-empty child_array in array required and other fields in array required and fields in child_array required
@@ -800,16 +787,105 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
 
 
 
-# class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
-#     pass
+class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    form = None
+    view = None
+    complex = None
 
+    def _test_complex_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-# class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
-#     pass
+    def _test_complex_with_children(self, type, answer_types, ref_schema={}):
+        complex_id = create_id(self.complex)
+        if ref_schema == {}:
+            ref_schema = {complex_id: reference_schemata.get_complex_ref_schema(self.complex.title)}
 
+        for at in answer_types:
+            ref_schema = test_content.create_child_in_object(ref_schema, type, at, self.complex)
+            self._test_complex_schema(ref_schema)
+            
+        return ref_schema
 
+    def setUp(self):
+        setUp_json_schema_test(self)
+        self.complex = api.content.create(type="Complex", title="a complex object", container=self.form)
 
-class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
+    def test_basic_complex(self):
+        ref_schema = {create_id(self.complex): reference_schemata.get_complex_ref_schema(self.complex.title)}
+        self._test_complex_schema(ref_schema)
+
+    def test_additional_information(self):
+        complex_id = create_id(self.complex)
+        ref_schema = {complex_id: reference_schemata.get_complex_ref_schema()}
+
+        self.complex.description = "a description"
+        ref_schema[complex_id]['description'] = "a description"
+        self._test_complex_schema(ref_schema)
+
+        self.complex.intern_information = "an extra info"
+        ref_schema[complex_id]['comment'] = "an extra info"
+        self._test_complex_schema(ref_schema)
+
+        self.complex.description = None
+        del ref_schema[complex_id]['description']
+        self._test_complex_schema(ref_schema)
+
+        self.complex.intern_information = None
+        del ref_schema[complex_id]['comment']
+
+    def test_complex_with_fields(self):
+        field_answer_types = [t.value for t in Answer_types]
+        self._test_complex_with_children("Field", field_answer_types)
+
+    def test_complex_with_selectionfields(self):
+        selectionfield_answer_types = [t.value for t in Selection_answer_types]
+        ref_schema = self._test_complex_with_children("SelectionField", selectionfield_answer_types)
+        self._test_complex_schema(ref_schema)
+
+    def test_complex_with_uploadfields(self):
+        uploadfield_answer_types = [t.value for t in Upload_answer_types]
+        self._test_complex_with_children("UploadField", uploadfield_answer_types)
+
+    def test_complex_with_children(self):
+        complex_id = create_id(self.complex)
+        ref_schema = {complex_id: reference_schemata.get_complex_ref_schema(self.complex.title)}
+
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.complex)
+        self._test_complex_schema(ref_schema)
+
+    def test_complex_with_complex(self):
+        complex_id = create_id(self.complex)
+        ref_schema = {complex_id: reference_schemata.get_complex_ref_schema(self.complex.title)}
+
+        # test complex with empty complex
+        child_complex = api.content.create(type="Complex", title="child complex", container=self.complex)
+        child_complex_id = create_id(child_complex)
+        child_ref_schema = reference_schemata.get_complex_ref_schema(child_complex.title)
+        ref_schema[complex_id]['properties'][child_complex_id] = child_ref_schema
+        self._test_complex_schema(ref_schema)
+
+        # test complex with two empty complexes
+        child_complex2 = api.content.create(type="Complex", title="child complex 2", container=self.complex)
+        child_complex_id2 = create_id(child_complex2)
+        child_ref_schema2 = reference_schemata.get_complex_ref_schema(child_complex2.title)
+        ref_schema[complex_id]['properties'][child_complex_id2] = child_ref_schema2
+        self._test_complex_schema(ref_schema)
+
+        # test complex with non-empty complex and empty complex
+        child_ref_schema = test_content.create_all_child_types_in_object({child_complex_id:child_ref_schema}, child_complex)[child_complex_id]
+        self._test_complex_schema(ref_schema)
+
+        # test complex with two non-empty complexes
+        child_ref_schema2 = test_content.create_all_child_types_in_object({child_complex_id2:child_ref_schema2}, child_complex2)[child_complex_id2]
+        self._test_complex_schema(ref_schema)
+
+        # test complex with children and with two non-empty complexes
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.complex)
+        self._test_complex_schema(ref_schema)
+
+class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     view = None
     form = None
