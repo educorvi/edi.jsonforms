@@ -20,7 +20,7 @@ from edi.jsonforms.views.common import create_id
 
 import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
 import edi.jsonforms.tests.utils.create_content as test_content
-from edi.jsonforms.tests.utils._test_required_choice import test_required_choices
+from edi.jsonforms.tests.utils._test_required_choice import test_required_choices, test_object_required, test_object_not_required, test_object_children_required
 from edi.jsonforms.tests.utils._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_json_schema_test
 
 
@@ -647,94 +647,12 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         computed_schema = json.loads(self.view())['properties']
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-    def _test_array_required(self, array_id, parent_id=None):
-        computed_schema = json.loads(self.view())
-        if parent_id:
-            computed_schema = computed_schema['properties'][parent_id]['items']
-        required_list = computed_schema['required']
-        self.assertIn(array_id, required_list)
-
-    def _test_array_not_required(self, array_id, parent_id=None):
-        computed_schema = json.loads(self.view())
-        if parent_id:
-            computed_schema = computed_schema['properties'][parent_id]['items']
-        required_list = computed_schema['required']
-        self.assertNotIn(array_id, required_list)
-
-    def _test_array_children_required(self, array, ref_schema):
-        array_id = create_id(array)
-
-        # save original schema
-        tmp_ref_schema = copy.deepcopy(ref_schema)
-        ref_schema[array_id]['items']['required'] = []
-
-        # test that each child is required
-        for child in array.getFolderContents():
-            child = child.getObject()
-            child_id = create_id(child)
-
-            # test that array is not in required-list
-            self._test_array_not_required(array_id)
-
-            # test that child is in the required-list of the array
-            child.required_choice = "required"
-            ref_schema[array_id]['items']['required'].append(child_id)
-            if child.portal_type == "Array":
-                ref_schema[array_id]['items']['properties'][child_id]['minItems'] = 1
-            self._test_array_schema(ref_schema)
-
-            # test that each child and the array are required
-            array.required_choice = "required"
-            ref_schema[array_id]['minItems'] = 1
-            self._test_array_schema(ref_schema)
-            self._test_array_required(array_id)
-
-            # revert required-status
-            child.required_choice = "optional"
-            array.required_choice = "optional"
-            ref_schema[array_id]['items']['required'] = []
-            if child.portal_type == "Array":
-                del ref_schema[array_id]['items']['properties'][child_id]['minItems']
-            del ref_schema[array_id]['minItems']
-
-        # test that all children are required
-        for child in array.getFolderContents():
-            child = child.getObject()
-            child_id = create_id(child)
-
-            # test that array is not in required-list
-            self._test_array_not_required(array_id)
-
-            # test that child is in the required-list of the array
-            child.required_choice = "required"
-            ref_schema[array_id]['items']['required'].append(child_id)
-            if child.portal_type == "Array":
-                ref_schema[array_id]['items']['properties'][child_id]['minItems'] = 1
-            self._test_array_schema(ref_schema)
-
-            # test that each child and the array are required
-            array.required_choice = "required"
-            ref_schema[array_id]['minItems'] = 1
-            self._test_array_schema(ref_schema)
-            self._test_array_required(array_id)
-
-            # revert required-status of array
-            self.array.required_choice = "optional"
-            del ref_schema[array_id]['minItems']
-
-        # restore original schema
-        ref_schema = tmp_ref_schema
-        for child in array.getFolderContents():
-            child = child.getObject()
-            child.required_choice = "optional"
-
-
     def test_array_required(self):
-        self._test_array_not_required(self.array_id)
+        test_object_not_required(self, self.array_id)
 
         # test that array occurs in required list of the form
         self.array.required_choice = "required"
-        self._test_array_required(self.array_id)
+        test_object_required(self, self.array_id)
         # test that array has minItems and that it is 1
         ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
         ref_schema[self.array_id]['minItems'] = 1
@@ -744,7 +662,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
         ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.array)
 
-        self._test_array_children_required(self.array, ref_schema)
+        test_object_children_required(self, self.array, ref_schema, self._test_array_schema)
 
     def test_array_in_array_required(self):
         ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
@@ -769,7 +687,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         child_array.required_choice = "optional"
         ref_schema[self.array_id]['items']['required'] = []
         del child_array_schema['minItems']
-        self._test_array_children_required(self.array, ref_schema)
+        test_object_children_required(self, self.array, ref_schema, self._test_array_schema)
 
         # test non-empty child_array in array required and other fields in array optional and fields in child_array optional
         child_array.required_choice = "required"
@@ -783,7 +701,7 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
             child = child.getObject()
             child.required_choice = "required"
             child_array_schema['items']['required'].append(create_id(child))
-        self._test_array_children_required(self.array, ref_schema)
+        test_object_children_required(self, self.array, ref_schema, self._test_array_schema)
 
 
 
@@ -887,21 +805,89 @@ class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
 
 class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    view = None
     form = None
-    field = []
-    selectionfield = []
+    view = None
+    complex = None
+    complex_id = None
 
-    # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
+    def setUp(self):
+        setUp_json_schema_test(self)
+        self.complex = api.content.create(type="Complex", title="a complex object", container=self.form)
+        self.complex_id = create_id(self.complex)
+
+    def _test_complex_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def test_complex_required(self):
+        test_object_not_required(self, self.complex_id)
+
+        try:
+            tmp = self.complex.required_choice
+            self.fail("A complex object should not have an attribute to set the required status. An object cannot be required.")
+        except AttributeError:
+            pass
+
+    def test_complex_children_required(self):
+        ref_schema = {self.complex_id: reference_schemata.get_complex_ref_schema(self.complex.title)}
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.complex)
+
+        test_object_children_required(self, self.complex, ref_schema, self._test_complex_schema)
+
+    def test_complex_in_complex_required(self):
+        ref_schema = {self.complex_id: reference_schemata.get_complex_ref_schema()}
+
+        # create child complex
+        child_complex = api.content.create(type="Complex", title="Child Complex", container=self.complex)
+        child_complex_id = create_id(child_complex)
+        child_complex_schema = reference_schemata.get_complex_ref_schema(child_complex.title)
+        ref_schema[self.complex_id]['properties'][child_complex_id] = child_complex_schema
+        self._test_complex_schema(ref_schema)
+
+        # create other fields in complex that are optional
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.complex)
+        self._test_complex_schema(ref_schema)
+
+        # test that the other fields are required
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.complex)
+        test_object_children_required(self, self.complex, ref_schema, self._test_complex_schema)
+        # TODO for some reason after this test the next test doesnt work, because the required list is full but should be empty
+
+        # test non-empty child_complex in complex with optional fields and other fields in complex optional
+        child_complex_schema = test_content.create_all_child_types_in_object({child_complex_id: child_complex_schema}, child_complex)[child_complex_id]
+        self._test_complex_schema(ref_schema)
+
+        # # test non-empty child_complex in complex required and other fields in complex required and fields in child_complex required
+        # for child in child_complex.getFolderContents():
+        #     child = child.getObject()
+        #     child.required_choice = "required"
+        #     child_complex_schema['items']['required'].append(create_id(child))
+        # test_object_children_required(self, self.array, ref_schema, self._test_complex_schema)
+
+
+
+# # class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
+# #     pass
+
+
+
+# class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
+#     layer = EDI_JSONFORMS_INTEGRATION_TESTING
+#     view = None
+#     form = None
+#     field = []
+#     selectionfield = []
+
+#     # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
 
 
 
 
 
-# class ViewsFunctionalTest(unittest.TestCase):
+# # class ViewsFunctionalTest(unittest.TestCase):
 
-#     layer = EDI_JSONFORMS_FUNCTIONAL_TESTING
+# #     layer = EDI_JSONFORMS_FUNCTIONAL_TESTING
 
-#     def setUp(self):
-#         self.portal = self.layer['portal']
-#         setRoles(self.portal, TEST_USER_ID, ['Manager'])
+# #     def setUp(self):
+# #         self.portal = self.layer['portal']
+# #         setRoles(self.portal, TEST_USER_ID, ['Manager'])
