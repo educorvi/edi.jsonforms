@@ -850,8 +850,8 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
 
         # test that the other fields are required
         ref_schema = test_content.create_all_child_types_in_object(ref_schema, self.complex)
+        # import pdb; pdb.set_trace()
         test_object_children_required(self, self.complex, ref_schema, self._test_complex_schema)
-        # TODO for some reason after this test the next test doesnt work, because the required list is full but should be empty
 
         # test non-empty child_complex in complex with optional fields and other fields in complex optional
         child_complex_schema = test_content.create_all_child_types_in_object({child_complex_id: child_complex_schema}, child_complex)[child_complex_id]
