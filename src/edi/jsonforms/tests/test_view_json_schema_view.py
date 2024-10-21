@@ -857,12 +857,12 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
         child_complex_schema = test_content.create_all_child_types_in_object({child_complex_id: child_complex_schema}, child_complex)[child_complex_id]
         self._test_complex_schema(ref_schema)
 
-        # # test non-empty child_complex in complex required and other fields in complex required and fields in child_complex required
-        # for child in child_complex.getFolderContents():
-        #     child = child.getObject()
-        #     child.required_choice = "required"
-        #     child_complex_schema['items']['required'].append(create_id(child))
-        # test_object_children_required(self, self.array, ref_schema, self._test_complex_schema)
+        # test non-empty child_complex in complex and other fields in complex required and fields in child_complex required
+        for child in child_complex.getFolderContents():
+            child = child.getObject()
+            child.required_choice = "required"
+            child_complex_schema['items']['required'].append(create_id(child))
+        test_object_children_required(self, self.array, ref_schema, self._test_complex_schema)
 
 
 
