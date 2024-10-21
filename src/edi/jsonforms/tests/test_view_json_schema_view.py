@@ -866,9 +866,72 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
 
 
 
-# # class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
-# #     pass
+class ViewsJsonSchemaNestedTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    form = None
+    view = None
+    maxDiff = None
 
+    def setUp(self):
+        setUp_json_schema_test(self)
+
+    def _test_schema(self, ref_schema):
+        computed_schema = json.loads(self.view())['properties']
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
+
+    def test_complex_in_array(self):
+        outer_array = api.content.create(type="Array", title="outer array", container=self.form)
+        array_id = create_id(outer_array)
+        inner_complex = api.content.create(type="Complex", title="inner complex", container=outer_array)
+        complex_id = create_id(inner_complex)
+
+        # test empty complex in array
+        ref_schema = {array_id: reference_schemata.get_array_ref_schema(outer_array.title)}
+        complex_schema = reference_schemata.get_complex_ref_schema(inner_complex.title)
+        ref_schema[array_id]['items']['properties'][complex_id] = complex_schema
+        self._test_schema(ref_schema)
+
+        # test complex with children in array with children
+        complex_schema = test_content.create_all_child_types_in_object({complex_id: complex_schema}, inner_complex)
+        ref_schema = test_content.create_all_child_types_in_object(ref_schema, outer_array)
+        self._test_schema(ref_schema)
+
+    def create_array_and_complex(self, container, ref_schema):
+        ref_props = {}
+        if container.portal_type == "Array":
+            ref_props = ref_schema['items']['properties']
+        else:
+            ref_props = ref_schema['properties']
+        array = api.content.create(type="Array", title="an array", container=container)
+        complex = api.content.create(type="Complex", title="a complex", container=container)
+        ref_props[create_id(array)] = reference_schemata.get_array_ref_schema(array.title)
+        ref_props[create_id(complex)] = reference_schemata.get_complex_ref_schema(complex.title)
+
+    def test_nested_depth_3(self):
+        # test depth 1
+        ref_schema = reference_schemata.get_form_ref_schema()
+        self.create_array_and_complex(self.form, ref_schema)
+        self._test_schema(ref_schema['properties'])
+
+        # test depth 2
+        children = [child.getObject() for child in self.form.getFolderContents()]
+        for child in children:
+            self.create_array_and_complex(child, ref_schema['properties'][create_id(child)])
+        self._test_schema(ref_schema['properties'])
+
+        # test depth 3
+        for child in children:
+            child_id = create_id(child)
+            ref = ref_schema['properties'][child_id]
+            if child.portal_type == "Array":
+                ref = ref['items']['properties']
+            else:
+                ref = ref['properties']
+            for c in child.getFolderContents():
+                c = c.getObject()
+                self.create_array_and_complex(c, ref[create_id(c)])
+        self._test_schema(ref_schema['properties'])
+        
 
 
 # class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
@@ -879,6 +942,30 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
 #     selectionfield = []
 
 #     # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
+
+class ViewsJsonSchemaShowOnPropertiesTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    form = None
+    view = None
+    maxDiff = None
+
+    def setUp(self):
+        setUp_json_schema_test(self)
+
+# class ViewsJsonSchemaDependenciesTest(unittest.TestCase):
+#     layer = EDI_JSONFORMS_INTEGRATION_TESTING
+#     form = None
+#     view = None
+#     maxDiff = None
+
+#     def setUp(self):
+#         setUp_json_schema_test(self)
+
+
+
+# # class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
+# #     pass
+
 
 
 
