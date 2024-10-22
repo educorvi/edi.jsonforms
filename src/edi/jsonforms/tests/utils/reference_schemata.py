@@ -49,13 +49,18 @@ def get_field_ref_schema(type, title="a field"):
     }
     return field_reference_schemata[type]
 
-def get_selectionfield_ref_schema(type, title="a selectionfield"):
+def get_selectionfield_ref_schema(type, title="a selectionfield", options=[]):
     selectionfield_reference_schemata = {
         "radio": {"title": title, "type": "string", "enum": []},
         "checkbox": {"title": title, "type": "array", "items": {"enum": [], "type": "string"}},
         "select": {"title": title, "type": "string", "enum": []},
         "selectmultiple": {"title": title, "type": "array", "items": {"enum": [], "type": "string"}}
     }
+    if options != []:
+        if "enum" in selectionfield_reference_schemata:
+            selectionfield_reference_schemata['enum'] = options
+        else:
+            selectionfield_reference_schemata['items']['enum'] = options
     return selectionfield_reference_schemata[type]
 
 def get_uploadfield_ref_schema(type, title="an uploadfield"):
