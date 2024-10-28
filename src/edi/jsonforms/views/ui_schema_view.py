@@ -60,7 +60,7 @@ class UiSchemaView(BrowserView):
         self.uischema['layout'] = layout
         return json.dumps(self.uischema)
 
-    def get_schema_for_child(self, child, scope):
+    def get_schema_for_child(self, child, scope, recursive=True):
         type = child.portal_type
 
         if type == 'Field':
@@ -70,9 +70,9 @@ class UiSchemaView(BrowserView):
         elif type == 'UploadField':
             return self.get_schema_for_uploadfield(child, scope)
         elif type == 'Array':
-            return self.get_schema_for_array(child, scope)
+            return self.get_schema_for_array(child, scope, recursive)
         elif type == 'Complex':
-            return self.get_schema_for_object(child, scope)
+            return self.get_schema_for_object(child, scope, recursive)
         elif type == 'Fieldset':
             return self.get_schema_for_fieldset(child, scope)
         return {}
@@ -152,10 +152,7 @@ class UiSchemaView(BrowserView):
 
         array_schema = {
             'type': 'Control',
-            'scope': array_scope,
-            'options': {
-                'descendantControlOverrides': {}
-            }
+            'scope': array_scope
         }
 
         if array.dependencies:
@@ -163,78 +160,9 @@ class UiSchemaView(BrowserView):
             if showOn != {}:
                 array_schema['showOn'] = showOn
 
-        def add_child(descendantControlOverrides, child_object, base_scope):
-            if child_object.portal_type in ["Field", "SelectionField", "UploadField"]:
-                descendantControlOverrides = add_control(descendantControlOverrides, child_object, base_scope)
-            elif child_object.portal_type in ["Fieldset", "Complex"]:
-                descendantControlOverrides = add_group(descendantControlOverrides, child_object, base_scope)
-            elif child_object.portal_type == "Array":
-                descendantControlOverrides = add_array(descendantControlOverrides, child_object, base_scope)
-            else:   # ignore this type
-                pass
-            return descendantControlOverrides
-        
-        def convert_to_child_of_array_schema(schema):
-            child_schema = {}
-            if "options" in schema:
-                child_schema['options'] = schema['options']
-            if "showOn" in schema:
-                child_schema['showOn'] = schema['showOn']
-            return child_schema
-
-        def add_control(descendantControlOverrides, child_object, base_scope):
-            child_tmp_schema = self.get_schema_for_child(child_object, base_scope)
-            child_schema = convert_to_child_of_array_schema(child_tmp_schema)
-            if child_schema != {}:
-                descendantControlOverrides[child_tmp_schema['scope']] = child_schema
-            return descendantControlOverrides
-
-        def add_group(descendantControlOverrides, object, scope):
-            if object.portal_type == "Fieldset":
-                # child_tmp_schema = self.get_schema_for_fieldset(object, scope, False)
-                base_scope = scope
-            elif object.portal_type == "Complex":
-                child_tmp_schema = self.get_schema_for_object(object, scope, False)
-                complex_scope = scope + create_id(object)
-                base_scope = complex_scope + "/properties/"
-
-                child_schema = convert_to_child_of_array_schema(child_tmp_schema)
-                if child_schema != {}:
-                    descendantControlOverrides[complex_scope] = child_schema
-            else:
-                return descendantControlOverrides
-
-            # add children
-            children = object.getFolderContents()
-            for child in children:
-                child_object = child.getObject()
-                descendantControlOverrides = add_child(descendantControlOverrides, child_object, base_scope)
-
-            return descendantControlOverrides
-
-        def add_array(descendantControlOverrides, object, scope):
-            child_tmp_schema = self.get_schema_for_array(object, scope, False)
-            if "showOn" in child_tmp_schema:
-                descendantControlOverrides[child_tmp_schema['scope']]['showOn'] = child_tmp_schema['showOn']
-
-            base_scope = child_tmp_schema['scope'] + "/items/properties/"
-            children = object.getFolderContents()
-            for child in children:
-                child_object = child.getObject()
-                descendantControlOverrides = add_child(descendantControlOverrides, child_object, base_scope)
-
-            return descendantControlOverrides
-
+        # add children of array to the schema
         if recursive:
-            # add children to array_schema
-            base_scope = array_scope + "/items/properties/"
-            descendantControlOverrides = {}
-            children = array.getFolderContents()
-            for child in children:
-                child_object = child.getObject()
-                descendantControlOverrides = add_child(descendantControlOverrides, child_object, base_scope)
-
-            array_schema['options']['descendantControlOverrides'] = descendantControlOverrides
+            array_schema['options'] = {'descendantControlOverrides': self.create_descendantControlOverrides(array_scope, array)}
 
         return array_schema
     
@@ -244,8 +172,79 @@ class UiSchemaView(BrowserView):
         complex_scope = scope + complex_id
         # self.lookup_scopes[complex_id] = complex_scope
 
-        return self.create_group(complex, complex_scope + '/properties/', recursive)
+        complex_schema = {
+            'type': 'Control',
+            'scope': complex_scope
+        }
 
+        if complex.dependencies:
+            showOn = create_showon_properties(complex, self.lookup_scopes)
+            if showOn != {}:
+                complex_schema['showOn'] = showOn
+
+        # add children of complex to the schema
+        if recursive:
+            complex_schema['options'] = {'descendantControlOverrides': self.create_descendantControlOverrides(complex_scope, complex)}
+
+        return complex_schema
+
+
+    def add_child_to_descendantControlOverrides(self, descendantControlOverrides, child_object, base_scope):
+        child_tmp_schema = {}
+
+        # add options and showon to the descendantControlOverrides
+        if child_object.portal_type in ["Field", "SelectionField", "UploadField", "Complex", "Array"]:
+            # descendantControlOverrides = add_control(descendantControlOverrides, child_object, scope)
+            child_tmp_schema = self.get_schema_for_child(child_object, base_scope, False)
+            
+            child_schema = {}
+            if "options" in child_tmp_schema:
+                child_schema['options'] = child_tmp_schema['options']
+            if "showOn" in child_tmp_schema:
+                child_schema['showOn'] = child_tmp_schema['showOn']
+
+            if child_schema != {}:
+                descendantControlOverrides[child_tmp_schema['scope']] = child_schema
+        else:   # ignore this type
+            pass
+
+        # add it recursively if child_object is a container type
+        if child_object.portal_type in ["Fieldset", "Complex", "Array"]:
+            container_base_scope = child_tmp_schema['scope']
+            if child_object.portal_type == "Array":
+                container_base_scope += "/items/properties/"
+            elif child_object.portal_type == "Complex":
+                container_base_scope += "/properties/"
+            for c in child_object.getFolderContents():
+                c_object = c.getObject()
+                descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, c_object, container_base_scope)
+
+        return descendantControlOverrides
+
+    # only call if parent_object of portal_type Array or Complex
+    def create_descendantControlOverrides(self, scope, parent_object):
+        # add children to array_schema
+        descendantControlOverrides = {}
+        base_scope = scope
+        if parent_object.portal_type == "Array":
+            base_scope += "/items"
+        base_scope += "/properties/"
+
+        for child in parent_object.getFolderContents():
+            child_object = child.getObject()
+            descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, child_object, base_scope)
+    
+        return descendantControlOverrides
+
+
+
+
+
+
+
+
+
+    # ????????
     def get_schema_for_fieldset(self, fieldset, scope, recursive=True):
         # save scope in lookup_scopes
         # fieldset_id = create_id(fieldset)
