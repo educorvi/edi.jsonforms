@@ -86,6 +86,9 @@ class IField(IDependentExtended):
             if data.maximum < data.minimum:
                 # TODO translate this string
                 raise Invalid(_('Maximum cannot be smaller than Minimum.'))
+        if data.maximum:
+            if data.maximum <= 0:
+                raise Invalid(_('Maximum cannot be smaller or equal to zero.'))
     
     @invariant
     def placeholder_invariant(data):
