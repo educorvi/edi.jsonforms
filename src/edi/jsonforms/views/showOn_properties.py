@@ -1,4 +1,5 @@
 from edi.jsonforms.views.common import create_id
+import re
 
 
 """
@@ -23,11 +24,25 @@ def get_scope(lookup_scopes, object):
             parent = parent.aq_parent
         while parent.portal_type != 'Form':
             if parent.portal_type != 'Fieldset':
-                scope = create_id(parent) + '/properties/' + scope
+                if parent.portal_type == "Array":
+                    scope = create_id(parent) + '/items/properties/' + scope
+                else:
+                    scope = create_id(parent) + '/properties/' + scope
             parent = parent.aq_parent
         scope = '/properties/' + scope
+    lookup_scopes[obj_id] = scope
 
-    return scope
+    # convert scope to object writing form:
+    # remove 'properties/' from the string
+    path = re.sub(r'properties/', '', scope)
+    # replace 'items' with '[0]' # TODO temporary until feature for "self" exists
+    path = re.sub(r'/items/', '[0].', path)
+    # replace remaining slashes with dots, but the first / is removed
+    path = re.sub(r'/', '.', path)
+    # remove leading dot if present
+    if path.startswith('.'):
+        path = path[1:]
+    return path
 
 def create_rule_for_single_select_option(scope, title):
     rule = {
@@ -92,6 +107,7 @@ def create_rule_for_num(scope):
                 'arguments': [
                     {
                         'type': 'atom',
+                        'default': 0,
                         'path': scope
                     },
                     0
@@ -104,6 +120,7 @@ def create_rule_for_num(scope):
                 'arguments': [
                     {
                         'type': 'atom',
+                        'default': 0,
                         'path': scope
                     },
                     0
@@ -124,6 +141,7 @@ def create_rule_for_text(scope):
                     'type': 'length',
                     'array': {
                         'type': 'atom',
+                        'default': "",
                         'path': scope
                     }
                 }
