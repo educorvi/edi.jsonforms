@@ -953,11 +953,12 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
     view = None
     maxDiff = None
     intids = None
-    ref_schema = reference_schemata.get_form_ref_schema("")
+    ref_schema = None
 
     def setUp(self):
         setUp_json_schema_test(self)
         self.intids = component.getUtility(IIntIds)
+        self.ref_schema = reference_schemata.get_form_ref_schema("")
 
     def create_all_content_types(self, container):
         # create dependent field in form 
@@ -984,7 +985,8 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
 
         return (dependent_field, dependent_selectionfield, dependent_complex, dependent_array)
 
-    def _test_form_schema(self, ref_schema=ref_schema):
+    def _test_form_schema(self, ref_schema=None):
+        ref_schema = ref_schema if ref_schema is not None else self.ref_schema
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
@@ -998,6 +1000,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         dep_field, dep_sel_field, dep_complex, dep_array = self.create_all_content_types(self.form)
         ids = [create_id(dep_field), create_id(dep_sel_field), create_id(dep_complex), create_id(dep_array)]
 
+        # test dep_field (type field, selection_field, upload_field, complex or array) is dependent required from the independent field
         def test_dep_req(dep_field, id):
             # add dependency to the independent_field
             dep_field.dependencies = [RelationValue(self.intids.getId(independent_field))]
@@ -1018,6 +1021,8 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
                     self.ref_schema['dependentRequired'][independent_field_id].append([id])
                 else:
                     self.ref_schema['dependentRequired'][independent_field_id] = [id]
+                if dep_field.portal_type == "Array":
+                    self.ref_schema['properties'][id]['minItems'] = 1
             # test schema, dependentrequired should be changed (unless it is a complex object)
             self._test_form_schema()
 
@@ -1032,6 +1037,9 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
                 self.ref_schema['dependentRequired'][independent_field_id].remove(id)
                 if self.ref_schema['dependentRequired'][independent_field_id] == []:
                     del self.ref_schema['dependentRequired'][independent_field_id]
+                if dep_field.portal_type == "Array":
+                    del self.ref_schema['properties'][create_id(dep_field)]['minItems']
+            dep_field.dependencies = []
 
         answer_types = [a.value for a in Answer_types]
         # test 'dependentRequired' for different answer types
@@ -1039,26 +1047,37 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
             independent_field.answer_type = at_independent
             self.ref_schema['properties'][independent_field_id] = reference_schemata.get_field_ref_schema(at_independent, independent_field.title)
 
-            for at_dependent in answer_types:
-                dep_field.answer_type = at_dependent
-                self.ref_schema['properties'][ids[0]] = reference_schemata.get_field_ref_schema(at_dependent, dep_field.title)
-                test_dep_req(dep_field, ids[0])
-                
-            for at_dependent in [a.value for a in Selection_answer_types]:
-                dep_sel_field.answer_type = at_dependent
-                self.ref_schema['properties'][ids[1]] = reference_schemata.get_selectionfield_ref_schema(at_dependent, dep_sel_field.title)
-                test_dep_req(dep_sel_field, ids[1])
+            self._test_dependencies([dep_field, dep_sel_field, dep_complex, dep_array], test_dep_req)
 
-            test_dep_req(dep_complex, ids[3])
+    """
+    test_dep_req takes a field and its id as argument
+    """
+    def _test_dependencies(self, dependents: list, test_dep_req):
+        answer_types = [a.value for a in Answer_types]
+        selection_answer_types = [a.value for a in Selection_answer_types]
+        ids = [create_id(obj) for obj in dependents]
 
-            # TODO
-            test_dep_req(dep_array, ids[4])
+        id = 0
+        for d in dependents:
+            if d.portal_type == "Field":
+                for at_dependent in answer_types:
+                    d.answer_type = at_dependent
+                    self.ref_schema['properties'][ids[id]] = reference_schemata.get_field_ref_schema(at_dependent, d.title)
+                    test_dep_req(d, ids[id])
+            elif d.portal_type == "SelectionField":
+                for at_dependent in selection_answer_types:
+                    d.answer_type = at_dependent
+                    self.ref_schema['properties'][ids[id]] = reference_schemata.get_selectionfield_ref_schema(at_dependent, d.title)
+                    test_dep_req(d, ids[id])
+            else:
+                test_dep_req(d, ids[id])
+            id += 1
 
-    # TODO
     def test_dependent_from_selectionfield(self):
-        # create independent field in the form
+        # create independent selectionfield in the form with two options
         independent_field = api.content.create(type="SelectionField", title="independent", container=self.form)
         opt1 = api.content.create(type="Option", title="yes", container=independent_field)
+        opt1_id = create_id(opt1)
         opt2 = api.content.create(type="Option", title="no", container=independent_field)
         options = [opt1.title, opt2.title]
 
@@ -1069,9 +1088,10 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         dep_field, dep_sel_field, dep_complex, dep_array = self.create_all_content_types(self.form)
         ids = [create_id(dep_field), create_id(dep_sel_field), create_id(dep_complex), create_id(dep_array)]
 
+        # test dep_field (type field, selection_field, upload_field, complex or array) is dependent required from the independent selectionfield
         def test_dep_req(dep_field, id):
-            # add dependency to the independent_field
-            dep_field.dependencies = [RelationValue(self.intids.getId(independent_field))]
+            # add dependency to the option of the independent_field
+            dep_field.dependencies = [RelationValue(self.intids.getId(opt1))]
             modified(dep_field)
             # test schema, nothing should be changed
             self._test_form_schema()
@@ -1085,13 +1105,9 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
             # make dependent one required
             dep_field.required_choice = "required"
             if dep_field.portal_type != "Complex":
-                self.ref_schema['allOf'] = {'if': {'properties': {independent_field_id}}}
-                # TODO
-
-                if independent_field_id in self.ref_schema['dependentRequired']:
-                    self.ref_schema['dependentRequired'][independent_field_id].append([id])
-                else:
-                    self.ref_schema['dependentRequired'][independent_field_id] = [id]
+                self.ref_schema['allOf'] = [{'if': {'properties': {independent_field_id: {'const': opt1.title}}}, 'then': {'required': id}}]
+                if dep_field.portal_type == "Array":
+                    self.ref_schema['properties'][id]['minItems'] = 1
             # test schema, dependentrequired should be changed (unless it is a complex object)
             self._test_form_schema()
 
@@ -1103,35 +1119,27 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
             # revert changes
             dep_field.required_choice = "optional"
             if dep_field.portal_type != "Complex":
-                self.ref_schema['dependentRequired'][independent_field_id].remove(id)
-                if self.ref_schema['dependentRequired'][independent_field_id] == []:
-                    del self.ref_schema['dependentRequired'][independent_field_id]
+                self.ref_schema['allOf'] = []
+                if dep_field.portal_type == "Array":
+                    del self.ref_schema['properties'][create_id(dep_field)]['minItems']
+            dep_field.dependencies = []
 
-        answer_types = [a.value for a in Answer_types]
+        selection_answer_types = [a.value for a in Selection_answer_types]
         # test 'dependentRequired' for different answer types
-        for at_independent in answer_types:
+        for at_independent in selection_answer_types:
             independent_field.answer_type = at_independent
-            self.ref_schema['properties'][independent_field_id] = reference_schemata.get_field_ref_schema(at_independent, independent_field.title)
+            self.ref_schema['properties'][independent_field_id] = reference_schemata.get_selectionfield_ref_schema(at_independent, independent_field.title, options)
 
-            for at_dependent in answer_types:
-                dep_field.answer_type = at_dependent
-                self.ref_schema['properties'][ids[0]] = reference_schemata.get_field_ref_schema(at_dependent, dep_field.title)
-                test_dep_req(dep_field, ids[0])
-                
-            for at_dependent in [a.value for a in Selection_answer_types]:
-                dep_sel_field.answer_type = at_dependent
-                self.ref_schema['properties'][ids[1]] = reference_schemata.get_selectionfield_ref_schema(at_dependent, dep_sel_field.title)
-                test_dep_req(dep_sel_field, ids[1])
+            self._test_dependencies([dep_field, dep_sel_field, dep_complex, dep_array], test_dep_req)
 
-            test_dep_req(dep_complex, ids[3])
-
-            # TODO
-            test_dep_req(dep_array, ids[4])
-
-
-
-    def test_dependent_from_selectionfield(self):
+    # TODO test additionally manually with JP after implementation
+    def test_dependent_from_uploadfield(self):
         pass
+
+
+    # TODO currently a dependency from an array is not possible
+    # def test_dependent_from_array(self):
+    #     pass
 
 
 # class ViewsJsonSchemaDependenciesTest(unittest.TestCase):
