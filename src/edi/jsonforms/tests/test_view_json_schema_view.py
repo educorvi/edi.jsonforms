@@ -937,15 +937,85 @@ class ViewsJsonSchemaNestedTest(unittest.TestCase):
         self._test_schema(ref_schema['properties'])
         
 
+class ViewsJsonSchemaFieldsetTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    form = None
+    view = None
+    ref_schema = None
 
-# class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
-#     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-#     view = None
-#     form = None
-#     field = []
-#     selectionfield = []
+    def _test_fieldset_schema(self, ref_schema=None):
+        ref_schema = ref_schema if ref_schema != None else self.ref_schema
+        computed_schema = json.loads(self.view())
+        self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-#     # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
+    def setUp(self):
+        setUp_json_schema_test(self)
+        self.ref_schema = reference_schemata.get_form_ref_schema("")
+
+    def test_empty_fieldset(self):
+        api.content.create(type="Fieldset", title="a fieldset", container=self.form)
+        self._test_fieldset_schema()
+
+    def create_everything_in_fieldset(self, schema, container):
+        for t in Answer_types:
+            t = t.value
+            child = api.content.create(type="Field", title="field_" + t, container=container)
+            child.answer_type = t
+            schema['properties'][create_id(child)] = reference_schemata.get_field_ref_schema(t, child.title)
+
+        for t in Selection_answer_types:
+            t = t.value
+            child = api.content.create(type="SelectionField", title="selectionfield_" + t, container=container)
+            child.answer_type = t
+            opt = api.content.create(type="Option", title="option1" + t, container=child)
+            schema['properties'][create_id(child)] = reference_schemata.get_selectionfield_ref_schema(t, child.title, [opt.title])
+
+        for t in Upload_answer_types:
+            t = t.value
+            child = api.content.create(type="UploadField", title="uploadfield_" + t, container=container)
+            child.answer_type = t
+            schema['properties'][create_id(child)] = reference_schemata.get_uploadfield_ref_schema(t, child.title)
+
+        array = api.content.create(type="Array", title="an array", container=container)
+        schema['properties'][create_id(array)] = reference_schemata.get_array_ref_schema(array.title)
+
+        array_child = api.content.create(type="Field", title="a field in an array", container=array)
+        schema['properties'][create_id(array)]['items']['properties'][create_id(array_child)] = reference_schemata.get_field_ref_schema(array_child.answer_type, array_child.title)
+
+        complex = api.content.create(type="Complex", title="a complex", container=container)
+        schema['properties'][create_id(complex)] = reference_schemata.get_complex_ref_schema(complex.title)
+
+        complex_child = api.content.create(type="Field", title="a field in a complex", container=complex)
+        schema['properties'][create_id(complex)]['properties'][create_id(complex_child)] = reference_schemata.get_field_ref_schema(complex_child.answer_type, complex_child.title)
+
+        fieldset2 = api.content.create(type="Fieldset", title="a fieldset in a fieldset", container=container)
+        fieldset2_child = api.content.create(type="Field", title="a field in an fieldset in an fieldset", container=fieldset2)
+        schema['properties'][create_id(fieldset2_child)] = reference_schemata.get_field_ref_schema(fieldset2_child.answer_type, fieldset2_child.title)
+
+    def test_fieldset_with_children(self):
+        fieldset = api.content.create(type="Fieldset", title="a fieldset", container=self.form)
+        self.create_everything_in_fieldset(self.ref_schema, fieldset)
+
+        self._test_fieldset_schema()
+
+    def test_nested_fieldset(self):
+        array = api.content.create(type="Array", title="an array", container=self.form)
+        self.ref_schema['properties'][create_id(array)] = reference_schemata.get_array_ref_schema(array.title)
+
+        fieldset1 = api.content.create(type="Fieldset", title="a fieldset in an array", container=array)
+        self.create_everything_in_fieldset(self.ref_schema['properties'][create_id(array)]['items'], fieldset1)
+
+        complex = api.content.create(type="Complex", title="a complex", container=self.form)
+        self.ref_schema['properties'][create_id(complex)] = reference_schemata.get_complex_ref_schema(complex.title)
+
+        fieldset2 = api.content.create(type="Fieldset", title="a fieldset in a complex", container=complex)
+        self.create_everything_in_fieldset(self.ref_schema['properties'][create_id(complex)], fieldset2)
+
+        self._test_fieldset_schema()
+
+
+
+    # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
 
 class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
