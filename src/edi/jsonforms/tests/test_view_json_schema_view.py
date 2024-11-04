@@ -865,8 +865,8 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
         for child in child_complex.getFolderContents():
             child = child.getObject()
             child.required_choice = "required"
-            child_complex_schema['items']['required'].append(create_id(child))
-        test_object_children_required(self, self.array, ref_schema, self._test_complex_schema)
+            child_complex_schema['required'].append(create_id(child))
+        test_object_children_required(self, self.complex, ref_schema, self._test_complex_schema)
 
 
 
@@ -954,6 +954,8 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
     maxDiff = None
     intids = None
     ref_schema = None
+    # field = []
+    # selectionfield = []
 
     def setUp(self):
         setUp_json_schema_test(self)
@@ -1042,7 +1044,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
             dep_field.dependencies = []
 
         answer_types = [a.value for a in Answer_types]
-        # test 'dependentRequired' for different answer types
+        # test 'dependentRequired' for different answer types of undependent field
         for at_independent in answer_types:
             independent_field.answer_type = at_independent
             self.ref_schema['properties'][independent_field_id] = reference_schemata.get_field_ref_schema(at_independent, independent_field.title)
@@ -1077,7 +1079,6 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         # create independent selectionfield in the form with two options
         independent_field = api.content.create(type="SelectionField", title="independent", container=self.form)
         opt1 = api.content.create(type="Option", title="yes", container=independent_field)
-        opt1_id = create_id(opt1)
         opt2 = api.content.create(type="Option", title="no", container=independent_field)
         options = [opt1.title, opt2.title]
 
@@ -1140,21 +1141,6 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
     # TODO currently a dependency from an array is not possible
     # def test_dependent_from_array(self):
     #     pass
-
-
-# class ViewsJsonSchemaDependenciesTest(unittest.TestCase):
-#     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-#     form = None
-#     view = None
-#     maxDiff = None
-
-#     def setUp(self):
-#         setUp_json_schema_test(self)
-
-
-
-# # class ViewsJsonSchemaFormWithFieldsetTest(unittest.TestCase):
-# #     pass
 
 
 
