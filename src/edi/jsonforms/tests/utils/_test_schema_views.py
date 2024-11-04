@@ -91,17 +91,19 @@ def test_json_schema_view_not_matching_interface(self, view_name):
 
 # set up a test, that needs a form and a view
 def setUp_json_schema_test(self):
+    setUpView(self, "json-schema-view")
+
+def setUp_ui_schema_test(self):
+    setUpView(self, "ui-schema-view")
+
+def setUpView(self, schema_view):
     self.portal = self.layer['portal']
     self.request = self.layer['request']
     setRoles(self.portal, TEST_USER_ID, ['Manager'])
     self.form = api.content.create(self.portal, "Form", "Fragebogen")
     self.view = api.content.get_view(
-        name="json-schema-view",
+        name=schema_view,
         context=self.portal['Fragebogen'],
         request=self.request,
     )
     self.maxDiff = None
-
-
-def setUp_ui_schema_test(self):
-    pass
