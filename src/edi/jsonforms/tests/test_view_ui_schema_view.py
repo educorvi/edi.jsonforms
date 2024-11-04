@@ -11,6 +11,8 @@ import json
 import unittest
 
 from edi.jsonforms.tests.utils._test_schema_views import test_json_schema_view_is_registered, test_json_schema_view_not_matching_interface, setUp_integration_test, setUp_ui_schema_test
+import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
+
 
 
 class ViewsIntegrationTest(unittest.TestCase):
@@ -26,6 +28,26 @@ class ViewsIntegrationTest(unittest.TestCase):
 
     def test_ui_schema_view_not_matching_interface(self):
         test_json_schema_view_not_matching_interface(self, 'ui-schema-view')
+
+class ViewsUiSchemaPlainFormTest(unittest.TestCase):
+    layer = EDI_JSONFORMS_INTEGRATION_TESTING
+    form = None
+    view = None
+
+    def setUp(self):
+        setUp_ui_schema_test(self)
+
+    def test_plain_form(self):
+        ref_schema = reference_schemata.get_form_ref_schema_ui()
+        computed_schema = json.loads(self.view())
+        self.assertEqual(ref_schema, dict(computed_schema))
+
+
+
+
+
+
+
 
 
 class ViewsFunctionalTest(unittest.TestCase):
