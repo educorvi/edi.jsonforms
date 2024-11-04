@@ -65,7 +65,7 @@ creates all types of Fields, SelectionFields and UploadFields inside the given A
 the ref_schema has to be of type {id-of-object-container: { ... }, ...}
 """
 def create_all_child_types_in_object(ref_schema, container):
-    container_id = create_id(container)
+    # container_id = create_id(container)
 
     # Fields
     for type in Answer_types:

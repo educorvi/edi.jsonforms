@@ -88,3 +88,131 @@ def get_array_ref_schema(title="an array") -> dict:
     }
     return array_reference_schema
 
+
+
+
+### ui schemas
+
+def get_form_ref_schema_ui():
+    schema = {
+        "version": "2.0",
+        "layout": {
+            "type": "VerticalLayout",
+            "elements": [
+                {
+                    "type": "Buttongroup",
+                    "buttons": [
+                        {
+                            "type": "Button",
+                            "buttonType": "submit",
+                            "text": "Submit",
+                            "options": {
+                                "variant": "primary"
+                            }
+                        },
+                        {
+                            "type": "Button",
+                            "buttonType": "reset",
+                            "text": "Reset this form",
+                            "options": {
+                                "variant": "danger"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    return schema
+
+"""
+ui_schema must be of type get_form_ref_schema_ui output
+"""
+def insert_into_ui_schema(ui_schema: dict, child_schema: dict) -> dict:
+    # add child_schema to the elements before the buttons
+    return ui_schema['layout']['elements'].insert(-2, child_schema)
+
+"""
+the title is only required if the type is "Fieldset"
+"""
+def get_child_ref_schema_ui(type: str, title="") -> dict:
+    if type in ["radio", "checkbox", "select", "selectmultiple"]:
+        return get_selectionfield_ref_schema_ui(type)
+    elif type in ["file", "file-multi"]:
+        return get_uploadfield_ref_schema_ui(type)
+    elif type == "Array":
+        return get_array_ref_schema_ui()
+    elif type == "Complex":
+        return get_complex_ref_schema_ui()
+    elif type == "Fieldset":
+        return get_fieldset_ref_schema_ui(title)
+    else:
+        return get_field_ref_schema_ui(type)
+    
+def get_field_ref_schema_ui(type: str, scope: str) -> dict:
+    schema = {"type": "Control", "scope": scope}
+    field_reference_schemata_ui = {
+        "text": {},
+        "textarea": {"options": {"multi": True}},
+        "password": {"options": {"format": "password"}},
+        "tel": {"options": {"format": "tel"}},
+        "url": {"options": {"format": "url"}},
+        "email": {"options": {"format": "email"}},
+        "date": {"options": {"format": "date"}},
+        "datetime-local": {"options": {"format": "date-time"}},
+        "time": {"options": {"format": "time"}},
+        "number": {},
+        "integer": {},
+        "boolean": {}
+    }
+
+    return schema.update(field_reference_schemata_ui[type])
+
+def get_selectionfield_ref_schema_ui(type: str, scope: str) -> dict:
+    schema = {"type": "Control", "scope": scope}
+
+    selectionfield_reference_schemata_ui = {
+        "radio": {"options": {"displayAs": "radiobuttons", "stacked": True}},
+        "checkbox": {"options": {"stacked": True}},
+        "select": {},
+        "selectmultiple": {"options": {"stacked": True}}
+    }
+    
+    return schema.update(selectionfield_reference_schemata_ui[type])
+
+def get_uploadfield_ref_schema_ui(type: str, scope: str) -> dict:
+    schema = {"type": "Control", "scope": scope}
+
+    uploadfield_reference_schemata = {
+        "file": {"options": {"acceptedFileType": "*"}},
+        "file-multi": {"options": {"acceptedFileType": "*", "allowMultipleFiles": True}}
+    }
+    return schema.update(uploadfield_reference_schemata[type])
+
+def get_array_ref_schema_ui(scope: str) -> dict:
+    schema = {
+        "type": "Control",
+        "scope": scope,
+        "options": {
+            "descendantControlOverrides": {}
+        }
+    }
+    return schema
+
+def get_complex_ref_schema_ui(scope: str) -> dict:
+    schema = {
+        "type": "Control",
+        "scope": scope,
+        "options": {
+            "descendantControlOverrides": {}
+        }
+    }
+    return schema
+
+def get_fieldset_ref_schema_ui(title: str) -> dict:
+    schema = {
+            "type": "Group",
+            "options": {"label": title},
+            "elements": []
+        }
+    return schema
