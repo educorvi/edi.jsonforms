@@ -125,29 +125,27 @@ def get_form_ref_schema_ui():
     }
     return schema
 
-"""
-ui_schema must be of type get_form_ref_schema_ui output
-"""
-def insert_into_ui_schema(ui_schema: dict, child_schema: dict) -> dict:
+def insert_into_elements(elements: dict, child_schema: list) -> dict:
     # add child_schema to the elements before the buttons
-    return ui_schema['layout']['elements'].insert(-2, child_schema)
+    elements.insert(-1, child_schema)
+    return elements
 
 """
 the title is only required if the type is "Fieldset"
 """
-def get_child_ref_schema_ui(type: str, title="") -> dict:
+def get_child_ref_schema_ui(type: str, scope: str, title="") -> dict:
     if type in ["radio", "checkbox", "select", "selectmultiple"]:
-        return get_selectionfield_ref_schema_ui(type)
+        return get_selectionfield_ref_schema_ui(type, scope)
     elif type in ["file", "file-multi"]:
-        return get_uploadfield_ref_schema_ui(type)
+        return get_uploadfield_ref_schema_ui(type, scope)
     elif type == "Array":
-        return get_array_ref_schema_ui()
+        return get_array_ref_schema_ui(scope)
     elif type == "Complex":
-        return get_complex_ref_schema_ui()
+        return get_complex_ref_schema_ui(scope)
     elif type == "Fieldset":
-        return get_fieldset_ref_schema_ui(title)
+        return get_fieldset_ref_schema_ui(title, scope)
     else:
-        return get_field_ref_schema_ui(type)
+        return get_field_ref_schema_ui(type, scope)
     
 def get_field_ref_schema_ui(type: str, scope: str) -> dict:
     schema = {"type": "Control", "scope": scope}
@@ -166,7 +164,8 @@ def get_field_ref_schema_ui(type: str, scope: str) -> dict:
         "boolean": {}
     }
 
-    return schema.update(field_reference_schemata_ui[type])
+    schema.update(field_reference_schemata_ui[type])
+    return schema
 
 def get_selectionfield_ref_schema_ui(type: str, scope: str) -> dict:
     schema = {"type": "Control", "scope": scope}
@@ -178,7 +177,8 @@ def get_selectionfield_ref_schema_ui(type: str, scope: str) -> dict:
         "selectmultiple": {"options": {"stacked": True}}
     }
     
-    return schema.update(selectionfield_reference_schemata_ui[type])
+    schema.update(selectionfield_reference_schemata_ui[type])
+    return schema
 
 def get_uploadfield_ref_schema_ui(type: str, scope: str) -> dict:
     schema = {"type": "Control", "scope": scope}
@@ -187,7 +187,8 @@ def get_uploadfield_ref_schema_ui(type: str, scope: str) -> dict:
         "file": {"options": {"acceptedFileType": "*"}},
         "file-multi": {"options": {"acceptedFileType": "*", "allowMultipleFiles": True}}
     }
-    return schema.update(uploadfield_reference_schemata[type])
+    schema.update(uploadfield_reference_schemata[type])
+    return schema
 
 def get_array_ref_schema_ui(scope: str) -> dict:
     schema = {
