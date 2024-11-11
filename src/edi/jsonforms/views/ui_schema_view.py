@@ -113,6 +113,8 @@ class UiSchemaView(BrowserView):
                 field_schema['options']['placeholder'] = field.placeholder
             else:
                 field_schema['options'] = {'placeholder': field.placeholder}
+
+        self.add_user_info(field, field_schema)
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield, scope):
@@ -130,6 +132,7 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'select':
             pass # nothing
 
+        self.add_user_info(selectionfield, selectionfield_schema)
         return selectionfield_schema
 
     def get_schema_for_uploadfield(self, uploadfield, scope):
@@ -143,6 +146,7 @@ class UiSchemaView(BrowserView):
         if uploadfield.answer_type == 'file-multi':
             uploadfield_schema['options']['allowMultipleFiles'] = True
 
+        self.add_user_info(uploadfield, uploadfield_schema)
         return uploadfield_schema
 
     def get_schema_for_helptext(self, helptext):
@@ -174,6 +178,8 @@ class UiSchemaView(BrowserView):
         if recursive:
             array_schema['options'] = {'descendantControlOverrides': self.create_descendantControlOverrides(array_scope, array)}
 
+        self.add_user_info(array, array_schema)
+
         return array_schema
     
     def get_schema_for_object(self, complex, scope, recursive=True):
@@ -195,6 +201,8 @@ class UiSchemaView(BrowserView):
         # add children of complex to the schema
         if recursive:
             complex_schema['options'] = {'descendantControlOverrides': self.create_descendantControlOverrides(complex_scope, complex)}
+
+        self.add_user_info(complex, complex_schema)
 
         return complex_schema
 
@@ -280,6 +288,14 @@ class UiSchemaView(BrowserView):
                 base_schema['showOn'] = showOn
 
         return base_schema
+
+    def add_user_info(self, child, child_schema):
+        # TODO comes with ui-schema version 3.1
+        if child.user_info:
+            if 'options' in child_schema:
+                child_schema['options']['helptext'] = child.user_info
+            else:
+                child_schema['options'] = {'helptext'} = child.user_info
 
     def create_group(self, group, scope, recursive):
         group_schema = {
