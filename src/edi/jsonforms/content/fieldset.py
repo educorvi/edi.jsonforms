@@ -19,7 +19,7 @@ class IFieldset(IDependent):
     """
     # TODO translate these three
     title = schema.TextLine(title=_("Title"))
-    description = schema.Textarea(title=_("Description"),
+    description = schema.Text(title=_("Description"),
                            description=_("This is description is only for intern use and won't be shown in the form."),
                              required=False)
 

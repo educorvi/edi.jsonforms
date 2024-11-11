@@ -69,6 +69,8 @@ class UiSchemaView(BrowserView):
             return self.get_schema_for_selectionfield(child, scope)
         elif type == 'UploadField':
             return self.get_schema_for_uploadfield(child, scope)
+        elif type == 'Helptext':
+            return self.get_schema_for_helptext(child)
         elif type == 'Array':
             return self.get_schema_for_array(child, scope, recursive)
         elif type == 'Complex':
@@ -142,6 +144,14 @@ class UiSchemaView(BrowserView):
             uploadfield_schema['options']['allowMultipleFiles'] = True
 
         return uploadfield_schema
+
+    def get_schema_for_helptext(self, helptext):
+        # helptext as html-element
+        helptext = {
+            'type': 'HTML',
+            'htmlData': str(helptext.helptext.output)
+        }
+        return helptext
 
 
     def get_schema_for_array(self, array, scope, recursive=True):
@@ -284,13 +294,6 @@ class UiSchemaView(BrowserView):
 
         if recursive:
             group_schema['elements'] = []
-
-            # add description as html-element
-            description = {
-                'type': 'HTML',
-                'htmlData': str(group.html_description.output)
-            }
-            group_schema['elements'].append(description)
 
             children = group.getFolderContents()
             for child in children:
