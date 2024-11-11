@@ -215,11 +215,6 @@ def add_title_and_description(schema, child):
 
     return schema
 
-# def add_userhelptext(schema, child):
-#     if child.user_helptext:
-#         schema['???'] = child.user_helptext
-#     return schema
-
 def add_interninformation(schema, child):
     if child.intern_information:
         schema['comment'] = child.intern_information

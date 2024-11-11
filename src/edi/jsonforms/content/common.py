@@ -1,4 +1,4 @@
-from plone.app.textfield import RichText
+# from plone.app.textfield import RichText
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.supermodel import model
@@ -7,8 +7,8 @@ from plone.autoform import directives
 from zope import schema
 from zope.globalrequest import getRequest
 from zope.interface import Invalid, invariant
-from zope.interface import provider
-from zope.schema.interfaces import IContextSourceBinder
+# from zope.interface import provider
+# from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from z3c.relationfield.schema import RelationChoice, RelationList
 from z3c.form.browser.radio import RadioFieldWidget
@@ -143,6 +143,7 @@ class IDependentExtended(IDependent):
     #                                  required=False)
 
     # previously tipp
+    # TODO will be displayed as a little "i". Right now ignored. Comes with UI-Schema Version 3.1
     user_helptext = schema.TextLine(title=_('Hint or helptext for the user'),
                              required=False)
 

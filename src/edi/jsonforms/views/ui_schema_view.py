@@ -284,6 +284,14 @@ class UiSchemaView(BrowserView):
 
         if recursive:
             group_schema['elements'] = []
+
+            # add description as html-element
+            description = {
+                'type': 'HTML',
+                'htmlData': str(group.html_description.output)
+            }
+            group_schema['elements'].append(description)
+
             children = group.getFolderContents()
             for child in children:
                 child_object = child.getObject()
