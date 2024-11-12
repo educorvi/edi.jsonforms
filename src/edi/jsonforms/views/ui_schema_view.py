@@ -295,7 +295,7 @@ class UiSchemaView(BrowserView):
             if 'options' in child_schema:
                 child_schema['options']['helptext'] = child.user_info
             else:
-                child_schema['options'] = {'helptext'} = child.user_info
+                child_schema['options'] = {'helptext': child.user_info}
 
     def create_group(self, group, scope, recursive):
         group_schema = {
