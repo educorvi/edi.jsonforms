@@ -125,9 +125,12 @@ def get_form_ref_schema_ui():
     }
     return schema
 
-def insert_into_elements(elements: dict, child_schema: list) -> dict:
+def insert_into_elements(elements: dict, child_schema: list, has_buttons_element=True) -> dict:
     # add child_schema to the elements before the buttons
-    elements.insert(-1, child_schema)
+    if has_buttons_element:
+        elements.insert(-1, child_schema)
+    else:
+        elements.append(child_schema)
     return elements
 
 """
@@ -138,6 +141,8 @@ def get_child_ref_schema_ui(type: str, scope: str, title="") -> dict:
         return get_selectionfield_ref_schema_ui(type, scope)
     elif type in ["file", "file-multi"]:
         return get_uploadfield_ref_schema_ui(type, scope)
+    elif type == "Helptext":
+        return get_helptext_ref_schema_ui(title)
     elif type == "Array":
         return get_array_ref_schema_ui(scope)
     elif type == "Complex":
@@ -188,6 +193,13 @@ def get_uploadfield_ref_schema_ui(type: str, scope: str) -> dict:
         "file-multi": {"options": {"acceptedFileType": "*", "allowMultipleFiles": True}}
     }
     schema.update(uploadfield_reference_schemata[type])
+    return schema
+
+def get_helptext_ref_schema_ui(text: str) -> dict:
+    schema = {
+        "type": "HTML",
+        "htmlData": text
+    }
     return schema
 
 def get_array_ref_schema_ui(scope: str) -> dict:
