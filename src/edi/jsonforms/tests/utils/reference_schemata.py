@@ -229,3 +229,16 @@ def get_fieldset_ref_schema_ui(title: str) -> dict:
             "elements": []
         }
     return schema
+
+"""
+descendantControlOverrides: needs key "descendantControlOverrides": {...}
+"""
+def insert_schema_into_descConOv(descendantControlOverrides: dict, child_schema: dict, scope: str):
+    controlOverrides = {}
+    if "options" in child_schema:
+        controlOverrides['options'] = child_schema['options']
+    if "showOn" in child_schema:
+        controlOverrides['showOn'] = child_schema['showOn']
+
+    if controlOverrides != {}:
+        descendantControlOverrides['options']['descendantControlOverrides'][scope] = controlOverrides

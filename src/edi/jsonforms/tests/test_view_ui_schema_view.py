@@ -161,8 +161,23 @@ class ViewsUiSchemaFormWithFieldsetTest(unittest.TestCase):
         # test filled fieldset in filled fieldset
         create_content_ui.create_and_test_all_children(self, self.ref_schema, self.ref_schema['layout']['elements'][0]['elements'], self.fieldset, "/properties/")
 
-    def test_array_in_fieldset(self):
-        pass
+    # def test_array_in_fieldset(self):
+    #     # test empty array in fieldset
+    #     nested_array = api.content.create(type="Array", title="Nested Array", container=self.fieldset)
+    #     nested_array_schema = reference_schemata.get_array_ref_schema_ui(nested_array.title)
+
+    #     # insert schema of nested_scope into descendantControlOverrides of self.array (flattened)
+    #     self.ref_schema['layout']['elements'][0]['elements'] = reference_schemata.insert_into_elements(self.ref_schema['layout']['elements'][0]['elements'], nested_array_schema)
+    #     self._test_schema(self.ref_schema)
+
+    #     # test filled array in fieldset
+    #     base_nested_scope = "/properties/" + create_id(nested_array) + "/items/properties/"
+    #     # insert children of nested_array into descendantControlOverrides of nested_array
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, nested_array_schema['options']['descendantControlOverrides'], nested_array, base_nested_scope)
+
+    #     # test filled array in filled fieldset
+    #     # create children in fieldset
+    #     create_content_ui.create_and_test_all_children(self, self.ref_schema, self.ref_schema['layout']['elements'][0]['elements'], self.fieldset, "/properties/")
         # TODO
 
     def test_complex_in_fieldset(self):
@@ -189,21 +204,39 @@ class ViewsUiSchemaFormWithArrayTest(unittest.TestCase):
         self.ref_schema['layout']['elements'] = reference_schemata.insert_into_elements(self.ref_schema['layout']['elements'], array_schema)
 
     def test_empty_array(self):
-        pass
         # TODO
-        # self._test_schema(self.ref_schema)
+        self._test_schema(self.ref_schema)
 
     def test_children_in_array(self):
-        pass
+        base_scope = "/properties/" + create_id(self.array) + "/items/properties/"
+        create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.ref_schema['layout']['elements'][0], self.array, base_scope)
         # TODO
 
-    def test_array_in_array(self):
-        pass
-        # TODO
+    # def test_array_in_array(self):
+    #     # test empty array in array
+    #     nested_array = api.content.create(type="Array", title="Nested Array", container=self.array)
+    #     nested_array_schema = reference_schemata.get_array_ref_schema_ui(nested_array.title)
 
-    def test_fieldset_in_array(self):
-        pass
-        # TODO
+    #     base_scope = "/properties/" + create_id(self.array) + "items/properties/"
+    #     nested_scope = base_scope + create_id(nested_array)
+    #     # insert nested_array_schema into descendantControlOverrides of self.array (flattened)
+    #     reference_schemata.insert_schema_into_descConOv(self.array['options']['descendantControlOverrides'], nested_array_schema, nested_scope)
+    #     self._test_schema(self.ref_schema)
+
+    #     # test filled array in array
+    #     base_nested_scope = nested_scope + "/items/properties/"
+    #     # insert children of nested_array into descendantControlOverrides of self.array (is flattened) using base_nested_scope
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.array['options']['descendantControlOverrides'], nested_array, base_nested_scope)
+
+    #     # test filled array in filled array
+    #     # insert children of self.array into descendantControlOverrides of self.array (is flattened) using base_scope
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.array['options']['descendantControlOverrides'], self.array, base_scope)
+    #     # TODO
+
+    # NOT POSSIBLE
+    # def test_fieldset_in_array(self):
+    #     pass
+    #     # TODO
 
     def test_complex_in_array(self):
         pass
@@ -229,21 +262,56 @@ class ViewsUiSchemaFormWithComplexTest(unittest.TestCase):
         self.ref_schema['layout']['elements'] = reference_schemata.insert_into_elements(self.ref_schema['layout']['elements'], complex_schema)
 
     def test_empty_complex(self):
-        pass
         # TODO
-        # self._test_schema(self.ref_schema)
+        self._test_schema(self.ref_schema)
 
     def test_children_in_complex(self):
-        pass
+        base_scope = "/properties/" + create_id(self.complex) + "/properties/"
+        create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.ref_schema['layout']['elements'][0], self.complex, base_scope)
         # TODO
 
-    def test_complex_in_complex(self):
-        pass
-        # TODO
+    # def test_complex_in_complex(self):
+    #     # TODO replace with create_children_test_container_in_container, also in other methods
+    #     # test empty complex in complex
+    #     nested_complex = api.content.create(type="Complex", title="Nested Complex", container=self.complex)
+    #     nested_complex_schema = reference_schemata.get_complex_ref_schema_ui(nested_complex.title)
 
-    def test_fieldset_in_complex(self):
-        pass
-        # TODO
+    #     base_scope = "/properties/" + create_id(self.complex) + "/properties/"
+    #     nested_scope = base_scope + create_id(nested_complex)
+    #     # insert nested_complex_schema into descendantControlOverrides of self.complex (flattened)
+    #     reference_schemata.insert_schema_into_descConOv(self.complex['options']['descendantControlOverrides'], nested_complex_schema, nested_scope)
+    #     self._test_schema(self.ref_schema)
+
+    #     # test filled complex in complex
+    #     base_nested_scope = nested_scope + "/properties/"
+    #     # insert children of nested_complex into descendantControlOverrides of self.complex (is flattened) using base_nested_scope
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.complex['options']['descendantControlOverrides'], nested_complex, base_nested_scope)
+
+    #     # test filled complex in filled complex
+    #     # insert children of self.complex into descendantControlOverrides of self.complex (is flattened) using base_scope
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.complex['options']['descendantControlOverrides'], self.complex, base_scope)
+    #     # TODO
+
+    # def test_fieldset_in_complex(self):
+    #     # test empty complex in complex
+    #     nested_fieldset = api.content.create(type="Fieldset", title="Nested Fieldset", container=self.complex)
+    #     nested_complex_schema = reference_schemata.get_complex_ref_schema_ui(nested_complex.title)
+
+    #     base_scope = "/properties/" + create_id(self.complex) + "/properties/"
+    #     nested_scope = base_scope + create_id(nested_complex)
+    #     # insert nested_complex_schema into descendantControlOverrides of self.complex (flattened)
+    #     reference_schemata.insert_schema_into_descConOv(self.complex['options']['descendantControlOverrides'], nested_complex_schema, nested_scope)
+    #     self._test_schema(self.ref_schema)
+
+    #     # test filled complex in complex
+    #     base_nested_scope = nested_scope + "/properties/"
+    #     # insert children of nested_complex into descendantControlOverrides of self.complex (is flattened) using base_nested_scope
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.complex['options']['descendantControlOverrides'], nested_complex, base_nested_scope)
+
+    #     # test filled complex in filled complex
+    #     # insert children of self.complex into descendantControlOverrides of self.complex (is flattened) using base_scope
+    #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.complex['options']['descendantControlOverrides'], self.complex, base_scope)
+    #     # TODO
 
     def test_array_in_complex(self):
         pass
