@@ -38,14 +38,14 @@ class UiSchemaView(BrowserView):
         buttons = {
             "type": "Buttongroup",
             "buttons": [
-                {
-                    "type": "Button",
-                    "buttonType": "submit",
-                    "text": _("Submit"),
-                    "options": {
-                        "variant": "primary"
-                    }
-                },
+                # {
+                #     "type": "Button",
+                #     "buttonType": "submit",
+                #     "text": _("Submit"),
+                #     "options": {
+                #         "variant": "primary"
+                #     }
+                # },
                 {
                     "type": "Button",
                     "buttonType": "reset",
@@ -71,6 +71,8 @@ class UiSchemaView(BrowserView):
             return self.get_schema_for_uploadfield(child, scope)
         elif type == 'Helptext':
             return self.get_schema_for_helptext(child)
+        elif type == 'Button Handler':
+            return self.get_schema_for_buttons(child)
         elif type == 'Array':
             return self.get_schema_for_array(child, scope, recursive)
         elif type == 'Complex':
@@ -156,6 +158,37 @@ class UiSchemaView(BrowserView):
             'htmlData': str(helptext.helptext.output)
         }
         return helptext
+
+    def get_schema_for_buttons(self, button_handler):
+        buttons = button_handler.getFolderContents()
+        if len(buttons) == 0:
+            return
+        
+        buttons_schema = {
+            "type": "Buttongroup",
+            "buttons": []
+        }
+
+        for button in buttons:
+            button = button.getObject()
+            button_schema = {
+                "type": "Button",
+                "buttonType": "submit",
+                "text": button.button_label,
+                "options": {
+                    "variant": "primary"
+                },
+                # TODO how to send to_address, from_address, email_text and subject from button (if it is an email handler) together with the form data?
+                "nativeSubmitSettings": {
+                    "formaction": "api endpoint to post data to", #TODO
+                    "formmethod": "post",
+                    # "formtarget": , ???
+                    "formenctype": "text/plain" # TODO so?
+                }
+            }
+            buttons_schema['buttons'].append(button_schema)
+
+        return buttons_schema
 
 
     def get_schema_for_array(self, array, scope, recursive=True):

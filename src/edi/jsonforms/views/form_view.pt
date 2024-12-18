@@ -8,6 +8,13 @@
         <!--json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
     <vue-json-form json-schema="${view/json_schema_view}" ui-schema="${view/ui_schema_view}" return-data-as-scopes="true"></vue-json-form>-->
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="true"></vue-json-form>
+        <!-- <div tal:repeat="button view/getButtons">
+          <button type="button"
+                  tal:attributes="onclick button/action"
+                  tal:content="button/label">
+              Button
+          </button>
+        </div> -->
         <h2>JSON-Schema</h2>
         <p tal:content="json" />
         <h2>UI-Schema</h2>

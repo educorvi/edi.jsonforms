@@ -28,6 +28,7 @@
     <element value="SelectionField" />
     <element value="UploadField" />
     <element value="Helptext" />
+    <element value="Button Handler" />
   </property>
   <!-- Schema, class and security -->
   <property name="add_permission">edi.jsonforms.AddForm</property>
