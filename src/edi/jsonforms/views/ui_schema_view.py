@@ -186,6 +186,7 @@ class UiSchemaView(BrowserView):
         # save scope in lookup_scopes
         complex_id = create_id(complex)
         complex_scope = scope + complex_id
+
         # self.lookup_scopes[complex_id] = complex_scope
 
         complex_schema = {
