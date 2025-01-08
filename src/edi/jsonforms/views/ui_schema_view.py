@@ -263,7 +263,7 @@ class UiSchemaView(BrowserView):
             pass
 
         # add it recursively if child_object is a container type
-        if child_object.portal_type in ["Fieldset", "Complex", "Array"]:
+        if child_object.portal_type in ["Complex", "Array"]:
             container_base_scope = child_tmp_schema['scope']
             if child_object.portal_type == "Array":
                 container_base_scope += "/items/properties/"
