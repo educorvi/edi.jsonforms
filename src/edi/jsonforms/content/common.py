@@ -120,11 +120,11 @@ class IDependent(model.Schema):
                                      description=_('Here you can provide additional information that the Software-Team should to take into account while creating the Form.'),
                                      required=False)
     
-    # TODO no added to ui-schema yet (version 3.1)
-    # TODO translate
-    user_info = schema.Text(title=_('Helptext for the user'),
-                                description=_("Is displayed as a little i next to the title."),
-                                required=False)
+    # # TODO no added to ui-schema yet (version 3.1)
+    # # TODO translate
+    # user_info = schema.Text(title=_('Helptext for the user'),
+    #                             description=_("Is displayed as a little i next to the title."),
+    #                             required=False)
 
 class IDependentExtended(IDependent):
     title = schema.TextLine(title=_('Title of the field/question'), required=True)

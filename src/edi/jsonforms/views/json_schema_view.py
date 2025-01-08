@@ -16,6 +16,8 @@ def check_for_dependencies(child_object):
 
 class JsonSchemaView(BrowserView):
 
+    content_types_without_schema = ['Helptext', 'Button Handler']
+
     def __init__(self, context, request):
         super().__init__(context, request)
         self.jsonschema = {}
@@ -38,7 +40,7 @@ class JsonSchemaView(BrowserView):
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 self.jsonschema = self.modify_schema_for_fieldset(self.jsonschema, child_object)
-            elif child_object.portal_type != 'Helptext':
+            elif child_object.portal_type not in self.content_types_without_schema:
                 self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
 
             # mark children as required
@@ -57,7 +59,7 @@ class JsonSchemaView(BrowserView):
             child_id = create_id(child_object)
             if child_object.portal_type == 'Fieldset':
                 schema = self.modify_schema_for_fieldset(schema, child_object)
-            elif child_object.portal_type != 'Helptext':
+            elif child_object.portal_type not in self.content_types_without_schema:
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
                 if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                     if check_for_dependencies(child_object):
@@ -186,7 +188,7 @@ class JsonSchemaView(BrowserView):
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 complex_schema = self.modify_schema_for_fieldset(complex_schema, child_object)
-            elif child_object.portal_type != 'Helptext':
+            elif child_object.portal_type not in self.content_types_without_schema:
                 complex_schema['properties'][create_id(child_object)] = self.get_schema_for_child(child_object)
 
             # mark children as required

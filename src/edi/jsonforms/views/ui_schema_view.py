@@ -33,7 +33,9 @@ class UiSchemaView(BrowserView):
             child_object = child.getObject()
 
             # add children to the schema
-            layout['elements'].append(self.get_schema_for_child(child_object, '/properties/'))
+            child_schema = self.get_schema_for_child(child_object, '/properties/')
+            if child_schema != None and child_schema != {}:
+                layout['elements'].append(child_schema)
 
         buttons = {
             "type": "Buttongroup",
@@ -162,7 +164,7 @@ class UiSchemaView(BrowserView):
     def get_schema_for_buttons(self, button_handler):
         buttons = button_handler.getFolderContents()
         if len(buttons) == 0:
-            return
+            return {}
         
         buttons_schema = {
             "type": "Buttongroup",
@@ -180,9 +182,9 @@ class UiSchemaView(BrowserView):
                 },
                 # TODO how to send to_address, from_address, email_text and subject from button (if it is an email handler) together with the form data?
                 "nativeSubmitSettings": {
-                    "formaction": "api endpoint to post data to", #TODO
+                    "formaction": "http://localhost:8080/jsonforms/test-descendantcontroloverrides/@send-email", #TODO
                     "formmethod": "post",
-                    # "formtarget": , ???
+                    "formtarget": "_top",
                     "formenctype": "text/plain" # TODO so?
                 }
             }
@@ -324,12 +326,13 @@ class UiSchemaView(BrowserView):
         return base_schema
 
     def add_user_info(self, child, child_schema):
-        # TODO comes with ui-schema version 3.1
-        if child.user_info:
-            if 'options' in child_schema:
-                child_schema['options']['helptext'] = child.user_info
-            else:
-                child_schema['options'] = {'helptext': child.user_info}
+        pass
+    #     # TODO comes with ui-schema version 3.1
+    #     if child.user_info:
+    #         if 'options' in child_schema:
+    #             child_schema['options']['helptext'] = child.user_info
+    #         else:
+    #             child_schema['options'] = {'helptext': child.user_info}
 
     def create_group(self, group, scope, recursive):
         group_schema = {
@@ -348,6 +351,9 @@ class UiSchemaView(BrowserView):
             children = group.getFolderContents()
             for child in children:
                 child_object = child.getObject()
-                group_schema['elements'].append(self.get_schema_for_child(child_object, scope))
+
+                child_schema = self.get_schema_for_child(child_object, scope)
+                if child_schema != None and child_schema != {}:
+                    group_schema['elements'].append(child_schema)
 
         return group_schema
