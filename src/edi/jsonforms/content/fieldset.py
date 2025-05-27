@@ -23,10 +23,6 @@ class IFieldset(IDependent):
     #                       description=_("This is description is only for intern use and won't be shown in the form."),
     #                         required=False)
 
-    introtext = RichText(title=_("Introtext"), 
-                         description = _("This text will be displayed as Intro of Fieldset"),
-                         required=False)
-
 
 @implementer(IFieldset)
 class Fieldset(Container):

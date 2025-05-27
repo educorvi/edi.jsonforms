@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-05-27 12:33+0000\n"
+"POT-Creation-Date: 2025-05-27 14:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,10 +179,6 @@ msgstr "In an UploadField an user can upload one or multiple files."
 msgid "Installs the edi.jsonforms add-on."
 msgstr "Installs the edi.jsonforms add-on."
 
-#: ./content/fieldset.py:26
-msgid "Introtext"
-msgstr ""
-
 #: ./views/json_schema_view.pt:9
 msgid "JSON-Schema"
 msgstr "JSON-Schema"
@@ -310,10 +306,6 @@ msgstr ""
 
 #: ./profiles/default/types/Helptext.xml
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
-msgstr ""
-
-#: ./content/fieldset.py:27
-msgid "This text will be displayed as Intro of Fieldset"
 msgstr ""
 
 #: ./content/field.py:27
