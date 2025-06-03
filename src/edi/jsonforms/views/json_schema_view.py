@@ -6,7 +6,9 @@ from Products.Five.browser import BrowserView
 import copy
 import json
 
-from edi.jsonforms.views.common import possibly_required_types, create_id
+from edi.jsonforms.views.common import possibly_required_types, create_id, string_type_fields
+
+is_extended_schema = True # True if schema is generated for an api call and not for the usual form view
 
 def check_for_dependencies(child_object):
     if child_object.dependencies is not None and child_object.dependencies != []:
@@ -222,6 +224,15 @@ def add_interninformation(schema, child):
         schema['comment'] = child.intern_information
     return schema
 
+def create_else_statement(child_object):
+    if child_object.portal_type == 'Field':
+        if child_object.answer_type in string_type_fields:
+            return {
+                'properties': {
+                    create_id(child_object): {'maxLength': 0}
+                }
+            }
+
 def add_dependent_required(schema, child_object, child_id):
     dependencies = child_object.dependencies
 
@@ -242,9 +253,12 @@ def add_dependent_required(schema, child_object, child_id):
                         }
                     },
                     'then': {
-                        'required': child_id
+                        'required': [child_id]
                     }
                 }
+
+                if is_extended_schema:
+                    if_then['else'] = create_else_statement(child_object)
                 # if 'allOf' in schema:
                 #     schema['allOf'].append(if_then)
                 # else:
