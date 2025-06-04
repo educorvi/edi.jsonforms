@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-07-11 13:37+0000\n"
+"POT-Creation-Date: 2025-05-27 14:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "A Field represents a specific data entry point within a Form where users
 msgid "A Fieldset is used to logically group fields inside a Form, allowing users to organize related fields together. By encapsulating fields within a fieldset, users can enhance the clarity and structure of their questionnaires or forms. Fieldsets provide a means to categorize and visually organize fields, improving the usability."
 msgstr "A Fieldset is used to logically group fields inside a Form, allowing users to organize related fields together. By encapsulating fields within a fieldset, users can enhance the clarity and structure of their questionnaires or forms. Fieldsets provide a means to categorize and visually organize fields, improving the usability."
 
-#: ./content/field.py:90
+#: ./content/field.py:98
 msgid "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
 msgstr "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
 
@@ -104,7 +104,11 @@ msgstr "Dependencies"
 msgid "Dependent from this answer option:"
 msgstr "Dependent from this answer option:"
 
-#: ./content/common.py:126
+#: ./content/helptext.py:22
+msgid "Description"
+msgstr ""
+
+#: ./content/common.py:132
 msgid "Description of the field/question"
 msgstr "Description of the field/question"
 
@@ -117,10 +121,6 @@ msgstr "Edit"
 #: ./content/field.py:24
 msgid "Email"
 msgstr "Email"
-
-#: ./views/ui_schema_view.py:156
-msgid "Enter an array element"
-msgstr "Enter an array element"
 
 #: ./profiles/default/types/Field.xml
 msgid "Field"
@@ -150,11 +150,16 @@ msgstr "For a number/integer this is the minimal value it must have.            
 msgid "Form"
 msgstr "Form"
 
+#: ./content/helptext.py:25
+#: ./profiles/default/types/Helptext.xml
+msgid "Helptext"
+msgstr ""
+
 #: ./content/common.py:120
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 
-#: ./content/common.py:146
+#: ./content/common.py:153
 msgid "Hint or helptext for the user"
 msgstr "Hint or helptext for the user"
 
@@ -185,6 +190,14 @@ msgstr "Label of the answer option"
 #: ./content/field.py:62
 msgid "Maximum"
 msgstr "Maximum"
+
+#: ./content/field.py:92
+msgid "Maximum cannot be smaller or equal to zero."
+msgstr ""
+
+#: ./content/field.py:88
+msgid "Maximum cannot be smaller than Minimum."
+msgstr ""
 
 #: ./content/field.py:56
 msgid "Minimum"
@@ -238,7 +251,7 @@ msgstr "Regular expression to validate a Textline/-area field."
 msgid "Required"
 msgstr "Required"
 
-#: ./views/ui_schema_view.py:46
+#: ./views/ui_schema_view.py:54
 msgid "Reset this form"
 msgstr "Reset this form"
 
@@ -251,17 +264,13 @@ msgid "Selection (single selection)"
 msgstr "Selection (single selection)"
 
 #: ./content/array.py:24
-#: ./content/common.py:129
+#: ./content/common.py:135
 msgid "Selection of Field Requirement"
 msgstr "Selection of Field Requirement"
 
 #: ./profiles/default/types/SelectionField.xml
 msgid "SelectionField"
 msgstr "SelectionField"
-
-#: ./views/ui_schema_view.py:38
-msgid "Submit"
-msgstr "Submit"
 
 #: ./content/field.py:22
 msgid "Telephone"
@@ -283,15 +292,31 @@ msgstr "The Form enables users to create and manage structured questionnaires, s
 msgid "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 msgstr "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 
+#: ./content/helptext.py:24
+msgid "The description won't be shown in the form."
+msgstr ""
+
 #: ./content/field.py:39
 msgid "The provided regular expression isn't valid."
 msgstr "The provided regular expression isn't valid."
+
+#: ./content/helptext.py:21
+msgid "The title won't be shown in the form."
+msgstr ""
+
+#: ./profiles/default/types/Helptext.xml
+msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
+msgstr ""
 
 #: ./content/field.py:27
 msgid "Time"
 msgstr "Time"
 
-#: ./content/common.py:124
+#: ./content/helptext.py:20
+msgid "Title"
+msgstr ""
+
+#: ./content/common.py:130
 msgid "Title of the field/question"
 msgstr "Title of the field/question"
 
@@ -311,7 +336,7 @@ msgstr "Unformatted intern information for the JSON-Schema"
 msgid "Uninstalls the edi.jsonforms add-on."
 msgstr "Uninstalls the edi.jsonforms add-on."
 
-#: ./content/field.py:96
+#: ./content/field.py:104
 msgid "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
 msgstr "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
 

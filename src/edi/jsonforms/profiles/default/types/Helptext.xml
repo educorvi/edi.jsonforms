@@ -1,47 +1,37 @@
 <?xml version="1.0"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    name="Form"
+    name="Helptext"
     meta_type="Dexterity FTI"
     i18n:domain="edi.jsonforms">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">Form</property>
+      name="title">Helptext</property>
   <property
       i18n:translate=""
-      name="description">The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets.</property>
+      name="description">This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form.</property>
 
   <property name="allow_discussion">False</property>
-  <property name="factory">Form</property>
-  <property name="icon_expr">string:${portal_url}/document_icon.png</property>
+  <property name="factory">Helptext</property>
+  <property name="icon_expr">string:puzzle</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
-  <property name="global_allow">True</property>
-  <property name="filter_content_types">True</property>
-  <property name="allowed_content_types">
-    <element value="Fieldset" />
-    <element value="Array" />
-    <element value="Complex" />
-    <element value="Field" />
-    <element value="SelectionField" />
-    <element value="UploadField" />
-    <element value="Helptext" />
-    <element value="Button Handler" />
-  </property>
+  <property name="global_allow">False</property>
   <!-- Schema, class and security -->
-  <property name="add_permission">edi.jsonforms.AddForm</property>
-  <property name="klass">edi.jsonforms.content.form.Form</property>
+  <property name="add_permission">edi.jsonforms.AddHelptext</property>
+  <property name="klass">edi.jsonforms.content.helptext.Helptext</property>
   <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema">edi.jsonforms.content.form.IForm</property>
+  <property name="schema">edi.jsonforms.content.helptext.IHelptext</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">
     <!-- Details about all standard behaviors following can be read at
          https://docs.plone.org/external/plone.app.dexterity/docs/reference/standard-behaviours.html
     -->
+    <!--<element value="plone.basic"/>-->
     <element value="plone.namefromtitle"/>
     <element value="plone.allowdiscussion"/>
     <element value="plone.excludefromnavigation"/>
@@ -49,27 +39,22 @@
     <element value="plone.ownership"/>
     <element value="plone.publication"/>
     <element value="plone.categorization"/>
-    <element value="plone.basic"/>
-    <element value="plone.app.referenceablebehavior.referenceable.IReferenceable" />
+    <!--<element value="plone.locking" />-->
     <!--<element value="plone.leadimage"/>-->
-    <element value="plone.relateditems"/>
+    <!--<element value="plone.relateditems"/>-->
     <!--<element value="plone.richtext"/>-->
     <!--<element value="plone.tableofcontents"/>-->
-    <element value="plone.versioning" />
+    <!--<element value="plone.versioning" />-->
     <!--<element value="plone.translatable" />-->
-    <!--<element value="plone.nextprevioustoggle" />-->
-    <!--<element value="plone.nextpreviousenabled" />-->
-    <!--<element value="plone.navigationroot" />-->
-    <!--<element value="plone.selectablecontrainstypes" />-->
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++Form</property>
-  <property name="default_view">form-view</property>
+  <property name="add_view_expr">string:${folder_url}/++add++Helptext</property>
+  <property name="default_view">view</property>
   <property name="default_view_fallback">False</property>
-  <property name="immediate_view">form-view</property>
+  <property name="immediate_view">view</property>
   <property name="view_methods">
-    <element value="form-view"/>
+    <element value="view"/>
   </property>
 
   <!-- Method aliases -->
@@ -96,7 +81,9 @@
       category="object"
       condition_expr=""
       i18n:attributes="title"
+      i18n:domain="plone"
       title="View"
+      icon_expr="string:toolbar-action/view"
       url_expr="string:${object_url}"
       visible="True">
     <permission value="View"/>
@@ -106,7 +93,9 @@
       category="object"
       condition_expr="not:object/@@plone_lock_info/is_locked_for_current_user|python:True"
       i18n:attributes="title"
+      i18n:domain="plone"
       title="Edit"
+      icon_expr="string:toolbar-action/edit"
       url_expr="string:${object_url}/edit"
       visible="True">
     <permission value="Modify portal content"/>

@@ -2,9 +2,13 @@
 
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
+
+import copy
 import json
 
-from edi.jsonforms.views.common import possibly_required_types, create_id
+from edi.jsonforms.views.common import possibly_required_types, create_id, string_type_fields
+
+is_extended_schema = True # True if schema is generated for an api call and not for the usual form view
 
 def check_for_dependencies(child_object):
     if child_object.dependencies is not None and child_object.dependencies != []:
@@ -13,6 +17,8 @@ def check_for_dependencies(child_object):
         return False
 
 class JsonSchemaView(BrowserView):
+
+    content_types_without_schema = ['Helptext', 'Button Handler']
 
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -28,6 +34,7 @@ class JsonSchemaView(BrowserView):
         self.jsonschema['properties'] = {}
         self.jsonschema['required'] = []
         self.jsonschema['dependentRequired'] = {}
+        self.jsonschema['allOf'] = []
         for child in children:
             child_object = child.getObject()
             child_id = create_id(child_object)
@@ -35,7 +42,7 @@ class JsonSchemaView(BrowserView):
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 self.jsonschema = self.modify_schema_for_fieldset(self.jsonschema, child_object)
-            else:
+            elif child_object.portal_type not in self.content_types_without_schema:
                 self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
 
             # mark children as required
@@ -45,7 +52,11 @@ class JsonSchemaView(BrowserView):
                 else:
                     self.jsonschema['required'].append(child_id)
 
+<<<<<<< HEAD
         return json.dumps(self.jsonschema, ensure_ascii=False)
+=======
+        return json.dumps(self.jsonschema, indent=4)
+>>>>>>> main
 
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()
@@ -54,7 +65,7 @@ class JsonSchemaView(BrowserView):
             child_id = create_id(child_object)
             if child_object.portal_type == 'Fieldset':
                 schema = self.modify_schema_for_fieldset(schema, child_object)
-            else:
+            elif child_object.portal_type not in self.content_types_without_schema:
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
                 if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                     if check_for_dependencies(child_object):
@@ -155,6 +166,7 @@ class JsonSchemaView(BrowserView):
 
     def get_schema_for_array(self, array):
         array_schema = add_title_and_description({'type': 'array'}, array)
+        array_schema = add_interninformation(array_schema, array)
         if array.required_choice == 'required':
             array_schema['minItems'] = 1
         array_schema['items'] = self.get_schema_for_object(array)
@@ -164,12 +176,15 @@ class JsonSchemaView(BrowserView):
         complex_schema = {}
         complex_schema['type'] = 'object'
         if object.portal_type != 'Array':
-            complex_schema['title'] = object.title
-            if object.description:
-                complex_schema['description'] = object.description
+            # complex_schema['title'] = object.title
+            # if object.description:
+            #     complex_schema['description'] = object.description
+            complex_schema = add_title_and_description(complex_schema, object)
+            complex_schema = add_interninformation(complex_schema, object)
         complex_schema['properties'] = {}
         complex_schema['required'] = []
         complex_schema['dependentRequired'] = {}
+        complex_schema['allOf'] = []
 
         children = object.getFolderContents()
         for child in children:
@@ -179,7 +194,7 @@ class JsonSchemaView(BrowserView):
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 complex_schema = self.modify_schema_for_fieldset(complex_schema, child_object)
-            else:
+            elif child_object.portal_type not in self.content_types_without_schema:
                 complex_schema['properties'][create_id(child_object)] = self.get_schema_for_child(child_object)
 
             # mark children as required
@@ -208,20 +223,27 @@ def add_title_and_description(schema, child):
 
     return schema
 
-# def add_userhelptext(schema, child):
-#     if child.user_helptext:
-#         schema['???'] = child.user_helptext
-#     return schema
-
 def add_interninformation(schema, child):
     if child.intern_information:
         schema['comment'] = child.intern_information
     return schema
 
+def create_else_statement(child_object):
+    if child_object.portal_type == 'Field':
+        if child_object.answer_type in string_type_fields:
+            return {
+                'properties': {
+                    create_id(child_object): {'maxLength': 0}
+                }
+            }
+
 def add_dependent_required(schema, child_object, child_id):
     dependencies = child_object.dependencies
-    schema_allof_copy = schema['allOf']
-    schema_dependenrequired_copy = schema['dependentRequired']
+
+    # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
+    schema_allof_copy = copy.deepcopy(schema['allOf'])
+    schema_dependentrequired_copy = copy.deepcopy(schema['dependentRequired'])
+
     for dep in dependencies:
         try:
             dep = dep.to_object
@@ -235,23 +257,28 @@ def add_dependent_required(schema, child_object, child_id):
                         }
                     },
                     'then': {
-                        'required': child_id
+                        'required': [child_id]
                     }
                 }
-                if 'allOf' in schema:
-                    schema['allOf'].append(if_then)
-                else:
-                    schema['allOf'] = [if_then]
+
+                if is_extended_schema:
+                    if_then['else'] = create_else_statement(child_object)
+                # if 'allOf' in schema:
+                #     schema['allOf'].append(if_then)
+                # else:
+                #     schema['allOf'] = [if_then]
+                schema['allOf'].append(if_then)
             else:
                 if dep_id in schema['dependentRequired']:
                     schema['dependentRequired'][dep_id].append(child_id)
                 else:
                     schema['dependentRequired'][dep_id] = [child_id]
         except:
-            # dependency got deleted, plone error
+            # dependency got deleted, plone error, ignore this dependency
             continue
     
-    # Check that at least one dependency wasn't deleted. Otherwise add child_object to required-list of the schema
-    if schema_allof_copy == schema['allOf'] and schema_dependenrequired_copy == schema['dependentRequired']:
+    # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
+    # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
+    if schema_allof_copy == schema['allOf'] and schema_dependentrequired_copy == schema['dependentRequired']:
         schema['required'].append(child_id)
     return schema
