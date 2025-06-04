@@ -8,16 +8,8 @@ import json
 
 from edi.jsonforms.views.common import possibly_required_types, create_id, string_type_fields
 
-is_extended_schema = True # True if schema is generated for an api call and not for the usual form view
-
-def check_for_dependencies(child_object):
-    if child_object.dependencies is not None and child_object.dependencies != []:
-        return True
-    else:
-        return False
-
 class JsonSchemaView(BrowserView):
-
+    is_extended_schema = False # True if schema is generated for an api call and not for the usual form view
     content_types_without_schema = ['Helptext', 'Button Handler']
 
     def __init__(self, context, request):
@@ -25,6 +17,10 @@ class JsonSchemaView(BrowserView):
         self.jsonschema = {}
 
     def __call__(self):
+        self.jsonschema = self.get_schema()
+        return json.dumps(self.jsonschema, ensure_ascii=False, indent=4)
+
+    def get_schema(self):
         self.jsonschema = {}
         form = self.context
         self.jsonschema['type'] = 'object'
@@ -48,15 +44,14 @@ class JsonSchemaView(BrowserView):
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                 if check_for_dependencies(child_object):
-                    self.jsonschema = add_dependent_required(self.jsonschema, child_object, child_id)
+                    self.jsonschema = self.add_dependent_required(self.jsonschema, child_object, child_id)
                 else:
                     self.jsonschema['required'].append(child_id)
 
-<<<<<<< HEAD
-        return json.dumps(self.jsonschema, ensure_ascii=False)
-=======
-        return json.dumps(self.jsonschema, indent=4)
->>>>>>> main
+        return self.jsonschema
+    
+    def set_is_extended_schema(self, value=True):
+        self.is_extended_schema = value
 
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()
@@ -69,7 +64,7 @@ class JsonSchemaView(BrowserView):
                 schema['properties'][child_id] = self.get_schema_for_child(child_object)
                 if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                     if check_for_dependencies(child_object):
-                        schema = add_dependent_required(schema, child_object, child_id)
+                        schema = self.add_dependent_required(schema, child_object, child_id)
                     else:
                         schema['required'].append(child_id)
         return schema
@@ -200,12 +195,65 @@ class JsonSchemaView(BrowserView):
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
                 if check_for_dependencies(child_object):
-                    complex_schema = add_dependent_required(complex_schema, child_object, child_id)
+                    complex_schema = self.add_dependent_required(complex_schema, child_object, child_id)
                 else:
                     complex_schema['required'].append(child_id)
 
         return complex_schema
+    
+    def add_dependent_required(self, schema, child_object, child_id):
+        dependencies = child_object.dependencies
 
+        # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
+        schema_allof_copy = copy.deepcopy(schema['allOf'])
+        schema_dependentrequired_copy = copy.deepcopy(schema['dependentRequired'])
+
+        for dep in dependencies:
+            try:
+                dep = dep.to_object
+                dep_id = create_id(dep)
+                if dep.portal_type == 'Option':
+                    selection_parent = dep.aq_parent
+                    if_then = {
+                        'if': {
+                            'properties': {
+                                create_id(selection_parent): {'const': dep.title}
+                            }
+                        },
+                        'then': {
+                            'required': [child_id]
+                        }
+                    }
+
+                    if self.is_extended_schema:
+                        if_then['else'] = create_else_statement(child_object)
+                    # if 'allOf' in schema:
+                    #     schema['allOf'].append(if_then)
+                    # else:
+                    #     schema['allOf'] = [if_then]
+                    schema['allOf'].append(if_then)
+                else:
+                    if dep_id in schema['dependentRequired']:
+                        schema['dependentRequired'][dep_id].append(child_id)
+                    else:
+                        schema['dependentRequired'][dep_id] = [child_id]
+            except:
+                # dependency got deleted, plone error, ignore this dependency
+                continue
+        
+        # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
+        # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
+        if schema_allof_copy == schema['allOf'] and schema_dependentrequired_copy == schema['dependentRequired']:
+            schema['required'].append(child_id)
+        return schema
+
+
+
+def check_for_dependencies(child_object):
+    if child_object.dependencies is not None and child_object.dependencies != []:
+        return True
+    else:
+        return False
 
 """
 create base schema for a field, selectionfield or an uploadfield
@@ -236,49 +284,3 @@ def create_else_statement(child_object):
                     create_id(child_object): {'maxLength': 0}
                 }
             }
-
-def add_dependent_required(schema, child_object, child_id):
-    dependencies = child_object.dependencies
-
-    # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
-    schema_allof_copy = copy.deepcopy(schema['allOf'])
-    schema_dependentrequired_copy = copy.deepcopy(schema['dependentRequired'])
-
-    for dep in dependencies:
-        try:
-            dep = dep.to_object
-            dep_id = create_id(dep)
-            if dep.portal_type == 'Option':
-                selection_parent = dep.aq_parent
-                if_then = {
-                    'if': {
-                        'properties': {
-                            create_id(selection_parent): {'const': dep.title}
-                        }
-                    },
-                    'then': {
-                        'required': [child_id]
-                    }
-                }
-
-                if is_extended_schema:
-                    if_then['else'] = create_else_statement(child_object)
-                # if 'allOf' in schema:
-                #     schema['allOf'].append(if_then)
-                # else:
-                #     schema['allOf'] = [if_then]
-                schema['allOf'].append(if_then)
-            else:
-                if dep_id in schema['dependentRequired']:
-                    schema['dependentRequired'][dep_id].append(child_id)
-                else:
-                    schema['dependentRequired'][dep_id] = [child_id]
-        except:
-            # dependency got deleted, plone error, ignore this dependency
-            continue
-    
-    # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
-    # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
-    if schema_allof_copy == schema['allOf'] and schema_dependentrequired_copy == schema['dependentRequired']:
-        schema['required'].append(child_id)
-    return schema

@@ -67,8 +67,11 @@ class JsonSchemaGet(Service):
     def reply(self):
         context = self.context
         view = context.restrictedTraverse('json-schema-view')
-        import pdb; pdb.set_trace()
-        return json.loads(view())
+        view.set_is_extended_schema(True)
+        return view.get_schema()              # kommt sortiert an, einmal entpacken
+        # return view()                         # kommt unsortiert an, aber muss zweimal entpacken
+        # return json.dumps(view.get_schema(), ensure_ascii=False)    # kommt unsortiert an, aber muss zweimal entpacken
+        # return json.loads(view())               # kommt sortiert an, einmal entpacken
 
 class UiSchemaGet(Service):
 
