@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from urllib.parse import urlencode
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
@@ -173,20 +174,47 @@ class UiSchemaView(BrowserView):
 
         for button in buttons:
             button = button.getObject()
+
+            request_url = "http://localhost:8080/Plone3/fragebogen-test-else-zweig/@send-email"
+
+            import pdb; pdb.set_trace()
+
+            query_params = {
+                "from_address": button.from_address,
+                "to_address": button.to_address,
+                "subject": button.subject if button.subject else "",
+                "email_text": button.email_text if button.email_text else ""
+            }
+
+            # Encode the query parameters
+            encoded_query = urlencode(query_params)
+
+            # Combine the base URL with the encoded query parameters
+            request_url = f"{request_url}?{encoded_query}"
+
+            # print(request_url)
+            # TODO add headers and auth to request after update of ui schema
+            # works: requests.post(request_url, headers={'Accept':'application/json', 'Content-Type': 'application/json'}, auth=('admin', 'admin'))
+            # also works: curl -X POST 'http://localhost:8080/Plone3/fragebogen-test-else-zweig/@send-email?to_address=nina.muecke@educorvi.de' \
+                # -H "Accept: application/json" \
+                # -H "Content-Type: application/json" \
+                # --user admin:admin \
+                # -d '{
+                #     "title": "My New Document",
+                #     "description": "A description of my document"
+
+
             button_schema = {
                 "type": "Button",
                 "buttonType": "submit",
                 "text": button.button_label,
                 "options": {
-                    "variant": "primary"
+                    "variant": "success",
+                    "submitOptions": {
+                        "action": "request",
+                        "requestUrl": request_url
+                    }
                 },
-                # TODO how to send to_address, from_address, email_text and subject from button (if it is an email handler) together with the form data?
-                "nativeSubmitSettings": {
-                    "formaction": "http://localhost:8080/jsonforms/test-descendantcontroloverrides/@send-email", #TODO
-                    "formmethod": "post",
-                    "formtarget": "_top",
-                    "formenctype": "text/plain" # TODO so?
-                }
             }
             buttons_schema['buttons'].append(button_schema)
 
