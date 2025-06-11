@@ -177,32 +177,22 @@ class UiSchemaView(BrowserView):
 
             request_url = "http://localhost:8080/Plone3/fragebogen-test-else-zweig/@send-email"
 
-            import pdb; pdb.set_trace()
-
             query_params = {
-                "from_address": button.from_address,
-                "to_address": button.to_address,
-                "subject": button.subject if button.subject else "",
-                "email_text": button.email_text if button.email_text else ""
+                "to_address": button.to_address
             }
+
+            if button.reply_to_address:
+                query_params['reply_to_address'] = button.reply_to_address
+            if button.email_subject:
+                query_params['subject'] = button.email_subject
+            if button.email_text:
+                query_params['email_text'] = button.email_text
 
             # Encode the query parameters
             encoded_query = urlencode(query_params)
 
             # Combine the base URL with the encoded query parameters
             request_url = f"{request_url}?{encoded_query}"
-
-            # print(request_url)
-            # TODO add headers and auth to request after update of ui schema
-            # works: requests.post(request_url, headers={'Accept':'application/json', 'Content-Type': 'application/json'}, auth=('admin', 'admin'))
-            # also works: curl -X POST 'http://localhost:8080/Plone3/fragebogen-test-else-zweig/@send-email?to_address=nina.muecke@educorvi.de' \
-                # -H "Accept: application/json" \
-                # -H "Content-Type: application/json" \
-                # --user admin:admin \
-                # -d '{
-                #     "title": "My New Document",
-                #     "description": "A description of my document"
-
 
             button_schema = {
                 "type": "Button",
@@ -212,7 +202,14 @@ class UiSchemaView(BrowserView):
                     "variant": "success",
                     "submitOptions": {
                         "action": "request",
-                        "requestUrl": request_url
+                        "request": {
+                            "url": request_url,
+                            "method": "POST",
+                            "headers": {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }
                     }
                 },
             }
