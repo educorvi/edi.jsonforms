@@ -7,8 +7,7 @@
       <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-view">
         <!--json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
     <vue-json-form json-schema="${view/json_schema_view}" ui-schema="${view/ui_schema_view}" return-data-as-scopes="true"></vue-json-form>-->
-        <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="true"></vue-json-form>
-        
+        <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
       </div>
       <!--<script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>-->
       <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
