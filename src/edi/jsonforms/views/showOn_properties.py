@@ -283,15 +283,15 @@ def get_rule(scope, object):
 def create_showon_properties(child, lookup_scopes):
     dependencies = child.dependencies
     if len(dependencies) == 1:
-        #try:
-        dep = dependencies[0].to_object
-        scope = find_scope(lookup_scopes, dep)
-        showOn = {
-            'id': 'ritaRule-' + create_id(child),
-            'rule': create_rule(scope, dep)
-        }
-        # except:
-        #     return {}
+        try:
+            dep = dependencies[0].to_object
+            scope = find_scope(lookup_scopes, dep)
+            showOn = {
+                'id': 'ritaRule-' + create_id(child),
+                'rule': create_rule(scope, dep)
+            }
+        except:
+            return {}
     else:
         conn = 'or'
         if child.connection_type:
