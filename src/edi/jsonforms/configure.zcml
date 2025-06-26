@@ -57,4 +57,16 @@
     name="edi.jsonforms"
     directory="static" />
 
+  <subscriber
+    for="edi.jsonforms.content.common.IFormElement
+        zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+    handler=".eventhandler.check_id_is_unique"
+    />
+
+  <subscriber
+    for="edi.jsonforms.content.common.IFormElement
+        zope.lifecycleevent.interfaces.IObjectAddedEvent"
+    handler=".eventhandler.check_id_is_unique"
+    />
+
 </configure>

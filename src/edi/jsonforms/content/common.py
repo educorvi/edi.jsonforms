@@ -43,8 +43,14 @@ def get_base_path_parent(context):
     return "/".join(basePath.getPhysicalPath())
 
 
+class IFormElement(model.Schema):
+    """
+    Interface for all content types that can be created within a Form, to check their id with an event handler (that it is unique within the Form).
+    """
 
-class IDependent(model.Schema):
+
+
+class IDependent(IFormElement):
 
     fieldset(
         'dependencies',

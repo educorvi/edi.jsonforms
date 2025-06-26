@@ -12,9 +12,10 @@ from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 
 from edi.jsonforms import _
+from edi.jsonforms.content.common import IFormElement
 
 
-class IOption(model.Schema):
+class IOption(IFormElement):
     """ Marker interface and Dexterity Python Schema for Option
     """
     title = schema.TextLine(title=_('Label of the answer option'))
