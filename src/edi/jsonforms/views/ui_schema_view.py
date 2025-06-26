@@ -367,8 +367,9 @@ class UiSchemaView(BrowserView):
     def create_group(self, group, scope, recursive):
         group_schema = {
             'type': 'Group',
-            'options': {'label': group.title},
         }
+        if group.show_title:
+            group_schema['options'] = {'label': group.title}
 
         if group.dependencies:
             showOn = create_showon_properties(group, self.lookup_scopes)

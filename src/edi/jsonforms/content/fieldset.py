@@ -23,6 +23,10 @@ class IFieldset(IDependent):
     #                       description=_("This is description is only for intern use and won't be shown in the form."),
     #                         required=False)
 
+    show_title = schema.Bool(title=_("Show title in form"),
+                             default=True,
+                             required=False)
+
 
 @implementer(IFieldset)
 class Fieldset(Container):
