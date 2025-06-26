@@ -103,7 +103,7 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'date':
             field_schema['options'] = {'format': 'date'}
         elif answer_type == 'datetime-local':
-            field_schema['options'] = {'format': 'date-time'}
+            field_schema['options'] = {'format': 'datetime-local'}
         elif answer_type == 'time':
             field_schema['options'] = {'format': 'time'}
         elif answer_type in ['number', 'integer']:

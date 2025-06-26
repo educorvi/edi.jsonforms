@@ -66,7 +66,7 @@ class IField(IDependentExtended):
                          required = False)
     
     unit = schema.TextLine(title=_('Unit of the answer'),
-                           description=_('Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt).'),
+                           description=_('Only use this for the answer types Decimal and Whole number (e.g. km, kg).'),
                            required=False)
     
     placeholder = schema.TextLine(title=_('Placeholder'),
