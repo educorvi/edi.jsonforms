@@ -137,6 +137,11 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'select':
             pass # nothing
 
+        if selectionfield.use_id_in_schema:
+            selectionfield_schema['options']['enumTitles'] = {}
+            for option in selectionfield.getFolderContents():
+                selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
+
         self.add_user_info(selectionfield, selectionfield_schema)
         return selectionfield_schema
 
