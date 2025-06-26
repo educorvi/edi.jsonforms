@@ -82,7 +82,7 @@ def create_rule_for_single_select_option(scope, title):
 
     return rule
 
-def create_rule_for_multi_select_option(scope, title):
+def create_rule_for_multi_select_option(scope, value):
     rule = {
         "type": "exists",
         "array":{
@@ -100,7 +100,7 @@ def create_rule_for_multi_select_option(scope, title):
                     "path": "current_option",
                     "default": ""
                 },
-                title
+                value
             ]
         }
     }
@@ -266,10 +266,13 @@ def create_rule(scope, object):
 
 def get_rule(scope, object):
     if object.portal_type == 'Option':
+        enum_value = object.title
+        if object.aq_parent.use_id_in_schema:
+            enum_value = object.id
         if object.aq_parent.answer_type in ['radio', 'select']:
-            rule = create_rule_for_single_select_option(scope, object.title)
+            rule = create_rule_for_single_select_option(scope, enum_value)
         elif object.aq_parent.answer_type in ['checkbox', 'selectmultiple']:
-            rule = create_rule_for_multi_select_option(scope, object.title)
+            rule = create_rule_for_multi_select_option(scope, enum_value)
     elif object.portal_type == 'Field':
         if object.answer_type == 'boolean':
             rule = create_rule_for_bool(scope)
