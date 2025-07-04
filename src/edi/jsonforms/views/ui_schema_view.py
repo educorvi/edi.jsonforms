@@ -61,7 +61,7 @@ class UiSchemaView(BrowserView):
         }
         layout['elements'].append(buttons)
         self.uischema['layout'] = layout
-        return json.dumps(self.uischema, ensure_ascii=False)
+        return json.dumps(self.uischema, ensure_ascii=False, indent=4)
 
     def get_schema_for_child(self, child, scope, recursive=True):
         type = child.portal_type
