@@ -69,4 +69,10 @@
     handler=".eventhandler.check_id_is_unique"
     />
 
+  <subscriber
+    for="edi.jsonforms.content.common.IFormElement
+        zope.lifecycleevent.interfaces.IObjectCopiedEvent"
+    handler=".eventhandler.mark_as_copied"
+    />
+
 </configure>
