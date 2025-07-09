@@ -11,10 +11,10 @@ from zope.interface import implementer
 
 
 from edi.jsonforms import _
-from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.common import IDependent
 
 
-class IHelptext(IFormElement):
+class IHelptext(IDependent):
     """ Marker interface and Dexterity Python Schema for Helptext
     """
     # TODO translate these three

@@ -6,7 +6,7 @@ from Products.Five.browser import BrowserView
 import json
 
 from edi.jsonforms import _
-from edi.jsonforms.views.common import possibly_required_types, create_id
+from edi.jsonforms.views.common import create_id, check_show_condition_in_request
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 
 
@@ -32,6 +32,8 @@ class UiSchemaView(BrowserView):
         children = form.getFolderContents()
         for child in children:
             child_object = child.getObject()
+            if child_object.portal_type != 'Button Handler' and not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                continue
 
             # add children to the schema
             child_schema = self.get_schema_for_child(child_object, '/properties/')
@@ -301,6 +303,8 @@ class UiSchemaView(BrowserView):
                 container_base_scope += "/properties/"
             for c in child_object.getFolderContents():
                 c_object = c.getObject()
+                if not check_show_condition_in_request(self.request, c_object.show_condition, c_object.negate_condition):
+                    continue
                 descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, c_object, container_base_scope)
 
         return descendantControlOverrides
@@ -316,6 +320,8 @@ class UiSchemaView(BrowserView):
 
         for child in parent_object.getFolderContents():
             child_object = child.getObject()
+            if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                continue
             descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, child_object, base_scope)
     
         return descendantControlOverrides
@@ -382,6 +388,8 @@ class UiSchemaView(BrowserView):
             children = group.getFolderContents()
             for child in children:
                 child_object = child.getObject()
+                if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                    continue
 
                 child_schema = self.get_schema_for_child(child_object, scope)
                 if child_schema != None and child_schema != {}:

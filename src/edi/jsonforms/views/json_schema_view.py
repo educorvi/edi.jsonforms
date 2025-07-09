@@ -6,7 +6,7 @@ from Products.Five.browser import BrowserView
 import copy
 import json
 
-from edi.jsonforms.views.common import possibly_required_types, create_id, string_type_fields
+from edi.jsonforms.views.common import possibly_required_types, create_id, string_type_fields, check_show_condition_in_request
 
 class JsonSchemaView(BrowserView):
     is_extended_schema = False # True if schema is generated for an api call and not for the usual form view
@@ -15,6 +15,8 @@ class JsonSchemaView(BrowserView):
     def __init__(self, context, request):
         super().__init__(context, request)
         self.jsonschema = {}
+        self.ids = set()
+        self.id_duplicates = set()
 
     def __call__(self):
         self.jsonschema = self.get_schema()
@@ -33,12 +35,14 @@ class JsonSchemaView(BrowserView):
         self.jsonschema['allOf'] = []
         for child in children:
             child_object = child.getObject()
-            child_id = create_id(child_object)
+            if child_object.portal_type in self.content_types_without_schema or not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                continue
+            child_id = self.create_and_check_id(child_object)
 
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 self.jsonschema = self.modify_schema_for_fieldset(self.jsonschema, child_object)
-            elif child_object.portal_type not in self.content_types_without_schema:
+            else:
                 self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
 
             # mark children as required
@@ -57,7 +61,9 @@ class JsonSchemaView(BrowserView):
         children = fieldset.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            child_id = create_id(child_object)
+            if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                continue
+            child_id = self.create_and_check_id(child_object)
             if child_object.portal_type == 'Fieldset':
                 schema = self.modify_schema_for_fieldset(schema, child_object)
             elif child_object.portal_type not in self.content_types_without_schema:
@@ -189,13 +195,15 @@ class JsonSchemaView(BrowserView):
         children = object.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            child_id = create_id(child_object)
+            if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                continue
+            child_id = self.create_and_check_id(child_object)
 
             # add children to the schema
             if child_object.portal_type == 'Fieldset':
                 complex_schema = self.modify_schema_for_fieldset(complex_schema, child_object)
             elif child_object.portal_type not in self.content_types_without_schema:
-                complex_schema['properties'][create_id(child_object)] = self.get_schema_for_child(child_object)
+                complex_schema['properties'][child_id] = self.get_schema_for_child(child_object)
 
             # mark children as required
             if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
@@ -251,6 +259,14 @@ class JsonSchemaView(BrowserView):
         if schema_allof_copy == schema['allOf'] and schema_dependentrequired_copy == schema['dependentRequired']:
             schema['required'].append(child_id)
         return schema
+    
+    def create_and_check_id(self, object):
+        id = create_id(object)
+        if id not in self.ids:
+            self.ids.add(id)
+        else:
+            self.id_duplicates.add(id)
+        return id
 
 
 
