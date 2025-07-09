@@ -31,7 +31,7 @@ class IUploadField(IDependentExtended):
     """
     answer_type = schema.Choice(title=_('Choose the answer type'),
                                 source=Upload_answer_types,
-                                default='file',
+                                default='file-multi',
                                 required=True)
 
     fieldset(
