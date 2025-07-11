@@ -6,7 +6,7 @@ from Products.Five.browser import BrowserView
 import copy
 import json
 
-from edi.jsonforms.views.common import possibly_required_types, create_id, string_type_fields, check_show_condition_in_request
+from edi.jsonforms.views.common import *
 
 class JsonSchemaView(BrowserView):
     is_extended_schema = False # True if schema is generated for an api call and not for the usual form view
@@ -26,7 +26,7 @@ class JsonSchemaView(BrowserView):
         self.jsonschema = {}
         form = self.context
         self.jsonschema['type'] = 'object'
-        self.jsonschema = add_title_and_description(self.jsonschema, form)
+        self.jsonschema = self.add_title_and_description(self.jsonschema, form)
 
         children = form.getFolderContents()
         self.jsonschema['properties'] = {}
@@ -91,7 +91,7 @@ class JsonSchemaView(BrowserView):
         return {}
 
     def get_schema_for_field(self, field):
-        field_schema = create_base_schema__field({}, field)
+        field_schema = self.create_base_schema__field({}, field)
         answer_type = field.answer_type
         if answer_type in ['text', 'textarea', 'password']:
             field_schema['type'] = 'string'
@@ -133,7 +133,7 @@ class JsonSchemaView(BrowserView):
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield):
-        selectionfield_schema = create_base_schema__field({}, selectionfield)
+        selectionfield_schema = self.create_base_schema__field({}, selectionfield)
         answer_type = selectionfield.answer_type
         options = selectionfield.getFolderContents()
 
@@ -157,7 +157,7 @@ class JsonSchemaView(BrowserView):
         return selectionfield_schema
 
     def get_schema_for_uploadfield(self, uploadfield):
-        uploadfield_schema = create_base_schema__field({}, uploadfield)
+        uploadfield_schema = self.create_base_schema__field({}, uploadfield)
         answer_type = uploadfield.answer_type
         if answer_type == 'file':
             uploadfield_schema['type'] = 'string'
@@ -171,7 +171,7 @@ class JsonSchemaView(BrowserView):
         return uploadfield_schema
 
     def get_schema_for_array(self, array):
-        array_schema = add_title_and_description({'type': 'array'}, array)
+        array_schema = self.add_title_and_description({'type': 'array'}, array)
         array_schema = add_interninformation(array_schema, array)
         if array.required_choice == 'required':
             array_schema['minItems'] = 1
@@ -182,10 +182,7 @@ class JsonSchemaView(BrowserView):
         complex_schema = {}
         complex_schema['type'] = 'object'
         if object.portal_type != 'Array':
-            # complex_schema['title'] = object.title
-            # if object.description:
-            #     complex_schema['description'] = object.description
-            complex_schema = add_title_and_description(complex_schema, object)
+            complex_schema = self.add_title_and_description(complex_schema, object)
             complex_schema = add_interninformation(complex_schema, object)
         complex_schema['properties'] = {}
         complex_schema['required'] = []
@@ -230,7 +227,7 @@ class JsonSchemaView(BrowserView):
                     if_then = {
                         'if': {
                             'properties': {
-                                create_id(selection_parent): {'const': dep.title}
+                                create_id(selection_parent): {'const': get_title(self.request, dep)}
                             }
                         },
                         'then': {
@@ -267,6 +264,23 @@ class JsonSchemaView(BrowserView):
         else:
             self.id_duplicates.add(id)
         return id
+    
+    """
+    create base schema for a field, selectionfield or an uploadfield
+    """
+    def create_base_schema__field(self, schema, child):
+        base_schema = self.add_title_and_description(schema, child)
+        # base_schema = add_userhelptext(base_schema, child)
+        base_schema = add_interninformation(base_schema, child)
+        return base_schema    
+
+    def add_title_and_description(self, schema, child):
+        schema['title'] = get_title(child, self.request)
+        description = get_description(child, self.request)
+        if description:
+            schema['description'] = description
+
+        return schema
 
 
 
@@ -275,22 +289,6 @@ def check_for_dependencies(child_object):
         return True
     else:
         return False
-
-"""
-create base schema for a field, selectionfield or an uploadfield
-"""
-def create_base_schema__field(schema, child):
-    base_schema = add_title_and_description(schema, child)
-    # base_schema = add_userhelptext(base_schema, child)
-    base_schema = add_interninformation(base_schema, child)
-    return base_schema
-
-def add_title_and_description(schema, child):
-    schema['title'] = child.title
-    if child.description:
-        schema['description'] = child.description
-
-    return schema
 
 def add_interninformation(schema, child):
     if child.intern_information:

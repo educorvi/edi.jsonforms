@@ -6,7 +6,7 @@ from Products.Five.browser import BrowserView
 import json
 
 from edi.jsonforms import _
-from edi.jsonforms.views.common import create_id, check_show_condition_in_request
+from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 
 
@@ -109,17 +109,19 @@ class UiSchemaView(BrowserView):
         elif answer_type == 'time':
             field_schema['options'] = {'format': 'time'}
         elif answer_type in ['number', 'integer']:
-            if field.unit:
-                field_schema['options'] = {'append': field.unit}
+            unit = get_unit(field, self.request)
+            if unit:
+                field_schema['options'] = {'append': unit}
         elif answer_type == 'boolean':
             pass
             # TODO
 
-        if field.placeholder and field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
+        placeholder = get_placeholder(field, self.request)
+        if placeholder and field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
             if 'options' in field_schema:
-                field_schema['options']['placeholder'] = field.placeholder
+                field_schema['options']['placeholder'] = placeholder
             else:
-                field_schema['options'] = {'placeholder': field.placeholder}
+                field_schema['options'] = {'placeholder': placeholder}
 
         self.add_user_info(field, field_schema)
         return field_schema
@@ -375,7 +377,7 @@ class UiSchemaView(BrowserView):
             'type': 'Group',
         }
         if group.show_title:
-            group_schema['options'] = {'label': group.title}
+            group_schema['options'] = {'label': get_title(group, self.request)}
 
         if group.dependencies:
             showOn = create_showon_properties(group, self.lookup_scopes)
