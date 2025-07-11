@@ -1,3 +1,12 @@
+# Endpoints
+
+## View Methods (relevant for vue json form component)
+- json-schema-view
+- ui-schema-view
+
+## API endpoints
+- @json-schema (includes else-statement in the allOf attribute)
+
 # Possible form types
 
 ## Field types
@@ -62,3 +71,19 @@
  - dependencies and their connection type (and, or)
  - intern information (for developers)
  - choice if the field is required (required)
+
+
+## Additional Features
+
+### Show Conditions
+ - one can specify that a field etc. is only shown if ?fork=condition is specified in the url
+ - it has to be specified in the attribute "Condition for showing this field" in the tab "Additional Information"
+
+### Override Options
+ - attributes can be overriden by specifying new values in the tab "Override Options". These only override the original attribute if ?fork=condition is specified in the url
+ - attributes that can be overridden:
+   - title
+   - description
+   - hint/helptext for the user
+   - unit (in case a unit is possible)
+   - placeholder (in case a placeholder is possible)
