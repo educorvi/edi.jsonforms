@@ -395,6 +395,13 @@ class UiSchemaView(BrowserView):
         }
         self.lookup_scopes[child_id] = child_scope
 
+        user_helptext = get_user_helptext(child, self.request)
+        if user_helptext:
+            if 'options' in base_schema:
+                base_schema['options']['help'] = {'text': user_helptext}
+            else:
+                base_schema['options'] = {'help': {'text': user_helptext}}
+
         # add showOn dependencies
         if child.dependencies:
             showOn = create_showon_properties(child, self.lookup_scopes)
