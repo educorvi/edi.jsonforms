@@ -142,6 +142,8 @@ class UiSchemaView(BrowserView):
             pass # nothing
 
         if selectionfield.use_id_in_schema:
+            if 'options' not in selectionfield_schema:
+                selectionfield_schema['options'] = {}
             selectionfield_schema['options']['enumTitles'] = {}
             for option in selectionfield.getFolderContents():
                 selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
