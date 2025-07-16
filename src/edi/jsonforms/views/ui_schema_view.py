@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from copy import deepcopy
 from urllib.parse import urlencode
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
@@ -258,7 +259,7 @@ class UiSchemaView(BrowserView):
                 encoded_query = urlencode(query_params)
                 request_url = f"{request_url}?{encoded_query}"
 
-                button_schema = request_button_schema.copy()
+                button_schema = deepcopy(request_button_schema)
                 button_schema['text'] = button.button_label
                 button_schema['options']['submitOptions']['request']['url'] = request_url
 
