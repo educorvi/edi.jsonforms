@@ -2,6 +2,7 @@
 
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
+from plone import api
 
 import copy
 import json
@@ -19,43 +20,65 @@ class JsonSchemaView(BrowserView):
         self.id_duplicates = set()
 
     def __call__(self):
-        self.jsonschema = self.get_schema()
+        self.get_schema()
         return json.dumps(self.jsonschema, ensure_ascii=False, indent=4)
-
+    
+    def set_is_extended_schema(self, value=True):
+        self.is_extended_schema = value
+    
     def get_schema(self):
-        self.jsonschema = {}
         form = self.context
-        self.jsonschema['type'] = 'object'
-        self.jsonschema = self.add_title_and_description(self.jsonschema, form)
+        self.set_json_base_schema(form)
 
         children = form.getFolderContents()
+        for child in children:
+            self.add_child_to_schema(child.getObject())
+
+        self.check_duplicates()
+
+        return self.jsonschema
+    
+    def set_json_base_schema(self, form):
+        self.jsonschema = {
+            'type': 'object'
+        }
+        self.jsonschema = self.add_title_and_description(self.jsonschema, form)
         self.jsonschema['properties'] = {}
         self.jsonschema['required'] = []
         self.jsonschema['dependentRequired'] = {}
         self.jsonschema['allOf'] = []
-        for child in children:
-            child_object = child.getObject()
-            if child_object.portal_type in self.content_types_without_schema or not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
-                continue
-            child_id = self.create_and_check_id(child_object)
+        self.ids = set()
+        self.id_duplicates = set()
 
-            # add children to the schema
-            if child_object.portal_type == 'Fieldset':
-                self.jsonschema = self.modify_schema_for_fieldset(self.jsonschema, child_object)
+    def add_child_to_schema(self, child_object):
+        if child_object.portal_type in self.content_types_without_schema or not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+            return
+        child_id = self.create_and_check_id(child_object)
+
+        # add children to the schema
+        if child_object.portal_type == 'Fieldset':
+            self.jsonschema = self.modify_schema_for_fieldset(self.jsonschema, child_object)
+        else:
+            self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
+
+        # mark children as required
+        if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
+            if check_for_dependencies(child_object):
+                self.jsonschema = self.add_dependent_required(self.jsonschema, child_object, child_id)
             else:
-                self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
+                self.jsonschema['required'].append(child_id)
 
-            # mark children as required
-            if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if check_for_dependencies(child_object):
-                    self.jsonschema = self.add_dependent_required(self.jsonschema, child_object, child_id)
-                else:
-                    self.jsonschema['required'].append(child_id)
-
-        return self.jsonschema
-    
-    def set_is_extended_schema(self, value=True):
-        self.is_extended_schema = value
+    def check_duplicates(self):
+        if self.id_duplicates:
+            if len(self.id_duplicates) == 1:
+                message = _('The id {id} is not unique. Please change it manually due to possible unexpected behavior').format(id=list(self.id_duplicates)[0])
+            else:
+                message = _('The ids {ids} are not unique. Please change them manually due to possible unexpected behavior').format(ids=', '.join(self.id_duplicates))
+            api.portal.show_message(
+                message=message,
+                request=self.request,
+                type='warning'
+            )
 
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()

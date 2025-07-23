@@ -20,51 +20,41 @@ class UiSchemaView(BrowserView):
 
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
-
+    
     def __call__(self):
+        self.get_schema()
+        return json.dumps(self.uischema, ensure_ascii=False, indent=4)
+    
+    def get_schema(self):
+        self.set_ui_base_schema()
+        
+        form = self.context
+        children = form.getFolderContents()
+        for child in children:
+            self.add_child_to_schema(child.getObject())
+
+        return self.uischema
+    
+    def set_ui_base_schema(self):
         self.uischema = {}
         self.lookup_scopes = {}
 
-        form = self.context
-        self.uischema = {'version': '2.0', 'layout': {}}
+        self.uischema = {
+            'version': '2.0',
+            'layout': {
+                'type': 'VerticalLayout',
+                'elements': []
+            }
+        }
+    
+    def add_child_to_schema(self, child_object):
+        if child_object.portal_type != 'Button Handler' and not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+            return
 
-        layout = {'type': 'VerticalLayout', 'elements': []}
-
-        children = form.getFolderContents()
-        for child in children:
-            child_object = child.getObject()
-            if child_object.portal_type != 'Button Handler' and not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
-                continue
-
-            # add children to the schema
-            child_schema = self.get_schema_for_child(child_object, '/properties/')
-            if child_schema != None and child_schema != {}:
-                layout['elements'].append(child_schema)
-
-        # buttons = {
-        #     "type": "Buttongroup",
-        #     "buttons": [
-        #         # {
-        #         #     "type": "Button",
-        #         #     "buttonType": "submit",
-        #         #     "text": _("Submit"),
-        #         #     "options": {
-        #         #         "variant": "primary"
-        #         #     }
-        #         # },
-        #         {
-        #             "type": "Button",
-        #             "buttonType": "reset",
-        #             "text": _("Reset this form"),
-        #             "options": {
-        #                 "variant": "danger"
-        #             }
-        #         }
-        #     ]
-        # }
-        # layout['elements'].append(buttons)
-        self.uischema['layout'] = layout
-        return json.dumps(self.uischema, ensure_ascii=False, indent=4)
+        # add children to the schema
+        child_schema = self.get_schema_for_child(child_object, '/properties/')
+        if child_schema != None and child_schema != {}:
+            self.uischema['layout']['elements'].append(child_schema)
 
     def get_schema_for_child(self, child, scope, recursive=True):
         type = child.portal_type
