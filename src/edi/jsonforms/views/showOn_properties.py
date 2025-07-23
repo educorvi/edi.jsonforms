@@ -90,14 +90,14 @@ def create_rule_for_multi_select_option(scope, value):
             "path": scope,
             "default": []
         },
-        "placeholder": f"current_option_{scope}",
+        "placeholder": f"current_option_{scope.replace('.', '_')}",
         "rule": {
             "type": "comparison",
             "operation": "equal",
             "arguments": [
                 {
                     "type": "atom",
-                    "path": f"current_option_{scope}",
+                    "path": f"current_option_{scope.replace('.', '_')}",
                     "default": ""
                 },
                 value
