@@ -74,7 +74,7 @@ def create_rule_for_single_select_option(scope, title):
             {
                 'type': 'atom',
                 'path': scope,
-                'default': None
+                'default': ''
             },
             title
         ]
@@ -90,14 +90,14 @@ def create_rule_for_multi_select_option(scope, value):
             "path": scope,
             "default": []
         },
-        "placeholder": "current_option",
+        "placeholder": f"current_option_{scope}",
         "rule": {
             "type": "comparison",
             "operation": "equal",
             "arguments": [
                 {
                     "type": "atom",
-                    "path": "current_option",
+                    "path": f"current_option_{scope}",
                     "default": ""
                 },
                 value
