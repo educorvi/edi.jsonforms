@@ -50,11 +50,11 @@
 
   <!-- View information -->
   <property name="add_view_expr">string:${folder_url}/++add++Helptext</property>
-  <property name="default_view">view</property>
+  <property name="default_view">form-element-view</property>
   <property name="default_view_fallback">False</property>
-  <property name="immediate_view">view</property>
+  <property name="immediate_view">form-element-view</property>
   <property name="view_methods">
-    <element value="view"/>
+    <element value="form-element-view"/>
   </property>
 
   <!-- Method aliases -->

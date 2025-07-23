@@ -28,7 +28,7 @@ class JsonSchemaView(BrowserView):
     
     def get_schema(self):
         form = self.context
-        self.set_json_base_schema(form)
+        self.set_json_base_schema()
 
         children = form.getFolderContents()
         for child in children:
@@ -38,11 +38,10 @@ class JsonSchemaView(BrowserView):
 
         return self.jsonschema
     
-    def set_json_base_schema(self, form):
+    def set_json_base_schema(self):
         self.jsonschema = {
             'type': 'object'
         }
-        self.jsonschema = self.add_title_and_description(self.jsonschema, form)
         self.jsonschema['properties'] = {}
         self.jsonschema['required'] = []
         self.jsonschema['dependentRequired'] = {}

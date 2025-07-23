@@ -8,9 +8,6 @@ from zope.interface import Interface
 
 from edi.jsonforms.content.form import Form
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
-from edi.jsonforms.views.common import check_show_condition_in_request
-
-from edi.jsonforms import _
 
 # from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
@@ -19,7 +16,6 @@ class IFormElementView(Interface):
 
 
 @implementer(IFormElementView)
-# class FormElementUiSchemaView(UiSchemaView):
 class FormElementJsonSchema(JsonSchemaView):
 
     def __init__(self, context, request):
@@ -30,7 +26,7 @@ class FormElementJsonSchema(JsonSchemaView):
         return json.dumps(jsonschema, ensure_ascii=False, indent=4)
     
     def json_schema(self):
-        self.set_json_base_schema(Form(title=_("Single View")))
+        self.set_json_base_schema()
 
         object = self.context
         self.add_child_to_schema(object)

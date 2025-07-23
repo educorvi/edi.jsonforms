@@ -7,7 +7,6 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 from edi.jsonforms.views.ui_schema_view import UiSchemaView
-from edi.jsonforms.views.common import check_show_condition_in_request
 
 # from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
