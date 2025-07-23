@@ -9,7 +9,6 @@
   <browser:page
     name="form-element-view"
     for="edi.jsonforms.content.common.IFormElement"
-    class=".form_element_view.FormElementView"
     template="form_element_view.pt"
     permission="zope2.View"
     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
