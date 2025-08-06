@@ -10,7 +10,7 @@
   </head>
   <body>
     <metal:block fill-slot="content-core">
-      <div class="m-3" tal:define="json context/@@form-element-json-schema; ui context/@@form-element-ui-schema">
+      <div class="m-3" tal:define="json context/@@form-element-json-schema; ui context/@@form-element-ui-schema-single-view">
       <!--TODO translate the titles-->
       <span>
         <a href="${view/get_view_url}" title="View"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">

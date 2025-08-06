@@ -30,5 +30,4 @@ class FormElementUiSchema(UiSchemaView):
 
         object = self.context
         self.add_child_to_schema(object)
-
         return self.uischema
