@@ -4,6 +4,8 @@ possibly_required_types = ['Field', 'SelectionField', 'UploadField', 'Array']
 
 string_type_fields = ['text', 'textarea', 'password', 'tel', 'url', 'email', 'date', 'datetime-local', 'time']
 
+container_types = ['Array', 'Fieldset', 'Complex']
+
 def create_id(object):
     id_str = str(object.id)
     return id_str
@@ -12,6 +14,24 @@ def create_unique_id(object):
     id_str =  str(object.id) + str(object.UID())
     escaped_id_str = id_str.replace('.', '').replace('/', '')
     return escaped_id_str
+
+def get_view_url(object):
+        return object.absolute_url()
+    
+def get_edit_url(object):
+    return object.absolute_url() + '/edit'
+
+def get_content_url(object):
+    if has_content(object):
+        return object.absolute_url() + '/folder_contents'
+    else:
+        return get_view_url(object)
+
+def get_delete_url(object):
+    return object.absolute_url() + '/delete_confirmation'
+
+def has_content(object):
+    return object.portal_type in ['Array', 'Selection Field', 'Button Handler', 'Fieldset', 'Complex']
 
 def get_fork(request):
     fork = request.get('fork', '')
