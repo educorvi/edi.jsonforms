@@ -5,12 +5,24 @@
   <body>
     <metal:block fill-slot="content-core">
       <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-view">
-        <!--json-schema='{"type":"object","properties":{"name":{"type":"string","minLength":1}},"required":["name"]}'
-    <vue-json-form json-schema="${view/json_schema_view}" ui-schema="${view/ui_schema_view}" return-data-as-scopes="true"></vue-json-form>-->
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
+
+        <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+
+        <!-- <div tal:repeat="child view/get_children"> -->
+
+        <!-- <html tal:replace="structure view/get_vjf_for_children"/> -->
+        <!-- <vue-json-form tal:attributes="json-schema child/@@form-element-json-schema; ui-schema child/@@form-element-ui-schema" return-data-as-scopes="false"></vue-json-form> -->
+        <!-- </div> -->
+
+        <script type="text/javascript" src="++resource++edi.jsonforms/js/replace_with_icons.js"></script>
+
+
+        <!-- <h4>JSON-Schema</h4>
+        <p tal:content="json" />
+        <h4>UI-Schema</h4>
+        <p tal:content="ui" /> -->
       </div>
-      <!--<script type="text/javascript" src="++resource++edi.jsonforms/js/test.js"></script>-->
-      <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
     </metal:block>
   </body>
 </html>
