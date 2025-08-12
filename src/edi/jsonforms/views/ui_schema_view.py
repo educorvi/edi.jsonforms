@@ -246,6 +246,9 @@ class UiSchemaView(BrowserView):
                             query_params[f'endpoint_{i}_api_key_header_name'] = endpoint.api_key_header_name
                             query_params[f'endpoint_{i}_api_key'] = endpoint.api_key
                     i += 1
+
+                if button.page_after_success:
+                    query_params['page_after_success'] = button.page_after_success
                 encoded_query = urlencode(query_params)
                 request_url = f"{request_url}?{encoded_query}"
 
