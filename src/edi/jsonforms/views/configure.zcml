@@ -63,5 +63,19 @@
     permission="zope2.View"
     />
 
+  <browser:page
+    name="simple-ui-schema-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".simple_ui_schema_view.SimpleUiSchemaView"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="cpt-generator"
+    for="edi.jsonforms.content.form.IForm"
+    class=".cpt_generator.ChameleonPageTemplateGenerator"
+    permission="zope2.View"
+    />
+
 
 </configure>
