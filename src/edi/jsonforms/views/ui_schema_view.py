@@ -376,16 +376,16 @@ class UiSchemaView(BrowserView):
         #                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>\
         #             </svg></a>\
         #         </span>']
-        html_links = ['<span><a href="{view_url}" title="View"><i class="bi bi-eye"></a>\n\
-                        <a href="{edit_url}" title="Edit"><i class="bi bi-pen-fill"></a>\n',
-                        '<a href="{content_url}" title="Content"><i class="bi bi-card-list"></i></a>\n',
-                        '<a href="{delete_url}" title="Delete"><i class="bi bi-trash"></i></a></span>'
+        html_links = ['<span><a href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
+                        <a href="{edit_url}" title="{edit}"><i class="bi bi-pen-fill"></a>\n',
+                        '<a href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
+                        '<a href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>'
                         ]
 
-        tools = html_links[0].format(view_url=get_view_url(child_object), edit_url=get_edit_url(child_object))
+        tools = html_links[0].format(view_url=get_view_url(child_object), view=_('View'), edit_url=get_edit_url(child_object), edit=_('Edit'))
         if has_content(child_object):
-            tools += html_links[1].format(content_url=get_content_url(child_object))
-        tools += html_links[2].format(delete_url=get_delete_url(child_object))
+            tools += html_links[1].format(content_url=get_content_url(child_object), content=_('Content'))
+        tools += html_links[2].format(delete_url=get_delete_url(child_object), delete=_('Delete'))
         return tools
 
     def add_tools_to_schema(self, child_schema, child_object):
