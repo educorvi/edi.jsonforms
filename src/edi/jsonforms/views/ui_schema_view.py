@@ -172,6 +172,7 @@ class UiSchemaView(BrowserView):
     def get_schema_for_helptext(self, helptext):
         # helptext as html-element
         helptext_schema = self.helptext_schema(self.get_tools_html(helptext) + '\n' + str(helptext.helptext.output))
+        helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
         return helptext_schema
 
     def get_schema_for_buttons(self, button_handler):
@@ -457,7 +458,7 @@ class UiSchemaView(BrowserView):
         if group.show_title:
             group_schema = self.add_option_to_schema(group_schema, {'label': get_title(group, self.request)})
 
-        group_schema = self.add_tools_to_schema(group_schema, group)
+        # group_schema = self.add_tools_to_schema(group_schema, group) # gets ignored, add html element before group instead
         group_schema = self.add_dependencies_to_schema(group_schema, group)
 
         if recursive:
@@ -471,7 +472,6 @@ class UiSchemaView(BrowserView):
 
                 child_schema = self.get_schema_for_child(child_object, scope)
                 if child_schema != None and child_schema != {}:
-                    child_schema = self.add_tools_to_schema(child_schema, child_object)
                     group_schema['elements'].append(child_schema)
 
         if self.tools_on:
