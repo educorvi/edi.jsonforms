@@ -55,35 +55,50 @@ class ChameleonPageTemplateGenerator(BrowserView):
         properties = self.schema.get("properties", {})
         required_fields = self.schema.get("required", [])
 
-        # Group fields by row based on column classes
-        rows = self._group_fields_by_row(properties)
+        # Process all form children in order, including Helptext
+        form_children = self.context.getFolderContents()
         
-        for row_fields in rows:
-            row_div = div(cls="row")
-            for field_name in row_fields:
-                ui_config = self.ui_schema.get(field_name, {})
-                column_class = ui_config.get("ui:column", "col-12")
-                col_div = div(cls=column_class)
+        for child in form_children:
+            child_obj = child.getObject()
+            if not check_show_condition_in_request(self.request, child_obj.show_condition, child_obj.negate_condition):
+                continue
                 
-                # Handle conditional fields and custom attributes
-                field_attributes = {"tal:replace": f"structure form['{field_name}'].render_template(form.widget.item_template)"}
-                
-                # Add conditions as data attributes
-                if "ui:conditions" in ui_config:
-                    conditions_data = self._prepare_conditions_data(ui_config)
-                    field_attributes.update(conditions_data)
-                    # Make sure conditional fields have the right class
-                    current_class = col_div.attributes.get('class', '')
-                    col_div.attributes['class'] = f"{current_class} conditional-field".strip()
-                
-                # Add custom attributes
-                if "ui:attributes" in ui_config:
-                    field_attributes.update(ui_config["ui:attributes"])
-                
-                field_div = div(**field_attributes)
-                col_div.add(field_div)
-                row_div.add(col_div)
-            form_element.add(row_div)
+            if child_obj.portal_type == 'Helptext':
+                # Add helptext as static HTML content
+                helptext_html = self._generate_helptext(child_obj)
+                form_element.add_raw_string(helptext_html)
+            elif child_obj.portal_type in ['Field', 'SelectionField', 'UploadField', 'Array', 'Complex']:
+                # Process regular fields through UI schema
+                field_name = create_id(child_obj)
+                if field_name in self.ui_schema:
+                    row_div = div(cls="row")
+                    ui_config = self.ui_schema[field_name]
+                    column_class = ui_config.get("ui:column", "col-12")
+                    col_div = div(cls=column_class)
+                    
+                    # Handle conditional fields and custom attributes
+                    field_attributes = {"tal:replace": f"structure form['{field_name}'].render_template(form.widget.item_template)"}
+                    
+                    # Add conditions as data attributes
+                    if "ui:conditions" in ui_config:
+                        conditions_data = self._prepare_conditions_data(ui_config)
+                        field_attributes.update(conditions_data)
+                        # Make sure conditional fields have the right class
+                        current_class = col_div.attributes.get('class', '')
+                        col_div.attributes['class'] = f"{current_class} conditional-field".strip()
+                    
+                    # Add custom attributes
+                    if "ui:attributes" in ui_config:
+                        field_attributes.update(ui_config["ui:attributes"])
+                    
+                    field_div = div(**field_attributes)
+                    col_div.add(field_div)
+                    row_div.add(col_div)
+                    form_element.add(row_div)
+            elif child_obj.portal_type == 'Fieldset':
+                # Process fieldset children
+                fieldset_html = self._generate_fieldset(child_obj)
+                form_element.add_raw_string(fieldset_html)
         
         container.add(form_element)
         return str(container)
@@ -161,3 +176,65 @@ class ChameleonPageTemplateGenerator(BrowserView):
             "data-conditions": conditions_json,
             "data-condition-logic": logic
         }
+
+    def _generate_helptext(self, helptext_obj) -> str:
+        """Generate static HTML for helptext content."""
+        helptext_content = ""
+        if hasattr(helptext_obj, 'helptext') and helptext_obj.helptext:
+            helptext_content = str(helptext_obj.helptext.output)
+        
+        helptext_html = f'''
+        <div class="row">
+            <div class="col-12">
+                <div class="helptext-content mb-3">
+                    {helptext_content}
+                </div>
+            </div>
+        </div>'''
+        
+        return helptext_html
+
+    def _generate_fieldset(self, fieldset_obj) -> str:
+        """Generate HTML for fieldset and its children."""
+        fieldset_title = get_title(fieldset_obj, self.request)
+        fieldset_html_parts = []
+        
+        # Add fieldset header if it has a title
+        if fieldset_title and getattr(fieldset_obj, 'show_title', True):
+            fieldset_html_parts.append(f'''
+        <div class="row">
+            <div class="col-12">
+                <h3 class="fieldset-title">{fieldset_title}</h3>
+            </div>
+        </div>''')
+        
+        # Process fieldset children
+        fieldset_children = fieldset_obj.getFolderContents()
+        for child in fieldset_children:
+            child_obj = child.getObject()
+            if not check_show_condition_in_request(self.request, child_obj.show_condition, child_obj.negate_condition):
+                continue
+                
+            if child_obj.portal_type == 'Helptext':
+                fieldset_html_parts.append(self._generate_helptext(child_obj))
+            elif child_obj.portal_type in ['Field', 'SelectionField', 'UploadField', 'Array', 'Complex']:
+                field_name = create_id(child_obj)
+                if field_name in self.ui_schema:
+                    ui_config = self.ui_schema[field_name]
+                    column_class = ui_config.get("ui:column", "col-12")
+                    
+                    field_attributes = {"tal:replace": f"structure form['{field_name}'].render_template(form.widget.item_template)"}
+                    
+                    # Add custom attributes
+                    if "ui:attributes" in ui_config:
+                        field_attributes.update(ui_config["ui:attributes"])
+                    
+                    field_html = f'''
+        <div class="row">
+            <div class="{column_class}">
+                <div''' + ''.join([f' {k}="{v}"' for k, v in field_attributes.items()]) + f'''></div>
+            </div>
+        </div>'''
+                    fieldset_html_parts.append(field_html)
+        
+        return '\n'.join(fieldset_html_parts)
