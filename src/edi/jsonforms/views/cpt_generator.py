@@ -73,8 +73,7 @@ class ChameleonPageTemplateGenerator(BrowserView):
                 if field_name in self.ui_schema:
                     row_div = div(cls="row")
                     ui_config = self.ui_schema[field_name]
-                    column_class = ui_config.get("ui:column", "col-12")
-                    col_div = div(cls=column_class)
+                    col_div = div(cls="col-12")
                     
                     # Handle conditional fields and custom attributes
                     field_attributes = {"tal:replace": f"structure form['{field_name}'].render_template(form.widget.item_template)"}
@@ -119,47 +118,6 @@ class ChameleonPageTemplateGenerator(BrowserView):
         ui_schema_view = SimpleUiSchemaView(form, self.request)
         self.ui_schema = json.loads(ui_schema_view())
     
-    def _group_fields_by_row(self, properties: Dict[str, Any]) -> List[List[str]]:
-        """Group fields by row based on column classes."""
-        rows = []
-        current_row = []
-        current_row_total = 0
-        
-        for field_name in properties.keys():
-            ui_config = self.ui_schema.get(field_name, {})
-            column_class = ui_config.get("ui:column", "col-12")
-            
-            # Extract column size from Bootstrap class (e.g., "col-md-6" -> 6)
-            column_size = self._extract_column_size(column_class)
-            
-            # If adding this field would exceed 12 columns, start a new row
-            if current_row_total + column_size > 12:
-                if current_row:
-                    rows.append(current_row)
-                current_row = [field_name]
-                current_row_total = column_size
-            else:
-                current_row.append(field_name)
-                current_row_total += column_size
-        
-        # Add the last row if it has fields
-        if current_row:
-            rows.append(current_row)
-        
-        return rows
-    
-    def _extract_column_size(self, column_class: str) -> int:
-        """Extract column size from Bootstrap class."""
-        # Handle classes like "col-md-6", "col-6", "col-lg-4", etc.
-        parts = column_class.split("-")
-        if len(parts) >= 2:
-            try:
-                # Try to get the last part as the column size
-                return int(parts[-1])
-            except ValueError:
-                pass
-        # Default to 12 if we can't parse
-        return 12
     
     def _prepare_conditions_data(self, ui_config: Dict[str, Any]) -> Dict[str, str]:
         """Prepare conditions data for jQuery module."""
@@ -221,7 +179,6 @@ class ChameleonPageTemplateGenerator(BrowserView):
                 field_name = create_id(child_obj)
                 if field_name in self.ui_schema:
                     ui_config = self.ui_schema[field_name]
-                    column_class = ui_config.get("ui:column", "col-12")
                     
                     field_attributes = {"tal:replace": f"structure form['{field_name}'].render_template(form.widget.item_template)"}
                     
@@ -231,7 +188,7 @@ class ChameleonPageTemplateGenerator(BrowserView):
                     
                     field_html = f'''
         <div class="row">
-            <div class="{column_class}">
+            <div class="col-12">
                 <div''' + ''.join([f' {k}="{v}"' for k, v in field_attributes.items()]) + f'''></div>
             </div>
         </div>'''

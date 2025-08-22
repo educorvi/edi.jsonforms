@@ -216,9 +216,6 @@ class SimpleUiSchemaView(BrowserView):
         if help_text:
             field_schema['ui:help'] = help_text
 
-        # Column layout (always full width to match your format)
-        field_schema['ui:column'] = 'col-md-12'
-
         # Add mask configuration if applicable (example implementation)
         if hasattr(field_obj, 'pattern') and field_obj.pattern:
             # Convert regex pattern to mask format - this is a simple example
