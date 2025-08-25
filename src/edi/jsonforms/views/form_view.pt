@@ -15,7 +15,7 @@
         <!-- <vue-json-form tal:attributes="json-schema child/@@form-element-json-schema; ui-schema child/@@form-element-ui-schema" return-data-as-scopes="false"></vue-json-form> -->
         <!-- </div> -->
 
-        <script type="text/javascript" src="++resource++edi.jsonforms/js/replace_with_icons.js"></script>
+        <!-- <script type="text/javascript" src="++resource++edi.jsonforms/js/replace_with_icons.js"></script> -->
 
 
         <!-- <h4>JSON-Schema</h4>
