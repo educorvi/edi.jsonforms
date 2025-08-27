@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-08-27 14:07+0000\n"
+"POT-Creation-Date: 2025-08-27 14:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -360,6 +360,10 @@ msgstr ""
 msgid "Title of the field/question"
 msgstr ""
 
+#: ./views/form_tools_view.pt:8
+msgid "Tooltips off"
+msgstr ""
+
 #: ./views/form_view.pt:8
 msgid "Tooltips on"
 msgstr ""
@@ -416,9 +420,4 @@ msgstr ""
 
 #: ./configure.zcml:38
 msgid "edi.jsonforms: Locales"
-msgstr ""
-
-#. Default: "Tooltips off"
-#: ./views/form_tools_view.pt:8
-msgid "tooltip_button_off"
 msgstr ""
