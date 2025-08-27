@@ -26,7 +26,7 @@ class FormElementUiSchema(UiSchemaView):
         self.set_ui_base_schema()
 
         object = self.context
-        self.add_child_to_schema(object)
+        self.add_child_to_schema(object, self.uischema)
 
         def remove_showon(dictionary):
             if isinstance(dictionary, dict):

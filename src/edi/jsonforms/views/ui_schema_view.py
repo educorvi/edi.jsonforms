@@ -36,7 +36,7 @@ class UiSchemaView(BrowserView):
         form = self.context
         children = form.getFolderContents()
         for child in children:
-            self.add_child_to_schema(child.getObject())
+            self.add_child_to_schema(child.getObject(), self.uischema)
 
         return self.uischema
     
@@ -52,14 +52,24 @@ class UiSchemaView(BrowserView):
             }
         }
 
-    def add_child_to_schema(self, child_object):
+    def add_child_to_schema(self, child_object, schema, scope='/properties/'):
+        """
+        schema needs the key 'elements' or 'layout' with the key 'elements'
+        """
         if child_object.portal_type != 'Button Handler' and not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
-            return
+            return schema
 
         # add children to the schema
-        child_schema = self.get_schema_for_child(child_object, '/properties/')
+        child_schema = self.get_schema_for_child(child_object, scope)
         if child_schema != None and child_schema != {}:
-            self.uischema['layout']['elements'].append(child_schema)
+            if 'layout' in schema:
+                schema['layout']['elements'].append(child_schema)
+            elif 'elements' in schema:
+                schema['elements'].append(child_schema)
+            else:
+                print("Error in UiSchemaView: could not add child to schema, no layout or elements found in schema")
+
+        # return schema
 
     def get_schema_for_child(self, child, scope, recursive=True):
         type = child.portal_type
@@ -283,6 +293,8 @@ class UiSchemaView(BrowserView):
 
         self.add_user_info(array, array_schema)
 
+        # array_schema['options']['label'] = False
+
         if array_schema['options'] == {}:
             del array_schema['options']
 
@@ -412,7 +424,6 @@ class UiSchemaView(BrowserView):
         return child_schema
 
 
-
     # ????????
     def get_schema_for_fieldset(self, fieldset, scope, recursive=True):
         # save scope in lookup_scopes
@@ -461,6 +472,9 @@ class UiSchemaView(BrowserView):
         # group_schema = self.add_tools_to_schema(group_schema, group) # gets ignored, add html element before group instead
         group_schema = self.add_dependencies_to_schema(group_schema, group)
 
+        if self.tools_on and group.aq_parent.portal_type == 'Form':
+            self.uischema['layout']['elements'].append(self.helptext_schema(self.get_tools_html(group)))
+
         if recursive:
             group_schema['elements'] = []
 
@@ -469,12 +483,9 @@ class UiSchemaView(BrowserView):
                 child_object = child.getObject()
                 if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
                     continue
-
-                child_schema = self.get_schema_for_child(child_object, scope)
-                if child_schema != None and child_schema != {}:
-                    group_schema['elements'].append(child_schema)
-
-        if self.tools_on:
-            self.uischema['layout']['elements'].append(self.helptext_schema(self.get_tools_html(group)))
+                
+                if self.tools_on and child_object.portal_type == 'Fieldset':
+                    group_schema['elements'].append(self.helptext_schema(self.get_tools_html(child_object)))
+                self.add_child_to_schema(child_object, group_schema, scope)
 
         return group_schema
