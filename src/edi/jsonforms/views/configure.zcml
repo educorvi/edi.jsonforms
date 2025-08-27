@@ -41,9 +41,24 @@
     />
 
   <browser:page
+    name="form-tools-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".form_view.FormView"
+    template="form_tools_view.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
     name="ui-schema-view"
     for="edi.jsonforms.content.form.IForm"
     class=".ui_schema_view.UiSchemaView"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="ui-schema-tools-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".ui_schema_tools_view.UiSchemaToolsView"
     permission="zope2.View"
     />
 
@@ -53,6 +68,5 @@
     class=".json_schema_view.JsonSchemaView"
     permission="zope2.View"
     />
-
 
 </configure>

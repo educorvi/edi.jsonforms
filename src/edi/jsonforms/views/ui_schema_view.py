@@ -14,7 +14,7 @@ from edi.jsonforms.views.showOn_properties import create_showon_properties
 
 class UiSchemaView(BrowserView):
 
-    tools_on = True
+    tools_on = False
 
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -27,7 +27,7 @@ class UiSchemaView(BrowserView):
         self.get_schema()
         return json.dumps(self.uischema, ensure_ascii=False, indent=4)
     
-    def set_tools_on(self, tools_on):
+    def set_tools(self, tools_on):
         self.tools_on = tools_on
     
     def get_schema(self):
