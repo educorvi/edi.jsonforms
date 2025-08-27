@@ -181,7 +181,12 @@ class UiSchemaView(BrowserView):
 
     def get_schema_for_helptext(self, helptext):
         # helptext as html-element
-        helptext_schema = self.helptext_schema(self.get_tools_html(helptext) + '\n' + str(helptext.helptext.output))
+        text = ""
+        if self.tools_on:
+            text += f"{self.get_tools_html(helptext)}\n"
+        text += str(helptext.helptext.output)
+
+        helptext_schema = self.helptext_schema(text)
         helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
         return helptext_schema
 
