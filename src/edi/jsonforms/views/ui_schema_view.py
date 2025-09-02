@@ -519,9 +519,11 @@ class UiSchemaView(BrowserView):
                 child_object = child.getObject()
                 if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
                     continue
-                
+
                 if self.tools_on and child_object.portal_type == 'Fieldset':
-                    group_schema['elements'].append(self.helptext_schema(self.get_tools_html(child_object)))
+                    helptext_schema = self.helptext_schema(self.get_tools_html(child_object))
+                    helptext_schema = self.add_dependencies_to_schema(helptext_schema, child_object)
+                    group_schema['elements'].append(helptext_schema)
                 self.add_child_to_schema(child_object, group_schema, scope)
 
         return group_schema
