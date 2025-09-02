@@ -10,6 +10,7 @@ from plone.supermodel import model
 from zope.interface import implementer
 from z3c.relationfield.schema import RelationChoice
 from zope.interface import Invalid, invariant
+from zope.globalrequest import getRequest
 
 
 from edi.jsonforms import _
@@ -49,9 +50,17 @@ class IReference(IDependent):
                     if ref_obj == dep:
                         raise Invalid(_("You cannot depend on the object that is referenced."))
 
-            import pdb; pdb.set_trace()
             def get_parent_form(obj):
-                parent = obj.aq_parent
+                try:
+                    parent = obj.aq_parent
+                except:
+                    try:
+                        parent = data.__context__.aq_parent
+                    except:
+                        try:
+                            parent = getRequest().PUBLISHED.context.aq_parent
+                        except:
+                            raise Invalid(_("Could not determine the parent Form."))
                 if parent.portal_type in ['Form']:
                     return parent
                 elif isinstance(parent.portal_type, IFormElement):
