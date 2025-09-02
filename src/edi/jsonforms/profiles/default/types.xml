@@ -11,4 +11,5 @@
   <object name="Complex" meta_type="Dexterity FTI"/>
   <object name="UploadField" meta_type="Dexterity FTI"/>
   <object name="Helptext" meta_type="Dexterity FTI"/>
+  <object name="Reference" meta_type="Dexterity FTI"/>
 </object>
