@@ -146,7 +146,19 @@ class IDependent(IFormElement):
     #                             description=_("Is displayed as a little i next to the title."),
     #                             required=False)
 
-class IDependentExtended(IDependent):
+
+class IDependentElements(IDependent):
+    # previously tipp
+    user_helptext = schema.TextLine(title=_('Hint or helptext for the user'),
+                             required=False)
+    
+    fieldset(
+        'additional-information',
+        label=_('Additional Information'),
+        fields=['user_helptext']
+    )
+
+class IDependentExtended(IDependentElements):
     title = schema.TextLine(title=_('Title of the field/question'), required=True)
 
     description = schema.Text(title=_('Description of the field/question'), required=False)
@@ -157,19 +169,8 @@ class IDependentExtended(IDependent):
                                     default='optional',
                                     required=True)
 
-    fieldset(
-        'additional-information',
-        label=_('Additional Information'),
-        fields=['user_helptext']
-    )
-
     # # previously helptext
     # intern_information = schema.Text(title=_('Unformatted intern information for the JSON-Schema'),
     #                                  description=_('Here you can provide additional information that the Software-Team should to take into account while creating the Form.'),
     #                                  required=False)
-
-    # previously tipp
-    # TODO will be displayed as a little "i". Right now ignored. Comes with UI-Schema Version 3.1
-    user_helptext = schema.TextLine(title=_('Hint or helptext for the user'),
-                             required=False)
 

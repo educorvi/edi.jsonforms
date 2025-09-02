@@ -132,7 +132,6 @@ class UiSchemaView(BrowserView):
         if field_schema['options'] == {}:
             del field_schema['options']
 
-        self.add_user_info(field, field_schema)
         return field_schema
 
     def get_schema_for_selectionfield(self, selectionfield, scope):
@@ -156,7 +155,6 @@ class UiSchemaView(BrowserView):
         if selectionfield_schema['options'] == {}:
             del selectionfield_schema['options']
 
-        self.add_user_info(selectionfield, selectionfield_schema)
         return selectionfield_schema
 
     def get_schema_for_uploadfield(self, uploadfield, scope):
@@ -170,7 +168,6 @@ class UiSchemaView(BrowserView):
         if uploadfield.answer_type == 'file-multi':
             uploadfield_schema['options']['allowMultipleFiles'] = True
 
-        self.add_user_info(uploadfield, uploadfield_schema)
         return uploadfield_schema
 
     def get_schema_for_reference(self, reference, scope):
@@ -316,23 +313,27 @@ class UiSchemaView(BrowserView):
         return buttons_schema
 
 
-    def get_schema_for_array(self, array, scope, recursive=True):
-        # don't save scope because one cannot depend on an array
-        array_schema = self.get_base_schema(array, scope, save_scope=False, has_user_helptext=False)
-        array_scope = scope + create_id(array)
+    def get_schema_for_array(self, array, scope, recursive=True, overwrite_scope=None):
+        return self.get_schema_for_object(array, scope, recursive, overwrite_scope)
+        # # don't save scope because one cannot depend on an array
+        # array_schema = self.get_base_schema(array, scope, save_scope=False, has_user_helptext=False)
+        # if overwrite_scope:
+        #     array_scope = overwrite_scope
+        # else:
+        #     array_scope = scope + create_id(array)
 
-        # add children of array to the schema
-        if recursive:
-            array_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(array_scope, array)
+        # # add children of array to the schema
+        # if recursive:
+        #     array_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(array_scope, array)
 
-        self.add_user_info(array, array_schema)
+        # self.add_user_info(array, array_schema)
 
-        # array_schema['options']['label'] = False
+        # # array_schema['options']['label'] = False
 
-        if array_schema['options'] == {}:
-            del array_schema['options']
+        # if array_schema['options'] == {}:
+        #     del array_schema['options']
 
-        return array_schema
+        # return array_schema
     
     def get_schema_for_object(self, complex, scope, recursive=True):
         # don't save scope because one cannot depend on a complex object
@@ -343,7 +344,7 @@ class UiSchemaView(BrowserView):
         if recursive:
             complex_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(complex_scope, complex)
 
-        self.add_user_info(complex, complex_schema)
+        self.add_user_helptext(complex, complex_schema)
 
         if complex_schema['options'] == {}:
             del complex_schema['options']
@@ -480,21 +481,18 @@ class UiSchemaView(BrowserView):
             self.lookup_scopes[child_id] = child_scope
 
         if has_user_helptext:
-            user_helptext = get_user_helptext(child, self.request)
-            if user_helptext:
-                base_schema = self.add_option_to_schema(base_schema, {'help': {'text': user_helptext}})
+            self.add_user_helptext(child, base_schema)
 
         base_schema = self.add_tools_to_schema(base_schema, child)
         base_schema = self.add_dependencies_to_schema(base_schema, child)
         base_schema = self.add_option_to_schema(base_schema, {})
 
         return base_schema
-
-    def add_user_info(self, child, child_schema):
-        pass
-    #     # TODO comes with ui-schema version 3.1
-    #     if child.user_info:
-    #         self.add_option_to_schema(child_schema, {'helptext': child.user_info})
+    
+    def add_user_helptext(self, child, child_schema):
+        user_helptext = get_user_helptext(child, self.request)
+        if user_helptext:
+            child_schema = self.add_option_to_schema(child_schema, {'help': {'text': user_helptext}})
 
     def create_group(self, group, scope, recursive):
         group_schema = {
