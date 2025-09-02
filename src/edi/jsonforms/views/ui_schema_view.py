@@ -14,7 +14,7 @@ from edi.jsonforms.views.showOn_properties import create_showon_properties
 
 class UiSchemaView(BrowserView):
 
-    tools_on = True
+    tools_on = False
 
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -27,7 +27,7 @@ class UiSchemaView(BrowserView):
         self.get_schema()
         return json.dumps(self.uischema, ensure_ascii=False, indent=4)
     
-    def set_tools_on(self, tools_on):
+    def set_tools(self, tools_on):
         self.tools_on = tools_on
     
     def get_schema(self):
@@ -36,7 +36,7 @@ class UiSchemaView(BrowserView):
         form = self.context
         children = form.getFolderContents()
         for child in children:
-            self.add_child_to_schema(child.getObject())
+            self.add_child_to_schema(child.getObject(), self.uischema)
 
         return self.uischema
     
@@ -51,60 +51,25 @@ class UiSchemaView(BrowserView):
                 'elements': []
             }
         }
-    
 
-    tools_schema = {
-            'type': 'HTML',
-            # 'htmlData': ['<span>\
-            #             <a href="{view_url}" title="View"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">\
-            #                 <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>\
-            #                 <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>\
-            #             </svg></a>\
-            #             <a href="{edit_url}" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">\
-            #                 <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>\
-            #             </svg></a>',
-            #             '<a href="{content_url}" title="Content"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-list" viewBox="0 0 16 16">\
-            #                 <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>\
-            #                 <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>\
-            #             </svg></a>',
-            #             '<a href={delete_url}" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">\
-            #                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>\
-            #                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>\
-            #             </svg></a>\
-            #         </span>']
-            'htmlData': ['<span>\
-                        <a class="edi-view" href="{view_url}" title="View">view</a>\n\
-                        <a class="edi-edit" href="{edit_url}" title="Edit">edit</a>\n',
-                        '<a class="edi-list" href="{content_url}" title="Content">list</a>\n',
-                        '<a class="edi-delete" href={delete_url}" title="Delete">delete</a>\
-                    </span>']
-        }
-    
-    def get_tools_for_child(self, child_object):
-        tools_schema = deepcopy(self.tools_schema)
-        tools_schema['htmlData'] = self.tools_schema['htmlData'][0].format(view_url=get_view_url(child_object),
-                                                                            edit_url=get_edit_url(child_object))
-        if has_content(child_object):
-            tools_schema['htmlData'] += self.tools_schema['htmlData'][1].format(content_url=get_content_url(child_object))
-        tools_schema['htmlData'] += self.tools_schema['htmlData'][2].format(delete_url=get_delete_url(child_object))
-
-        if child_object.portal_type != 'Button Handler' and child_object.dependencies:
-            showOn = create_showon_properties(child_object, self.lookup_scopes)
-            if showOn != {}:
-                tools_schema['showOn'] = showOn
-
-        return tools_schema
-
-    def add_child_to_schema(self, child_object):
+    def add_child_to_schema(self, child_object, schema, scope='/properties/'):
+        """
+        schema needs the key 'elements' or 'layout' with the key 'elements'
+        """
         if child_object.portal_type != 'Button Handler' and not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
-            return
+            return schema
 
         # add children to the schema
-        child_schema = self.get_schema_for_child(child_object, '/properties/')
+        child_schema = self.get_schema_for_child(child_object, scope)
         if child_schema != None and child_schema != {}:
-            if self.tools_on:
-                self.uischema['layout']['elements'].append(self.get_tools_for_child(child_object))
-            self.uischema['layout']['elements'].append(child_schema)
+            if 'layout' in schema:
+                schema['layout']['elements'].append(child_schema)
+            elif 'elements' in schema:
+                schema['elements'].append(child_schema)
+            else:
+                print("Error in UiSchemaView: could not add child to schema, no layout or elements found in schema")
+
+        # return schema
 
     def get_schema_for_child(self, child, scope, recursive=True):
         type = child.portal_type
@@ -134,35 +99,36 @@ class UiSchemaView(BrowserView):
         if answer_type == 'text':
             pass
         elif answer_type == 'textarea':
-            field_schema['options'] = {'multi': True}
+            field_schema['options']['multi'] = True
         elif answer_type == 'password':
-            field_schema['options'] = {'format': 'password'}
+            field_schema['options']['format'] = 'password'
         elif answer_type == 'tel':
-            field_schema['options'] = {'format': 'tel'}
+            field_schema['options']['format'] = 'tel'
         elif answer_type == 'url':
-            field_schema['options'] = {'format': 'url'}
+            field_schema['options']['format'] = 'url'
         elif answer_type == 'email':
-            field_schema['options'] = {'format': 'email'}
+            field_schema['options']['format'] = 'email'
         elif answer_type == 'date':
-            field_schema['options'] = {'format': 'date'}
+            field_schema['options']['format'] = 'date'
         elif answer_type == 'datetime-local':
-            field_schema['options'] = {'format': 'datetime-local'}
+            field_schema['options']['format'] = 'datetime-local'
         elif answer_type == 'time':
-            field_schema['options'] = {'format': 'time'}
+            field_schema['options']['format'] = 'time'
         elif answer_type in ['number', 'integer']:
             unit = get_unit(field, self.request)
             if unit:
-                field_schema['options'] = {'append': unit}
+                field_schema['options']['append'] = unit
         elif answer_type == 'boolean':
             pass
             # TODO
 
         placeholder = get_placeholder(field, self.request)
         if placeholder and field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
-            if 'options' in field_schema:
-                field_schema['options']['placeholder'] = placeholder
-            else:
-                field_schema['options'] = {'placeholder': placeholder}
+            field_schema['options']['placeholder'] = placeholder
+
+        # remove unnecessary options
+        if field_schema['options'] == {}:
+            del field_schema['options']
 
         self.add_user_info(field, field_schema)
         return field_schema
@@ -172,22 +138,21 @@ class UiSchemaView(BrowserView):
 
         answer_type = selectionfield.answer_type
         if answer_type == 'radio':
-            selectionfield_schema['options'] = {
-                'displayAs': 'radiobuttons',
-                'stacked': True
-            }
+            selectionfield_schema['options']['displayAs'] = 'radiobuttons'
+            selectionfield_schema['options']['stacked'] = True
         elif answer_type in ['checkbox', 'selectmultiple']:
             # TODO differentiate between checkbox and selectmultiple, both are displayed as checkboxes
-            selectionfield_schema['options'] = {'stacked': True}
+            selectionfield_schema['options']['stacked'] = True
         elif answer_type == 'select':
-            pass # nothing
+            pass
 
         if selectionfield.use_id_in_schema:
-            if 'options' not in selectionfield_schema:
-                selectionfield_schema['options'] = {}
             selectionfield_schema['options']['enumTitles'] = {}
             for option in selectionfield.getFolderContents():
                 selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
+        
+        if selectionfield_schema['options'] == {}:
+            del selectionfield_schema['options']
 
         self.add_user_info(selectionfield, selectionfield_schema)
         return selectionfield_schema
@@ -196,9 +161,9 @@ class UiSchemaView(BrowserView):
         uploadfield_schema = self.get_base_schema(uploadfield, scope)
 
         if uploadfield.accepted_file_types:
-            uploadfield_schema['options'] = {'acceptedFileType': uploadfield.accepted_file_types}
+            uploadfield_schema['options']['acceptedFileType'] = uploadfield.accepted_file_types
         else:
-            uploadfield_schema['options'] = {'acceptedFileType': '*'}
+            uploadfield_schema['options']['acceptedFileType'] = '*'
 
         if uploadfield.answer_type == 'file-multi':
             uploadfield_schema['options']['allowMultipleFiles'] = True
@@ -206,13 +171,24 @@ class UiSchemaView(BrowserView):
         self.add_user_info(uploadfield, uploadfield_schema)
         return uploadfield_schema
 
+    def helptext_schema(self, htmlData):
+        # helptext as html-element
+        helptext_schema = {
+            'type': 'HTML',
+            'htmlData': htmlData,
+        }
+        return helptext_schema
+
     def get_schema_for_helptext(self, helptext):
         # helptext as html-element
-        helptext = {
-            'type': 'HTML',
-            'htmlData': str(helptext.helptext.output)
-        }
-        return helptext
+        text = ""
+        if self.tools_on:
+            text += f"{self.get_tools_html(helptext)}\n"
+        text += str(helptext.helptext.output)
+
+        helptext_schema = self.helptext_schema(text)
+        helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
+        return helptext_schema
 
     def get_schema_for_buttons(self, button_handler):
         request_button_schema = {
@@ -312,53 +288,39 @@ class UiSchemaView(BrowserView):
 
 
     def get_schema_for_array(self, array, scope, recursive=True):
-        # save scope in lookup_scopes
-        array_id = create_id(array)
-        array_scope = scope + array_id
-        # self.lookup_scopes[array_id] = array_scope
-
-        array_schema = {
-            'type': 'Control',
-            'scope': array_scope
-        }
-
-        if array.dependencies:
-            showOn = create_showon_properties(array, self.lookup_scopes)
-            if showOn != {}:
-                array_schema['showOn'] = showOn
+        # don't save scope because one cannot depend on an array
+        array_schema = self.get_base_schema(array, scope, save_scope=False, has_user_helptext=False)
+        array_scope = scope + create_id(array)
 
         # add children of array to the schema
         if recursive:
-            array_schema['options'] = {'descendantControlOverrides': self.create_descendantControlOverrides(array_scope, array)}
+            array_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(array_scope, array)
 
         self.add_user_info(array, array_schema)
+
+        # array_schema['options']['label'] = False
+
+        if array_schema['options'] == {}:
+            del array_schema['options']
 
         return array_schema
     
     def get_schema_for_object(self, complex, scope, recursive=True):
-        # save scope in lookup_scopes
-        complex_id = create_id(complex)
-        complex_scope = scope + complex_id
-
-        # self.lookup_scopes[complex_id] = complex_scope
-
-        complex_schema = {
-            'type': 'Control',
-            'scope': complex_scope
-        }
-
-        if complex.dependencies:
-            showOn = create_showon_properties(complex, self.lookup_scopes)
-            if showOn != {}:
-                complex_schema['showOn'] = showOn
+        # don't save scope because one cannot depend on a complex object
+        complex_schema = self.get_base_schema(complex, scope, save_scope=False, has_user_helptext=False)
+        complex_scope = scope + create_id(complex)
 
         # add children of complex to the schema
         if recursive:
-            complex_schema['options'] = {'descendantControlOverrides': self.create_descendantControlOverrides(complex_scope, complex)}
+            complex_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(complex_scope, complex)
 
         self.add_user_info(complex, complex_schema)
 
+        if complex_schema['options'] == {}:
+            del complex_schema['options']
+
         return complex_schema
+
 
 
     def add_child_to_descendantControlOverrides(self, descendantControlOverrides, child_object, base_scope):
@@ -412,12 +374,59 @@ class UiSchemaView(BrowserView):
     
         return descendantControlOverrides
 
+    def get_tools_html(self, child_object):
+        # html_links = ['<span>\
+        #             <a href="{view_url}" title="View"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">\
+        #                 <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>\
+        #                 <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>\
+        #             </svg></a>\
+        #             <a href="{edit_url}" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">\
+        #                 <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>\
+        #             </svg></a>',
 
+        #             '<a href="{content_url}" title="Content"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-list" viewBox="0 0 16 16">\
+        #                 <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>\
+        #                 <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>\
+        #             </svg></a>',
 
+        #             '<a href={delete_url}" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">\
+        #                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>\
+        #                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>\
+        #             </svg></a>\
+        #         </span>']
+        html_links = ['<span><a href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
+                        <a href="{edit_url}" title="{edit}"><i class="bi bi-pen-fill"></a>\n',
+                        '<a href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
+                        '<a href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>'
+                        ]
 
+        tools = html_links[0].format(view_url=get_view_url(child_object), view=_('View'), edit_url=get_edit_url(child_object), edit=_('Edit'))
+        if has_content(child_object):
+            tools += html_links[1].format(content_url=get_content_url(child_object), content=_('Content'))
+        tools += html_links[2].format(delete_url=get_delete_url(child_object), delete=_('Delete'))
+        return tools
 
+    def add_tools_to_schema(self, child_schema, child_object):
+        if self.tools_on:
+            tools = self.get_tools_html(child_object)
+            child_schema = self.add_option_to_schema(child_schema, {'preHtml': tools})
+        return child_schema
 
+    def add_dependencies_to_schema(self, child_schema, child_object):
+        # add showOn dependencies
+        if child_object.dependencies:
+            showOn = create_showon_properties(child_object, self.lookup_scopes)
+            if showOn != {}:
+                child_schema['showOn'] = showOn
+        return child_schema
 
+    def add_option_to_schema(self, child_schema, options: dict):
+        if 'options' not in child_schema:
+            child_schema['options'] = options
+        else:
+            for key, value in options.items():
+                child_schema['options'][key] = value
+        return child_schema
 
 
     # ????????
@@ -430,27 +439,25 @@ class UiSchemaView(BrowserView):
         return self.create_group(fieldset, scope, recursive)
 
 
-    def get_base_schema(self, child, scope):
+    def get_base_schema(self, child, scope, save_scope=True, has_user_helptext=True):
         child_id = create_id(child)
         child_scope = scope + child_id
         base_schema = {
             'type': 'Control',
             'scope': child_scope,
         }
-        self.lookup_scopes[child_id] = child_scope
 
-        user_helptext = get_user_helptext(child, self.request)
-        if user_helptext:
-            if 'options' in base_schema:
-                base_schema['options']['help'] = {'text': user_helptext}
-            else:
-                base_schema['options'] = {'help': {'text': user_helptext}}
+        if save_scope:
+            self.lookup_scopes[child_id] = child_scope
 
-        # add showOn dependencies
-        if child.dependencies:
-            showOn = create_showon_properties(child, self.lookup_scopes)
-            if showOn != {}:
-                base_schema['showOn'] = showOn
+        if has_user_helptext:
+            user_helptext = get_user_helptext(child, self.request)
+            if user_helptext:
+                base_schema = self.add_option_to_schema(base_schema, {'help': {'text': user_helptext}})
+
+        base_schema = self.add_tools_to_schema(base_schema, child)
+        base_schema = self.add_dependencies_to_schema(base_schema, child)
+        base_schema = self.add_option_to_schema(base_schema, {})
 
         return base_schema
 
@@ -458,22 +465,22 @@ class UiSchemaView(BrowserView):
         pass
     #     # TODO comes with ui-schema version 3.1
     #     if child.user_info:
-    #         if 'options' in child_schema:
-    #             child_schema['options']['helptext'] = child.user_info
-    #         else:
-    #             child_schema['options'] = {'helptext': child.user_info}
+    #         self.add_option_to_schema(child_schema, {'helptext': child.user_info})
 
     def create_group(self, group, scope, recursive):
         group_schema = {
             'type': 'Group',
         }
         if group.show_title:
-            group_schema['options'] = {'label': get_title(group, self.request)}
+            group_schema = self.add_option_to_schema(group_schema, {'label': get_title(group, self.request)})
 
-        if group.dependencies:
-            showOn = create_showon_properties(group, self.lookup_scopes)
-            if showOn != {}:
-                group_schema['showOn'] = showOn
+        # group_schema = self.add_tools_to_schema(group_schema, group) # gets ignored, add html element before group instead
+        group_schema = self.add_dependencies_to_schema(group_schema, group)
+
+        if self.tools_on and group.aq_parent.portal_type == 'Form':
+            helptext_schema = self.helptext_schema(self.get_tools_html(group))
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, group)       # helptext has same showOn as group
+            self.uischema['layout']['elements'].append(helptext_schema)
 
         if recursive:
             group_schema['elements'] = []
@@ -483,11 +490,9 @@ class UiSchemaView(BrowserView):
                 child_object = child.getObject()
                 if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
                     continue
-
-                child_schema = self.get_schema_for_child(child_object, scope)
-                if child_schema != None and child_schema != {}:
-                    if self.tools_on:
-                        group_schema['elements'].append(self.get_tools_for_child(child_object))
-                    group_schema['elements'].append(child_schema)
+                
+                if self.tools_on and child_object.portal_type == 'Fieldset':
+                    group_schema['elements'].append(self.helptext_schema(self.get_tools_html(child_object)))
+                self.add_child_to_schema(child_object, group_schema, scope)
 
         return group_schema

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-05-27 14:45+0000\n"
+"POT-Creation-Date: 2025-08-27 14:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgstr "A SelectionField offers users a range of options to choose from within a
 msgid "Accepted file types for file upload"
 msgstr "Accepted file types for file upload"
 
-#: ./content/common.py:114
+#: ./content/common.py:120
 msgid "Additional Information"
 msgstr "Additional Information"
 
@@ -62,9 +62,13 @@ msgstr "An Option represents a specific choice available to users within a Form.
 msgid "Array"
 msgstr "Array"
 
-#: ./content/common.py:88
+#: ./content/common.py:94
 msgid "Cannot be dependent from itself or a child from itself."
 msgstr "Cannot be dependent from itself or a child from itself."
+
+#: ./content/selection_field.py:36
+msgid "Check if you want to use the id of the options instead of the label/title in the schema"
+msgstr ""
 
 #: ./content/field.py:30
 msgid "Checkbox (yes/no)"
@@ -84,6 +88,14 @@ msgstr "Choose the answer type"
 msgid "Complex"
 msgstr "Complex"
 
+#: ./content/common.py:130
+msgid "Condition for showing this field"
+msgstr ""
+
+#: ./views/ui_schema_view.py:405
+msgid "Content"
+msgstr ""
+
 #: ./content/field.py:25
 msgid "Date"
 msgstr "Date"
@@ -96,19 +108,23 @@ msgstr "Date and time"
 msgid "Decimal number"
 msgstr "Decimal number"
 
-#: ./content/common.py:51
+#: ./views/ui_schema_view.py:406
+msgid "Delete"
+msgstr ""
+
+#: ./content/common.py:57
 msgid "Dependencies"
 msgstr "Dependencies"
 
-#: ./content/common.py:56
+#: ./content/common.py:62
 msgid "Dependent from this answer option:"
 msgstr "Dependent from this answer option:"
 
-#: ./content/helptext.py:22
+#: ./content/helptext.py:23
 msgid "Description"
 msgstr ""
 
-#: ./content/common.py:132
+#: ./content/common.py:152
 msgid "Description of the field/question"
 msgstr "Description of the field/question"
 
@@ -150,16 +166,16 @@ msgstr "For a number/integer this is the minimal value it must have.            
 msgid "Form"
 msgstr "Form"
 
-#: ./content/helptext.py:25
+#: ./content/helptext.py:26
 #: ./profiles/default/types/Helptext.xml
 msgid "Helptext"
 msgstr ""
 
-#: ./content/common.py:120
+#: ./content/common.py:126
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 
-#: ./content/common.py:153
+#: ./content/common.py:173
 msgid "Hint or helptext for the user"
 msgstr "Hint or helptext for the user"
 
@@ -167,9 +183,13 @@ msgstr "Hint or helptext for the user"
 msgid "If no file type is selected, the default is * (all file types are accepted)."
 msgstr "If no file type is selected, the default is * (all file types are accepted)."
 
-#: ./content/common.py:57
+#: ./content/common.py:63
 msgid "If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."
 msgstr "If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."
+
+#: ./content/common.py:138
+msgid "If this option is checked, all show conditions will be negated. This means that if any of the conditions is present in the request URL, the field will not be displayed."
+msgstr ""
 
 #: ./profiles/default/types/UploadField.xml
 msgid "In an UploadField an user can upload one or multiple files."
@@ -183,9 +203,13 @@ msgstr "Installs the edi.jsonforms add-on."
 msgid "JSON-Schema"
 msgstr "JSON-Schema"
 
-#: ./content/option.py:20
+#: ./content/option.py:21
 msgid "Label of the answer option"
 msgstr "Label of the answer option"
+
+#: ./configure.zcml:38
+msgid "Loads translation catalogs before content types"
+msgstr ""
 
 #: ./content/field.py:62
 msgid "Maximum"
@@ -207,13 +231,17 @@ msgstr "Minimum"
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 msgstr "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 
-#: ./content/common.py:83
+#: ./content/common.py:137
+msgid "Negate all show conditions"
+msgstr ""
+
+#: ./content/common.py:89
 msgid "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
 msgstr "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
 
 #: ./content/field.py:69
-msgid "Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt)."
-msgstr "Only use this for the answer types Decimal and Whole number (e.g. ohm, ampere, volt)."
+msgid "Only use this for the answer types Decimal and Whole number (e.g. km, kg)."
+msgstr ""
 
 #: ./content/field.py:77
 msgid "Only use this for the answer types Textline and Textarea."
@@ -251,10 +279,6 @@ msgstr "Regular expression to validate a Textline/-area field."
 msgid "Required"
 msgstr "Required"
 
-#: ./views/ui_schema_view.py:54
-msgid "Reset this form"
-msgstr "Reset this form"
-
 #: ./content/selection_field.py:17
 msgid "Selection (multi-selection)"
 msgstr "Selection (multi-selection)"
@@ -264,13 +288,17 @@ msgid "Selection (single selection)"
 msgstr "Selection (single selection)"
 
 #: ./content/array.py:24
-#: ./content/common.py:135
+#: ./content/common.py:155
 msgid "Selection of Field Requirement"
 msgstr "Selection of Field Requirement"
 
 #: ./profiles/default/types/SelectionField.xml
 msgid "SelectionField"
 msgstr "SelectionField"
+
+#: ./content/fieldset.py:26
+msgid "Show title in form"
+msgstr ""
 
 #: ./content/field.py:22
 msgid "Telephone"
@@ -288,20 +316,32 @@ msgstr "Textline"
 msgid "The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets."
 msgstr "The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets."
 
-#: ./content/common.py:90
+#: ./content/common.py:96
 msgid "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 msgstr "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 
-#: ./content/helptext.py:24
+#: ./content/helptext.py:25
 msgid "The description won't be shown in the form."
+msgstr ""
+
+#: ./views/json_schema_view.py:82
+msgid "The id {id} is not unique. Please change it manually due to possible unexpected behavior"
+msgstr ""
+
+#: ./views/json_schema_view.py:84
+msgid "The ids {ids} are not unique. Please change them manually due to possible unexpected behavior"
 msgstr ""
 
 #: ./content/field.py:39
 msgid "The provided regular expression isn't valid."
 msgstr "The provided regular expression isn't valid."
 
-#: ./content/helptext.py:21
+#: ./content/helptext.py:22
 msgid "The title won't be shown in the form."
+msgstr ""
+
+#: ./content/common.py:131
+msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr ""
 
 #: ./profiles/default/types/Helptext.xml
@@ -312,13 +352,21 @@ msgstr ""
 msgid "Time"
 msgstr "Time"
 
-#: ./content/helptext.py:20
+#: ./content/helptext.py:21
 msgid "Title"
 msgstr ""
 
-#: ./content/common.py:130
+#: ./content/common.py:150
 msgid "Title of the field/question"
 msgstr "Title of the field/question"
+
+#: ./views/form_tools_view.pt:8
+msgid "Tooltips off"
+msgstr ""
+
+#: ./views/form_view.pt:8
+msgid "Tooltips on"
+msgstr ""
 
 #: ./views/ui_schema_view.pt:9
 msgid "UI-Schema"
@@ -328,11 +376,11 @@ msgstr "UI-Schema"
 msgid "URL"
 msgstr "URL"
 
-#: ./content/common.py:119
+#: ./content/common.py:125
 msgid "Unformatted intern information for the JSON-Schema"
 msgstr "Unformatted intern information for the JSON-Schema"
 
-#: ./configure.zcml:38
+#: ./configure.zcml:47
 msgid "Uninstalls the edi.jsonforms add-on."
 msgstr "Uninstalls the edi.jsonforms add-on."
 
@@ -348,6 +396,10 @@ msgstr "Unit of the answer"
 msgid "UploadField"
 msgstr "UploadField"
 
+#: ./content/selection_field.py:35
+msgid "Use id of options in schema"
+msgstr ""
+
 #: ./profiles/default/types/Array.xml
 #: ./profiles/default/types/Complex.xml
 #: ./profiles/default/types/Field.xml
@@ -362,6 +414,10 @@ msgstr "Whole number"
 msgid "edi.jsonforms"
 msgstr "edi.jsonforms"
 
-#: ./configure.zcml:38
+#: ./configure.zcml:47
 msgid "edi.jsonforms (uninstall)"
 msgstr "edi.jsonforms (uninstall)"
+
+#: ./configure.zcml:38
+msgid "edi.jsonforms: Locales"
+msgstr ""

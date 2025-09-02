@@ -32,7 +32,7 @@ class JsonSchemaView(BrowserView):
 
         children = form.getFolderContents()
         for child in children:
-            self.add_child_to_schema(child.getObject())
+            self.add_child_to_schema(child.getObject(), self.jsonschema)
 
         self.check_duplicates()
 
@@ -49,23 +49,40 @@ class JsonSchemaView(BrowserView):
         self.ids = set()
         self.id_duplicates = set()
 
-    def add_child_to_schema(self, child_object):
+    def add_child_to_schema(self, child_object, schema, parent_id=None):
+        """
+        schema needs the keys 'properties' and 'required'
+        """
         if child_object.portal_type in self.content_types_without_schema or not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
             return
-        child_id = self.create_and_check_id(child_object)
+        # child_id = self.create_and_check_id(child_object)
+        # For JSON schema properties, use clean field name (no parent path)
+        clean_field_id = strip_uid_suffix(create_id(child_object))
+        # For tracking purposes, use hierarchical ID
+        # hierarchical_child_id = self.create_and_check_id(child_object, current_object_id)
 
         # add children to the schema
         if child_object.portal_type == 'Fieldset':
-            self.jsonschema = self.modify_schema_for_fieldset(self.jsonschema, child_object)
+            schema = self.modify_schema_for_fieldset(schema, child_object)
+        elif 'properties' in schema:
+            if parent_id:
+                current_object_id = parent_id
+            else:
+                current_object_id = None
+            schema['properties'][clean_field_id] = self.get_schema_for_child(child_object, current_object_id)
         else:
-            self.jsonschema['properties'][child_id] = self.get_schema_for_child(child_object)
-
+            print("Error in JsonSchemaView: could not add child to schema, no 'properties' found in schema")
+            return
+ 
         # mark children as required
         if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
             if check_for_dependencies(child_object):
-                self.jsonschema = self.add_dependent_required(self.jsonschema, child_object, child_id)
+                schema = self.add_dependent_required(schema, child_object, clean_field_id)
+            elif 'required' in schema:
+                schema['required'].append(clean_field_id)
             else:
-                self.jsonschema['required'].append(child_id)
+                print("Error in JsonSchemaView: could not add requirements of child to schema, no 'required' found in schema")
+                return
 
     def check_duplicates(self):
         if self.id_duplicates:
@@ -83,18 +100,7 @@ class JsonSchemaView(BrowserView):
         children = fieldset.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
-                continue
-            child_id = self.create_and_check_id(child_object)
-            if child_object.portal_type == 'Fieldset':
-                schema = self.modify_schema_for_fieldset(schema, child_object)
-            elif child_object.portal_type not in self.content_types_without_schema:
-                schema['properties'][child_id] = self.get_schema_for_child(child_object)
-                if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                    if check_for_dependencies(child_object):
-                        schema = self.add_dependent_required(schema, child_object, child_id)
-                    else:
-                        schema['required'].append(child_id)
+            self.add_child_to_schema(child_object, schema)
         return schema
 
     def get_schema_for_child(self, child, parent_id=None):
@@ -220,25 +226,7 @@ class JsonSchemaView(BrowserView):
         children = object.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
-                continue
-            # For JSON schema properties, use clean field name (no parent path)
-            clean_field_id = strip_uid_suffix(create_id(child_object))
-            # For tracking purposes, use hierarchical ID
-            hierarchical_child_id = self.create_and_check_id(child_object, current_object_id)
-
-            # add children to the schema
-            if child_object.portal_type == 'Fieldset':
-                complex_schema = self.modify_schema_for_fieldset(complex_schema, child_object)
-            elif child_object.portal_type not in self.content_types_without_schema:
-                complex_schema['properties'][clean_field_id] = self.get_schema_for_child(child_object, current_object_id)
-
-            # mark children as required
-            if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
-                if check_for_dependencies(child_object):
-                    complex_schema = self.add_dependent_required(complex_schema, child_object, clean_field_id)
-                else:
-                    complex_schema['required'].append(clean_field_id)
+            self.add_child_to_schema(child_object, complex_schema, current_object_id)
 
         return complex_schema
     

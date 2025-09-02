@@ -30,15 +30,6 @@
     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
     />
 
-  <browser:page
-    name="form-element-ui-schema-single-view"
-    for="edi.jsonforms.content.common.IFormElement"
-    class=".form_element_ui_schema_single.FormElementUiSchemaSingle"
-    permission="zope2.View"
-    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
-    />
-
-
 
 
   <browser:page
@@ -50,9 +41,24 @@
     />
 
   <browser:page
+    name="form-tools-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".form_view.FormView"
+    template="form_tools_view.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
     name="ui-schema-view"
     for="edi.jsonforms.content.form.IForm"
     class=".ui_schema_view.UiSchemaView"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="ui-schema-tools-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".ui_schema_tools_view.UiSchemaToolsView"
     permission="zope2.View"
     />
 
@@ -76,6 +82,5 @@
     class=".cpt_generator.ChameleonPageTemplateGenerator"
     permission="zope2.View"
     />
-
 
 </configure>

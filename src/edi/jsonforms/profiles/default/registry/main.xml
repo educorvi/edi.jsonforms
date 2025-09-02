@@ -4,5 +4,11 @@
     i18n:domain="edi.jsonforms">
 
 <!-- -*- extra stuff goes here -*- -->
+    <records interface="plone.base.interfaces.resources.IBundleRegistry" prefix="plone.bundles/css">
+      <value key="enabled">True</value>
+      <value key="csscompilation">++resource++edi.jsonforms/css/bootstrap/bootstrap-icons.min.css</value>
+      <value key="depends">plone</value>
+    </records>
+
 
 </registry>

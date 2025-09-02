@@ -29,6 +29,6 @@ class FormElementJsonSchema(JsonSchemaView):
         self.set_json_base_schema()
 
         object = self.context
-        self.add_child_to_schema(object)
+        self.add_child_to_schema(object, self.jsonschema)
         self.check_duplicates()
         return self.jsonschema

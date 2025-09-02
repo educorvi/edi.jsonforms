@@ -24,7 +24,7 @@
    - minimum (possible for number, integer, textline, textarea, password)
    - maximum (possible for same answer types)
    - unit (possible for number, integer)
-   - placeholder (possible for textline, textare, password)
+   - placeholder (possible for textline, textarea, password)
    - pattern (possible for textline, textarea)
 
 ### Selection-field
@@ -80,6 +80,7 @@
  - it has to be specified in the attribute "Condition for showing this field" in the tab "Additional Information"
 
 ### Override Options
+ - the add-on edi.jsonforms.override must be installed
  - attributes can be overriden by specifying new values in the tab "Override Options". These only override the original attribute if ?fork=condition is specified in the url
  - attributes that can be overridden:
    - title

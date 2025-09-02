@@ -4,8 +4,8 @@
   xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:domain="edi.jsonforms" metal:use-macro="context/main_template/macros/master">
   <body>
     <metal:block fill-slot="content-core">
-      <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-view">
-        <a class="btn btn-primary" i18n:translate="" tal:attributes="href string:${context/absolute_url}/form-tools-view" role="button">Tooltips on</a>
+      <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-tools-view">
+        <a class="btn btn-primary" i18n:translate="" tal:attributes="href context/absolute_url" role="button">Tooltips off</a>
 
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
 

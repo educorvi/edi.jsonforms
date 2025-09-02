@@ -121,9 +121,7 @@ def get_description(object, request):
 
 # TODO use as soon as helptext is included in the schema
 def get_user_helptext(object, request):
-    if not hasattr(object, 'user_helptext'):
-        return None
-    user_helptext = object.user_helptext
+    user_helptext = getattr(object, 'user_helptext', '')
     # if object has the attribute override_user_helptext, use it instead of the user_helptext
     if hasattr(object, 'override_user_helptext') and object.override_user_helptext:
         user_helptext = get_value(object.override_user_helptext, user_helptext, request)
