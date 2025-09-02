@@ -478,7 +478,9 @@ class UiSchemaView(BrowserView):
         group_schema = self.add_dependencies_to_schema(group_schema, group)
 
         if self.tools_on and group.aq_parent.portal_type == 'Form':
-            self.uischema['layout']['elements'].append(self.helptext_schema(self.get_tools_html(group)))
+            helptext_schema = self.helptext_schema(self.get_tools_html(group))
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, group)       # helptext has same showOn as group
+            self.uischema['layout']['elements'].append(helptext_schema)
 
         if recursive:
             group_schema['elements'] = []

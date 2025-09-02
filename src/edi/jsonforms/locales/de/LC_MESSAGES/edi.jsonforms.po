@@ -197,7 +197,7 @@ msgstr "In einem Upload-Feld können ein oder mehrere Dateien hochgeladen werden
 
 #: ./configure.zcml:29
 msgid "Installs the edi.jsonforms add-on."
-msgstr "Installiert das edi.jsonforms Addon."
+msgstr "Installiert die edi.jsonforms Erweiterung."
 
 #: ./views/json_schema_view.pt:9
 msgid "JSON-Schema"
@@ -382,7 +382,7 @@ msgstr "Unformatierte interne Information für das JSON-Schema"
 
 #: ./configure.zcml:47
 msgid "Uninstalls the edi.jsonforms add-on."
-msgstr "Deinstalliert das edi.jsonforms Addon."
+msgstr "Deinstalliert die edi.jsonforms Erweiterung."
 
 #: ./content/field.py:104
 msgid "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
