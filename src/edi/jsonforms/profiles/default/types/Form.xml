@@ -70,6 +70,7 @@
   <property name="immediate_view">form-view</property>
   <property name="view_methods">
     <element value="form-view"/>
+    <element value="form-tools-view"/>
   </property>
 
   <!-- Method aliases -->
