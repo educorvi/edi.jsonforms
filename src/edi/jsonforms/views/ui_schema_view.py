@@ -71,7 +71,7 @@ class UiSchemaView(BrowserView):
 
         # return schema
 
-    def get_schema_for_child(self, child, scope, recursive=True):
+    def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):
         type = child.portal_type
 
         if type == 'Field':
@@ -87,9 +87,9 @@ class UiSchemaView(BrowserView):
         elif type == 'Button Handler':
             return self.get_schema_for_buttons(child)
         elif type == 'Array':
-            return self.get_schema_for_array(child, scope, recursive)
+            return self.get_schema_for_array(child, scope, recursive, overwrite_scope)
         elif type == 'Complex':
-            return self.get_schema_for_object(child, scope, recursive)
+            return self.get_schema_for_object(child, scope, recursive, overwrite_scope)
         elif type == 'Fieldset':
             return self.get_schema_for_fieldset(child, scope)
         return {}
@@ -175,8 +175,10 @@ class UiSchemaView(BrowserView):
             obj = reference.reference.to_object
             if obj:
                 reference_schema = self.get_base_schema(reference, scope, has_user_helptext=False)
-                import pdb; pdb.set_trace()
-                obj_schema = self.get_schema_for_child(obj, scope)
+                tools = self.tools_on
+                self.set_tools(False) # to deactivate tools for children of referenced object
+                obj_schema = self.get_schema_for_child(obj, scope, overwrite_scope=reference_schema['scope'])
+                self.set_tools(tools)  # reactivate tools
 
                 # replace scope and showon of referenced object with the one of the reference
                 obj_schema['scope'] = reference_schema['scope']
@@ -186,12 +188,9 @@ class UiSchemaView(BrowserView):
                     del obj_schema['showOn']
                 
                 self.add_tools_to_schema(obj_schema, reference)
-
-                if self.tools_on and obj.portal_type == 'Fieldset':
-                    self.uischema['layout']['elements'].pop(-1)
-                    helptext_schema = self.helptext_schema(self.get_tools_html(reference))
-                    helptext_schema = self.add_dependencies_to_schema(helptext_schema, reference)
-                    self.uischema['layout']['elements'].append(helptext_schema)
+                if self.tools_on:
+                    obj_schema['options']['preHtml'] = "<i class=\"bi bi-arrow-90deg-left\"></i> \n " + obj_schema['options']['preHtml']
+                    self.add_option_to_schema(obj_schema, {"help": {"text": _("This is a reference.") }})
                 
                 return obj_schema
         except:
@@ -335,10 +334,13 @@ class UiSchemaView(BrowserView):
 
         # return array_schema
     
-    def get_schema_for_object(self, complex, scope, recursive=True):
+    def get_schema_for_object(self, complex, scope, recursive=True, overwrite_scope=None):
         # don't save scope because one cannot depend on a complex object
         complex_schema = self.get_base_schema(complex, scope, save_scope=False, has_user_helptext=False)
-        complex_scope = scope + create_id(complex)
+        if overwrite_scope:
+            complex_scope = overwrite_scope
+        else:
+            complex_scope = scope + create_id(complex)
 
         # add children of complex to the schema
         if recursive:
