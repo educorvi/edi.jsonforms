@@ -69,7 +69,9 @@ class JsonSchemaView(BrowserView):
                 current_object_id = parent_id
             else:
                 current_object_id = None
-            schema['properties'][clean_field_id] = self.get_schema_for_child(child_object, current_object_id)
+            child_schema = self.get_schema_for_child(child_object, current_object_id)
+            if child_schema and child_schema != {}:
+                schema['properties'][clean_field_id] = child_schema
         else:
             print("Error in JsonSchemaView: could not add child to schema, no 'properties' found in schema")
             return
@@ -112,6 +114,8 @@ class JsonSchemaView(BrowserView):
             return self.get_schema_for_selectionfield(child)
         elif type == 'UploadField':
             return self.get_schema_for_uploadfield(child)
+        elif type == 'Reference':
+            return self.get_schema_for_reference(child)
         elif type == 'Array':
             return self.get_schema_for_array(child, parent_id)
         elif type == 'Complex':
@@ -197,6 +201,16 @@ class JsonSchemaView(BrowserView):
                 'format': 'uri'
             }
         return uploadfield_schema
+
+    def get_schema_for_reference(self, reference):
+        try:
+            obj = reference.reference.to_object
+            if obj:
+                obj_schema = self.get_schema_for_child(obj)
+                return obj_schema
+        except: # referenced object got deleted, ignore
+            return {}
+
 
     def get_schema_for_array(self, array, parent_id=None):
         array_schema = self.add_title_and_description({'type': 'array'}, array)

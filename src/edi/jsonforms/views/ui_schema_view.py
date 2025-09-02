@@ -80,6 +80,8 @@ class UiSchemaView(BrowserView):
             return self.get_schema_for_selectionfield(child, scope)
         elif type == 'UploadField':
             return self.get_schema_for_uploadfield(child, scope)
+        elif type == 'Reference':
+            return self.get_schema_for_reference(child, scope)
         elif type == 'Helptext':
             return self.get_schema_for_helptext(child)
         elif type == 'Button Handler':
@@ -170,6 +172,33 @@ class UiSchemaView(BrowserView):
 
         self.add_user_info(uploadfield, uploadfield_schema)
         return uploadfield_schema
+
+    def get_schema_for_reference(self, reference, scope):
+        try:
+            obj = reference.reference.to_object
+            if obj:
+                reference_schema = self.get_base_schema(reference, scope, has_user_helptext=False)
+                import pdb; pdb.set_trace()
+                obj_schema = self.get_schema_for_child(obj, scope)
+
+                # replace scope and showon of referenced object with the one of the reference
+                obj_schema['scope'] = reference_schema['scope']
+                if 'showOn' in reference_schema:
+                    obj_schema['showOn'] = reference_schema['showOn']
+                elif 'showOn' in obj_schema:
+                    del obj_schema['showOn']
+                
+                self.add_tools_to_schema(obj_schema, reference)
+
+                if self.tools_on and obj.portal_type == 'Fieldset':
+                    self.uischema['layout']['elements'].pop(-1)
+                    helptext_schema = self.helptext_schema(self.get_tools_html(reference))
+                    helptext_schema = self.add_dependencies_to_schema(helptext_schema, reference)
+                    self.uischema['layout']['elements'].append(helptext_schema)
+                
+                return obj_schema
+        except:
+            return {} # referenced object got deleted, ignore
 
     def helptext_schema(self, htmlData):
         # helptext as html-element
