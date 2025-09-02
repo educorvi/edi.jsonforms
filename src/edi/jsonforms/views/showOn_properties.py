@@ -1,4 +1,4 @@
-from edi.jsonforms.views.common import create_id, create_hierarchical_id, convert_dot_to_path
+from edi.jsonforms.views.common import create_id
 import re
 
 
@@ -18,39 +18,21 @@ def find_scope(lookup_scopes, object):
 
     # scope wasn't saved yet, has to be computed manually and then save it
     if scope is None:
-        # Build hierarchical ID using dot notation
-        hierarchical_id = _build_hierarchical_id(object)
-        # Convert to JSON schema path format
-        scope = convert_dot_to_path(hierarchical_id)
-    
+        scope = obj_id
+        parent = object.aq_parent
+        if object.portal_type == 'Option':
+            parent = parent.aq_parent
+        while parent.portal_type != 'Form':
+            if parent.portal_type != 'Fieldset':
+                if parent.portal_type == "Array":
+                    scope = create_id(parent) + '/items/properties/' + scope
+                else:
+                    scope = create_id(parent) + '/properties/' + scope
+            parent = parent.aq_parent
+        scope = '/properties/' + scope
     lookup_scopes[obj_id] = scope
-    return scope
 
-def _build_hierarchical_id(object):
-    """Build hierarchical ID by walking up the parent chain."""
-    if object.portal_type == 'Option':
-        # For options, use the parent selection field
-        return _build_hierarchical_id(object.aq_parent)
-    
-    obj_id = create_id(object)
-    parent = object.aq_parent
-    
-    # Walk up the parent chain to build the path
-    parent_id = None
-    if parent.portal_type != 'Form':
-        if parent.portal_type != 'Fieldset':  # Fieldsets are transparent
-            parent_id = _build_hierarchical_id(parent)
-        else:
-            # Skip fieldset and continue up
-            parent_id = _build_hierarchical_id(parent)
-            if parent_id and parent_id != create_id(parent):
-                return create_hierarchical_id(object, parent_id)
-            return obj_id
-    
-    if parent_id:
-        return create_hierarchical_id(object, parent_id)
-    
-    return obj_id
+    return scope
 
 """
 replaces /properties/ with 

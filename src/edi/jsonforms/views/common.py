@@ -15,62 +15,6 @@ def create_unique_id(object):
     escaped_id_str = id_str.replace('.', '').replace('/', '')
     return escaped_id_str
 
-def create_hierarchical_id(object, parent_id=None):
-    """Create a hierarchical ID using dot notation for fields in arrays/complex types."""
-    object_id = str(object.id)
-    
-    # Strip UID suffix to get clean field name for hierarchical IDs
-    clean_object_id = strip_uid_suffix(object_id)
-    
-    if parent_id is None:
-        return clean_object_id
-    
-    # Also clean the parent_id if it has UID suffixes
-    clean_parent_id = strip_uid_suffix(parent_id)
-    
-    # Get the parent object to determine the type
-    parent = object.aq_parent
-    if hasattr(parent, 'portal_type'):
-        if parent.portal_type == 'Array':
-            return f"{clean_parent_id}.items.{clean_object_id}"
-        elif parent.portal_type == 'Complex':
-            return f"{clean_parent_id}.{clean_object_id}"
-    
-    return clean_object_id
-
-def strip_uid_suffix(object_id):
-    """Strip UID suffix from object ID to get clean field name."""
-    import re
-    # UID suffixes are 32-character hex strings appended to the end
-    # Pattern: fieldname + 32 hex characters
-    pattern = r'^(.+?)([a-f0-9]{32})$'
-    match = re.match(pattern, object_id)
-    if match:
-        return match.group(1)
-    return object_id
-
-def convert_dot_to_path(dot_id):
-    """Convert dot notation ID to JSON schema path format."""
-    if '.' not in dot_id:
-        return f"/properties/{dot_id}"
-    
-    # Replace .items. with /items/properties/
-    # Replace . with /properties/
-    path = dot_id.replace('.items.', '/items/properties/')
-    path = path.replace('.', '/properties/')
-    return f"/properties/{path}"
-
-def convert_path_to_dot(json_path):
-    """Convert JSON schema path format to dot notation ID."""
-    if json_path.startswith('/properties/'):
-        json_path = json_path[12:]  # Remove '/properties/' prefix
-    
-    # Replace /items/properties/ with .items.
-    # Replace /properties/ with .
-    dot_id = json_path.replace('/items/properties/', '.items.')
-    dot_id = dot_id.replace('/properties/', '.')
-    return dot_id
-
 def get_view_url(object):
         return object.absolute_url()
     
