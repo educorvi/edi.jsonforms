@@ -49,39 +49,29 @@ class JsonSchemaView(BrowserView):
         self.ids = set()
         self.id_duplicates = set()
 
-    def add_child_to_schema(self, child_object, schema, parent_id=None):
+    def add_child_to_schema(self, child_object, schema):
         """
         schema needs the keys 'properties' and 'required'
         """
         if child_object.portal_type in self.content_types_without_schema or not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
             return
-        # child_id = self.create_and_check_id(child_object)
-        # For JSON schema properties, use clean field name (no parent path)
-        clean_field_id = strip_uid_suffix(create_id(child_object))
-        # For tracking purposes, use hierarchical ID
-        # hierarchical_child_id = self.create_and_check_id(child_object, current_object_id)
+        child_id = self.create_and_check_id(child_object)
 
         # add children to the schema
         if child_object.portal_type == 'Fieldset':
             schema = self.modify_schema_for_fieldset(schema, child_object)
         elif 'properties' in schema:
-            if parent_id:
-                current_object_id = parent_id
-            else:
-                current_object_id = None
-            child_schema = self.get_schema_for_child(child_object, current_object_id)
-            if child_schema and child_schema != {}:
-                schema['properties'][clean_field_id] = child_schema
+            schema['properties'][child_id] = self.get_schema_for_child(child_object)
         else:
             print("Error in JsonSchemaView: could not add child to schema, no 'properties' found in schema")
             return
- 
+
         # mark children as required
         if child_object.portal_type in possibly_required_types and child_object.required_choice == 'required':
             if check_for_dependencies(child_object):
-                schema = self.add_dependent_required(schema, child_object, clean_field_id)
+                schema = self.add_dependent_required(schema, child_object, child_id)
             elif 'required' in schema:
-                schema['required'].append(clean_field_id)
+                schema['required'].append(child_id)
             else:
                 print("Error in JsonSchemaView: could not add requirements of child to schema, no 'required' found in schema")
                 return
@@ -105,7 +95,7 @@ class JsonSchemaView(BrowserView):
             self.add_child_to_schema(child_object, schema)
         return schema
 
-    def get_schema_for_child(self, child, parent_id=None):
+    def get_schema_for_child(self, child):
         type = child.portal_type
 
         if type == 'Field':
@@ -117,9 +107,9 @@ class JsonSchemaView(BrowserView):
         elif type == 'Reference':
             return self.get_schema_for_reference(child)
         elif type == 'Array':
-            return self.get_schema_for_array(child, parent_id)
+            return self.get_schema_for_array(child)
         elif type == 'Complex':
-            return self.get_schema_for_object(child, parent_id)
+            return self.get_schema_for_object(child)
         return {}
 
     def get_schema_for_field(self, field):
@@ -212,18 +202,15 @@ class JsonSchemaView(BrowserView):
             return {}
 
 
-    def get_schema_for_array(self, array, parent_id=None):
+    def get_schema_for_array(self, array):
         array_schema = self.add_title_and_description({'type': 'array'}, array)
         array_schema = add_interninformation(array_schema, array)
         if array.required_choice == 'required':
             array_schema['minItems'] = 1
-        
-        # Pass the array's ID as parent context for its items
-        array_id = create_id(array) if parent_id is None else create_hierarchical_id(array, parent_id)
-        array_schema['items'] = self.get_schema_for_object(array, array_id)
+        array_schema['items'] = self.get_schema_for_object(array)
         return array_schema
 
-    def get_schema_for_object(self, object, parent_id=None):
+    def get_schema_for_object(self, object):
         complex_schema = {}
         complex_schema['type'] = 'object'
         if object.portal_type != 'Array':
@@ -234,13 +221,10 @@ class JsonSchemaView(BrowserView):
         complex_schema['dependentRequired'] = {}
         complex_schema['allOf'] = []
 
-        # Get the current object's ID to use as parent for its children
-        current_object_id = create_id(object) if parent_id is None else create_hierarchical_id(object, parent_id)
-
         children = object.getFolderContents()
         for child in children:
             child_object = child.getObject()
-            self.add_child_to_schema(child_object, complex_schema, current_object_id)
+            self.add_child_to_schema(child_object, complex_schema)
 
         return complex_schema
     
@@ -290,11 +274,8 @@ class JsonSchemaView(BrowserView):
             schema['required'].append(child_id)
         return schema
     
-    def create_and_check_id(self, object, parent_id=None):
-        if parent_id is not None:
-            id = create_hierarchical_id(object, parent_id)
-        else:
-            id = create_id(object)
+    def create_and_check_id(self, object):
+        id = create_id(object)
         if id not in self.ids:
             self.ids.add(id)
         else:
