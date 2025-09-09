@@ -9,12 +9,12 @@
 
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
 
-        <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+        <!-- <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script> -->
 
-        <!-- <h4>JSON-Schema</h4>
+        <h4>JSON-Schema</h4>
         <p tal:content="json" />
         <h4>UI-Schema</h4>
-        <p tal:content="ui" /> -->
+        <p tal:content="ui" />
       </div>
     </metal:block>
   </body>

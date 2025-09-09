@@ -4,10 +4,6 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       i18n:domain="edi.jsonforms"
       metal:use-macro="context/main_template/macros/master">
-  <head>
-    <link rel="stylesheet" href="++resource++edi.jsonforms/css/vue-json-form.css" />
-    <link rel="stylesheet" href="++resource++edi.jsonforms/css/vue-json-form-forms.css" />
-  </head>
   <body>
     <metal:block fill-slot="content-core">
       <div class="m-3" tal:define="json context/@@form-element-json-schema; ui context/@@form-element-ui-schema">
@@ -21,7 +17,7 @@
         <h4>UI-Schema</h4>
         <p tal:content="ui" /> -->
       </div>
-      <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+      <!-- <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script> -->
       <!-- <script type="text/javascript" src="++resource++edi.jsonforms/js/replace_with_icons.js"></script> -->
 
     </metal:block>
