@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-09-09 07:54+0000\n"
+"POT-Creation-Date: 2025-09-09 10:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,6 +178,14 @@ msgstr ""
 msgid "Form"
 msgstr ""
 
+#: ./views/configure.zcml:46
+msgid "Form View"
+msgstr ""
+
+#: ./views/configure.zcml:57
+msgid "Form view with tools"
+msgstr ""
+
 #: ./content/helptext.py:26
 #: ./profiles/default/types/Helptext.xml
 msgid "Helptext"
@@ -344,14 +352,6 @@ msgstr ""
 
 #: ./content/helptext.py:25
 msgid "The description won't be shown in the form."
-msgstr ""
-
-#: ./views/json_schema_view.py:82
-msgid "The id {id} is not unique. Please change it manually due to possible unexpected behavior"
-msgstr ""
-
-#: ./views/json_schema_view.py:84
-msgid "The ids {ids} are not unique. Please change them manually due to possible unexpected behavior"
 msgstr ""
 
 #: ./content/field.py:39

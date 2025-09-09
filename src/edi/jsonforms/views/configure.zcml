@@ -2,6 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="edi.jsonforms">
 
   -*- extra stuff goes here -*-
@@ -38,6 +39,9 @@
     class=".form_view.FormView"
     template="form_view.pt"
     permission="zope2.View"
+    title="Form View"
+    menu="plone_displayviews"
+    i18n:domain="edi.jsonforms"
     />
 
   <browser:page
@@ -46,6 +50,9 @@
     class=".form_view.FormView"
     template="form_tools_view.pt"
     permission="zope2.View"
+    title="Form view with tools"
+    menu="plone_displayviews"
+    i18n:domain="edi.jsonforms"
     />
 
   <browser:page

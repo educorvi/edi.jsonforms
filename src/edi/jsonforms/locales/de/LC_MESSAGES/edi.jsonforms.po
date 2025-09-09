@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-09-09 07:54+0000\n"
+"POT-Creation-Date: 2025-09-09 10:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,6 +178,14 @@ msgstr "Für eine Dezimal-/Ganzzahl ist dies der minimale Wert, den sie haben mu
 msgid "Form"
 msgstr "Fragebogen"
 
+#: ./views/configure.zcml:46
+msgid "Form View"
+msgstr "Standard-Ansicht"
+
+#: ./views/configure.zcml:57
+msgid "Form view with tools"
+msgstr "Werkzeug-Ansicht"
+
 #: ./content/helptext.py:26
 #: ./profiles/default/types/Helptext.xml
 msgid "Helptext"
@@ -345,14 +353,6 @@ msgstr "Die Abhängigkeiten haben eine und-Verbindung (Default: oder). Diese Opt
 #: ./content/helptext.py:25
 msgid "The description won't be shown in the form."
 msgstr "Die Beschreibung wird nicht im Fragebogen angezeigt."
-
-#: ./views/json_schema_view.py:82
-msgid "The id {id} is not unique. Please change it manually due to possible unexpected behavior"
-msgstr "Die ID {id} ist nicht eindeutig. Bitte ändern Sie sie manuell, da sonst unerwartetes Verhalten möglich ist"
-
-#: ./views/json_schema_view.py:84
-msgid "The ids {ids} are not unique. Please change them manually due to possible unexpected behavior"
-msgstr "Die IDs {ids} sind nicht eindeutig. Bitte ändern Sie sie manuell, da sonst unerwartetes Verhalten möglich ist"
 
 #: ./content/field.py:39
 msgid "The provided regular expression isn't valid."
