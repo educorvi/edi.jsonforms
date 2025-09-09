@@ -14,7 +14,7 @@
 
   <property name="allow_discussion">False</property>
   <property name="factory">Field</property>
-  <property name="icon_expr">string:${portal_url}/document_icon.png</property>
+  <property name="icon_expr">string:usb</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
