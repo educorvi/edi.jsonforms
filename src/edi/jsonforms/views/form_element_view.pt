@@ -12,7 +12,10 @@
     <metal:block fill-slot="content-core">
       <div class="m-3" tal:define="json context/@@form-element-json-schema; ui context/@@form-element-ui-schema">
 
-      <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
+        <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
+        <div tal:condition="view/empty_selection_field">
+          <p class="bg-warning" style="display: inline; padding: 5px 10px;" i18n:translate="">Please add options to this selection field.</p>
+        </div>
         <!-- <h4>JSON-Schema</h4>
         <p tal:content="json" />
         <h4>UI-Schema</h4>
