@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-08-27 14:11+0000\n"
+"POT-Creation-Date: 2025-09-09 07:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,9 +37,17 @@ msgstr "A Placeholder is only possible if the answer type is one of the followin
 msgid "A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible."
 msgstr "A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible."
 
+#: ./profiles/default/types/Reference.xml
+msgid "A reference of a form element with new dependencies."
+msgstr ""
+
 #: ./content/upload_field.py:43
 msgid "Accepted file types for file upload"
 msgstr "Accepted file types for file upload"
+
+#: ./content/array.py:33
+msgid "Add button label"
+msgstr ""
 
 #: ./content/common.py:120
 msgid "Additional Information"
@@ -92,8 +100,12 @@ msgstr "Complex"
 msgid "Condition for showing this field"
 msgstr ""
 
-#: ./views/ui_schema_view.py:405
+#: ./views/ui_schema_view.py:445
 msgid "Content"
+msgstr ""
+
+#: ./content/reference.py:63
+msgid "Could not determine the parent Form."
 msgstr ""
 
 #: ./content/field.py:25
@@ -108,7 +120,7 @@ msgstr "Date and time"
 msgid "Decimal number"
 msgstr "Decimal number"
 
-#: ./views/ui_schema_view.py:406
+#: ./views/ui_schema_view.py:446
 msgid "Delete"
 msgstr ""
 
@@ -124,7 +136,7 @@ msgstr "Dependent from this answer option:"
 msgid "Description"
 msgstr ""
 
-#: ./content/common.py:152
+#: ./content/common.py:164
 msgid "Description of the field/question"
 msgstr "Description of the field/question"
 
@@ -175,7 +187,7 @@ msgstr ""
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 
-#: ./content/common.py:173
+#: ./content/common.py:152
 msgid "Hint or helptext for the user"
 msgstr "Hint or helptext for the user"
 
@@ -207,8 +219,8 @@ msgstr "JSON-Schema"
 msgid "Label of the answer option"
 msgstr "Label of the answer option"
 
-#: ./configure.zcml:38
-msgid "Loads translation catalogs before content types"
+#: ./content/array.py:34
+msgid "Label of the button to add new elements. Default: +"
 msgstr ""
 
 #: ./content/field.py:62
@@ -271,6 +283,15 @@ msgstr "Placeholder"
 msgid "Radiobuttons (single selection)"
 msgstr "Radiobuttons (single selection)"
 
+#: ./content/reference.py:24
+#: ./profiles/default/types/Reference.xml
+msgid "Reference"
+msgstr ""
+
+#: ./content/reference.py:26
+msgid "Reference to another Form Element (e.g. Field or Array)"
+msgstr ""
+
 #: ./content/field.py:76
 msgid "Regular expression to validate a Textline/-area field."
 msgstr "Regular expression to validate a Textline/-area field."
@@ -288,7 +309,7 @@ msgid "Selection (single selection)"
 msgstr "Selection (single selection)"
 
 #: ./content/array.py:24
-#: ./content/common.py:155
+#: ./content/common.py:167
 msgid "Selection of Field Requirement"
 msgstr "Selection of Field Requirement"
 
@@ -296,6 +317,7 @@ msgstr "Selection of Field Requirement"
 msgid "SelectionField"
 msgstr "SelectionField"
 
+#: ./content/array.py:29
 #: ./content/fieldset.py:26
 msgid "Show title in form"
 msgstr ""
@@ -336,6 +358,18 @@ msgstr ""
 msgid "The provided regular expression isn't valid."
 msgstr "The provided regular expression isn't valid."
 
+#: ./content/reference.py:37
+msgid "The referenced object is either empty or deleted/invalid."
+msgstr ""
+
+#: ./content/reference.py:69
+msgid "The referenced object is not within a Form."
+msgstr ""
+
+#: ./content/reference.py:76
+msgid "The referenced object is not within the same Form."
+msgstr ""
+
 #: ./content/helptext.py:22
 msgid "The title won't be shown in the form."
 msgstr ""
@@ -348,6 +382,10 @@ msgstr ""
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr ""
 
+#: ./views/ui_schema_view.py:193
+msgid "This is a reference."
+msgstr ""
+
 #: ./content/field.py:27
 msgid "Time"
 msgstr "Time"
@@ -356,17 +394,9 @@ msgstr "Time"
 msgid "Title"
 msgstr ""
 
-#: ./content/common.py:150
+#: ./content/common.py:162
 msgid "Title of the field/question"
 msgstr "Title of the field/question"
-
-#: ./views/form_tools_view.pt:8
-msgid "Tooltips off"
-msgstr ""
-
-#: ./views/form_view.pt:8
-msgid "Tooltips on"
-msgstr ""
 
 #: ./views/ui_schema_view.pt:9
 msgid "UI-Schema"
@@ -380,7 +410,7 @@ msgstr "URL"
 msgid "Unformatted intern information for the JSON-Schema"
 msgstr "Unformatted intern information for the JSON-Schema"
 
-#: ./configure.zcml:47
+#: ./configure.zcml:38
 msgid "Uninstalls the edi.jsonforms add-on."
 msgstr "Uninstalls the edi.jsonforms add-on."
 
@@ -410,14 +440,30 @@ msgstr "View"
 msgid "Whole number"
 msgstr "Whole number"
 
+#: ./content/reference.py:51
+msgid "You cannot depend on the object that is referenced."
+msgstr ""
+
+#: ./content/reference.py:40
+msgid "You cannot reference a Fieldset."
+msgstr ""
+
+#: ./content/reference.py:44
+msgid "You cannot reference a Form."
+msgstr ""
+
+#: ./content/reference.py:42
+msgid "You cannot reference a Reference."
+msgstr ""
+
+#: ./content/reference.py:46
+msgid "You cannot reference the object itself."
+msgstr ""
+
 #: ./configure.zcml:29
 msgid "edi.jsonforms"
 msgstr "edi.jsonforms"
 
-#: ./configure.zcml:47
+#: ./configure.zcml:38
 msgid "edi.jsonforms (uninstall)"
 msgstr "edi.jsonforms (uninstall)"
-
-#: ./configure.zcml:38
-msgid "edi.jsonforms: Locales"
-msgstr ""

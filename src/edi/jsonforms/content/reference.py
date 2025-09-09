@@ -23,7 +23,7 @@ class IReference(IDependent):
     reference = RelationChoice(
             title=_("Reference"),
             required=True,
-            description=_("Reference to another Form Element (i.e. Field, Array or Fieldset)"),
+            description=_("Reference to another Form Element (e.g. Field or Array)"),
             #source=CatalogSource(portal_type=['Form', 'Complex', 'Array', 'Fieldset'], base_path=get_base_path),
             vocabulary='plone.app.vocabularies.Catalog',
     )

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-08-27 14:11+0000\n"
+"POT-Creation-Date: 2025-09-09 07:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,9 +37,17 @@ msgstr "Ein Platzhalter ist nur möglich, wenn der Antworttyp einer der folgende
 msgid "A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible."
 msgstr "Ein Auswahlfeld bietet dem Nutzer eine Reihe von Antwortmöglichkeiten, aus denen er auswählen kann. Die Optionen sind vordefinierte Werte und können als Radioboxen, Checkboxen oder Dropdown-Listen angezeigt werden."
 
+#: ./profiles/default/types/Reference.xml
+msgid "A reference of a form element with new dependencies."
+msgstr "Eine Referenz eines Fragebogenelements mit neuen Abhängigkeiten."
+
 #: ./content/upload_field.py:43
 msgid "Accepted file types for file upload"
 msgstr "Akzeptierte Dateitypen für den Upload"
+
+#: ./content/array.py:33
+msgid "Add button label"
+msgstr "Label des Hinzufügeknopfes"
 
 #: ./content/common.py:120
 msgid "Additional Information"
@@ -92,9 +100,13 @@ msgstr "Objekt"
 msgid "Condition for showing this field"
 msgstr "Bedingung, um dieses Feld anzuzeigen"
 
-#: ./views/ui_schema_view.py:405
+#: ./views/ui_schema_view.py:445
 msgid "Content"
 msgstr "Inhalt"
+
+#: ./content/reference.py:63
+msgid "Could not determine the parent Form."
+msgstr "Der Elternfragebogen konnte nicht gefunden werden."
 
 #: ./content/field.py:25
 msgid "Date"
@@ -108,7 +120,7 @@ msgstr "Datum und Uhrzeit"
 msgid "Decimal number"
 msgstr "Dezimalzahl"
 
-#: ./views/ui_schema_view.py:406
+#: ./views/ui_schema_view.py:446
 msgid "Delete"
 msgstr "Löschen"
 
@@ -124,7 +136,7 @@ msgstr "Abhängig von folgender Antwortoption:"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: ./content/common.py:152
+#: ./content/common.py:164
 msgid "Description of the field/question"
 msgstr "Beschreibung des Feldes / der Fragestellung"
 
@@ -175,7 +187,7 @@ msgstr "Hinweistext"
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Hier können zusätzliche Informationen für das Software-Team bereitgestellt werden, die beachtet werden sollen, wenn der Fragebogen erstellt wird."
 
-#: ./content/common.py:173
+#: ./content/common.py:152
 msgid "Hint or helptext for the user"
 msgstr "Hinweis oder Hilfetext für den Nutzer"
 
@@ -207,9 +219,9 @@ msgstr "JSON-Schema"
 msgid "Label of the answer option"
 msgstr "Label der Antwortoption"
 
-#: ./configure.zcml:38
-msgid "Loads translation catalogs before content types"
-msgstr ""
+#: ./content/array.py:34
+msgid "Label of the button to add new elements. Default: +"
+msgstr "Label des Knopfes, um neue Elemente hinzuzufügen. Default: +"
 
 #: ./content/field.py:62
 msgid "Maximum"
@@ -271,6 +283,15 @@ msgstr "Platzhalter"
 msgid "Radiobuttons (single selection)"
 msgstr "Radiobuttons (Einfachauswahl)"
 
+#: ./content/reference.py:24
+#: ./profiles/default/types/Reference.xml
+msgid "Reference"
+msgstr "Referenz"
+
+#: ./content/reference.py:26
+msgid "Reference to another Form Element (e.g. Field or Array)"
+msgstr "Referenz auf ein anderes Fragebogenelement (z. B. Feld oder Array)"
+
 #: ./content/field.py:76
 msgid "Regular expression to validate a Textline/-area field."
 msgstr "Regulärer Ausdruck gegen den die/das Textzeile/-feld validiert wird."
@@ -288,7 +309,7 @@ msgid "Selection (single selection)"
 msgstr "Auswahlmenü (Einfachauswahl)"
 
 #: ./content/array.py:24
-#: ./content/common.py:155
+#: ./content/common.py:167
 msgid "Selection of Field Requirement"
 msgstr "Auswahl zwischen optionalem und Pflichtfeld"
 
@@ -296,6 +317,7 @@ msgstr "Auswahl zwischen optionalem und Pflichtfeld"
 msgid "SelectionField"
 msgstr "Auswahlfeld"
 
+#: ./content/array.py:29
 #: ./content/fieldset.py:26
 msgid "Show title in form"
 msgstr "Titel im Fragebogen anzeigen"
@@ -336,6 +358,18 @@ msgstr "Die IDs {ids} sind nicht eindeutig. Bitte ändern Sie sie manuell, da so
 msgid "The provided regular expression isn't valid."
 msgstr "Der angegebene reguläre Ausdruck ist nicht valide."
 
+#: ./content/reference.py:37
+msgid "The referenced object is either empty or deleted/invalid."
+msgstr "Das referenzierte Objekt ist entweder leer/ungültig oder wurde gelöscht."
+
+#: ./content/reference.py:69
+msgid "The referenced object is not within a Form."
+msgstr "Das referenzierte Objekt befindet sich nicht in einem Fragebogen."
+
+#: ./content/reference.py:76
+msgid "The referenced object is not within the same Form."
+msgstr "Das referenzierte Objekt befindet sich nicht im gleichen Fragebogen."
+
 #: ./content/helptext.py:22
 msgid "The title won't be shown in the form."
 msgstr "Der Titel wird nicht im Fragebogen angezeigt."
@@ -348,6 +382,10 @@ msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr "Dieser Hinweistext kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden und als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
 
+#: ./views/ui_schema_view.py:193
+msgid "This is a reference."
+msgstr "Dies ist eine Referenz."
+
 #: ./content/field.py:27
 msgid "Time"
 msgstr "Uhrzeit"
@@ -356,17 +394,9 @@ msgstr "Uhrzeit"
 msgid "Title"
 msgstr "Titel"
 
-#: ./content/common.py:150
+#: ./content/common.py:162
 msgid "Title of the field/question"
 msgstr "Titel des Feldes / der Fragegestellung"
-
-#: ./views/form_tools_view.pt:8
-msgid "Tooltips off"
-msgstr "Tooltipps aus"
-
-#: ./views/form_view.pt:8
-msgid "Tooltips on"
-msgstr "Tooltipps an"
 
 #: ./views/ui_schema_view.pt:9
 msgid "UI-Schema"
@@ -380,7 +410,7 @@ msgstr "URL"
 msgid "Unformatted intern information for the JSON-Schema"
 msgstr "Unformatierte interne Information für das JSON-Schema"
 
-#: ./configure.zcml:47
+#: ./configure.zcml:38
 msgid "Uninstalls the edi.jsonforms add-on."
 msgstr "Deinstalliert die edi.jsonforms Erweiterung."
 
@@ -410,14 +440,30 @@ msgstr "View"
 msgid "Whole number"
 msgstr "Ganzzahl"
 
+#: ./content/reference.py:51
+msgid "You cannot depend on the object that is referenced."
+msgstr "Es kann keine Abhängigkeit zu dem Objekt geben, das referenziert wird."
+
+#: ./content/reference.py:40
+msgid "You cannot reference a Fieldset."
+msgstr "Feldgruppen können nicht referenziert werden."
+
+#: ./content/reference.py:44
+msgid "You cannot reference a Form."
+msgstr "Fragebögen können nicht referenziert werden."
+
+#: ./content/reference.py:42
+msgid "You cannot reference a Reference."
+msgstr "Referenzen können nicht referenziert werden."
+
+#: ./content/reference.py:46
+msgid "You cannot reference the object itself."
+msgstr "Es kann nicht das Objekt selbst referenziert werden."
+
 #: ./configure.zcml:29
 msgid "edi.jsonforms"
 msgstr "edi.jsonforms"
 
-#: ./configure.zcml:47
+#: ./configure.zcml:38
 msgid "edi.jsonforms (uninstall)"
 msgstr "edi.jsonforms (deinstallieren)"
-
-#: ./configure.zcml:38
-msgid "edi.jsonforms: Locales"
-msgstr ""
