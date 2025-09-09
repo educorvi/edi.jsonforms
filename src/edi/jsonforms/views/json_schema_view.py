@@ -17,7 +17,6 @@ class JsonSchemaView(BrowserView):
         super().__init__(context, request)
         self.jsonschema = {}
         self.ids = set()
-        self.id_duplicates = set()
 
     def __call__(self):
         self.get_schema()
@@ -34,8 +33,6 @@ class JsonSchemaView(BrowserView):
         for child in children:
             self.add_child_to_schema(child.getObject(), self.jsonschema)
 
-        self.check_duplicates()
-
         return self.jsonschema
     
     def set_json_base_schema(self):
@@ -47,7 +44,6 @@ class JsonSchemaView(BrowserView):
         self.jsonschema['dependentRequired'] = {}
         self.jsonschema['allOf'] = []
         self.ids = set()
-        self.id_duplicates = set()
 
     def add_child_to_schema(self, child_object, schema):
         """
@@ -75,18 +71,6 @@ class JsonSchemaView(BrowserView):
             else:
                 print("Error in JsonSchemaView: could not add requirements of child to schema, no 'required' found in schema")
                 return
-
-    def check_duplicates(self):
-        if self.id_duplicates:
-            if len(self.id_duplicates) == 1:
-                message = _('The id {id} is not unique. Please change it manually due to possible unexpected behavior').format(id=list(self.id_duplicates)[0])
-            else:
-                message = _('The ids {ids} are not unique. Please change them manually due to possible unexpected behavior').format(ids=', '.join(self.id_duplicates))
-            api.portal.show_message(
-                message=message,
-                request=self.request,
-                type='warning'
-            )
 
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()
@@ -274,12 +258,11 @@ class JsonSchemaView(BrowserView):
             schema['required'].append(child_id)
         return schema
     
+    # left over of duplicate check. method not deleted in case of other stuff with ids in the future
     def create_and_check_id(self, object):
         id = create_id(object)
         if id not in self.ids:
             self.ids.add(id)
-        else:
-            self.id_duplicates.add(id)
         return id
     
     """
