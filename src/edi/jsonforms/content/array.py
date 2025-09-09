@@ -25,6 +25,14 @@ class IArray(IComplex):
                                     source=Required_categories,
                                     default='optional',
                                     required=True)
+    
+    show_title = schema.Bool(title=_("Show title in form"),
+                             default=True,
+                             required=False)
+    
+    button_label = schema.TextLine(title=_("Add button label"),
+                                   description=_("Label of the button to add new elements. Default: +"),
+                                   required=False)
 
 
 

@@ -313,7 +313,15 @@ class UiSchemaView(BrowserView):
 
 
     def get_schema_for_array(self, array, scope, recursive=True, overwrite_scope=None):
-        return self.get_schema_for_object(array, scope, recursive, overwrite_scope)
+        array_schema = self.get_schema_for_object(array, scope, recursive, overwrite_scope)
+
+        if not array.show_title:
+            self.add_option_to_schema(array_schema, {"label": False})
+
+        if array.button_label:
+            self.add_option_to_schema(array_schema, {"addButtonText": array.button_label})
+
+        return array_schema
         # # don't save scope because one cannot depend on an array
         # array_schema = self.get_base_schema(array, scope, save_scope=False, has_user_helptext=False)
         # if overwrite_scope:
