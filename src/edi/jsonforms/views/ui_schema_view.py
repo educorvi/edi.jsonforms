@@ -165,8 +165,8 @@ class UiSchemaView(BrowserView):
         else:
             uploadfield_schema['options']['acceptedFileType'] = '*'
 
-        if uploadfield.answer_type == 'file-multi':
-            uploadfield_schema['options']['allowMultipleFiles'] = True
+        # if uploadfield.answer_type == 'file-multi':
+        #     uploadfield_schema['options']['allowMultipleFiles'] = True
 
         return uploadfield_schema
 
