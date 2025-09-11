@@ -66,9 +66,9 @@
 
   <!-- View information -->
   <property name="add_view_expr">string:${folder_url}/++add++Form</property>
-  <property name="default_view">form-view</property>
+  <property name="default_view">form-tools-view</property>
   <property name="default_view_fallback">False</property>
-  <property name="immediate_view">form-view</property>
+  <property name="immediate_view">form-tools-view</property>
   <property name="view_methods">
     <element value="form-view"/>
     <element value="form-tools-view"/>
