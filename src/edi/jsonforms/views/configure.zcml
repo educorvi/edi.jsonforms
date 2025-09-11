@@ -77,4 +77,17 @@
     permission="zope2.View"
     />
 
+  <browser:menuItems
+     for="edi.jsonforms.content.form.IForm"
+     menu="plone_displayviews">
+     <browser:menuItem
+       title="Form with Formtools"
+       action="form-tools-view"
+     />
+     <browser:menuItem
+       title="Form"
+       action="form-view"
+     />
+  </browser:menuItems>
+
 </configure>
