@@ -1,35 +1,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      i18n:domain="edi.jsonforms"
-      metal:use-macro="context/main_template/macros/master">
-<body>
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:domain="edi.jsonforms" metal:use-macro="context/main_template/macros/master">
+  <body>
+    <metal:block fill-slot="content-core">
+      <div class="m-3" tal:define="json view/jsonschema; ui view/uischema">
 
-  <metal:custom_title fill-slot="content-title">
-    <h1 tal:replace="structure context/@@title" />
+        <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
 
-    <!-- @@title view template: -->
-    <!--
-    <h1 tal:define="title context/Title" tal:condition="title" tal:content="title">
-      Title or id
-    </h1>
-    -->
-
-  </metal:custom_title>
-
-  <metal:custom_description fill-slot="content-description">
-    <p tal:replace="structure context/@@description" />
-  </metal:custom_description>
-
-  <metal:content-core fill-slot="content-core">
-  <metal:block define-macro="content-core">
-
-    <h2>Main content</h2>
-    <!--<div tal:replace="view/my_custom_view_method" />-->
-    <!--<div tal:replace="context/my_custom_field" />-->
-
-  </metal:block>
-  </metal:content-core>
-</body>
+        <!-- <h4>JSON-Schema</h4>
+        <p tal:content="json" />
+        <h4>UI-Schema</h4>
+        <p tal:content="ui" /> -->
+      </div>
+    </metal:block>
+  </body>
 </html>

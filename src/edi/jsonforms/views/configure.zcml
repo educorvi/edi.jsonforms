@@ -9,7 +9,7 @@
 
   <browser:page
     name="wizard-view"
-    for="Wizard"
+    for="edi.jsonforms.content.wizard.IWizard"
     class=".wizard_view.WizardView"
     template="wizard_view.pt"
     permission="zope2.View"

@@ -291,7 +291,7 @@ def check_for_dependencies(child_object):
         return False
 
 def add_interninformation(schema, child):
-    if child.intern_information:
+    if hasattr(child, 'intern_information') and child.intern_information:
         schema['comment'] = child.intern_information
     return schema
 
