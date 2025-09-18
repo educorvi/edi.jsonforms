@@ -249,7 +249,7 @@ class UiSchemaView(BrowserView):
             button = button.getObject()
 
             if button.portal_type == 'Email Handler':
-                request_url = "http://localhost:8080/Plone3/fragebogen-test-else-zweig/@send-email"
+                request_url = self.context.absolute_url() + '/@send-email'
 
                 query_params = {
                     "to_address": button.to_address
@@ -284,8 +284,7 @@ class UiSchemaView(BrowserView):
                 }
                 buttons_schema['buttons'].append(button_schema)
             elif button.portal_type == 'Webservice Handler':
-                request_url = "http://localhost:8080/Plone3/fragebogen-test-else-zweig/@webservice-request"
-
+                request_url = self.context.absolute_url() + '/@webservice-request'
                 i = 1
                 query_params = {}
                 endpoints = button.getFolderContents()
