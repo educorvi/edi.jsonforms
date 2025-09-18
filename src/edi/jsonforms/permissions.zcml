@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.jsonforms.AddWizard"
+        title="edi.jsonforms: Add Wizard"
+    />
+
+
+    <permission
         id="edi.jsonforms.AddReference"
         title="edi.jsonforms: Add Reference"
     />

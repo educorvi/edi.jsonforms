@@ -12,4 +12,5 @@
   <object name="UploadField" meta_type="Dexterity FTI"/>
   <object name="Helptext" meta_type="Dexterity FTI"/>
   <object name="Reference" meta_type="Dexterity FTI"/>
+  <object name="Wizard" meta_type="Dexterity FTI"/>
 </object>
