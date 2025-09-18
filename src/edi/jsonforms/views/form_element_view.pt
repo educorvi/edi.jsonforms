@@ -6,7 +6,7 @@
       metal:use-macro="context/main_template/macros/master">
   <body>
     <metal:block fill-slot="content-core">
-      <div class="m-3" tal:define="json context/@@form-element-json-schema; ui context/@@form-element-ui-schema">
+      <div class="m-3" tal:define="json view/form_element_jsonschema; ui view/form_element_uischema">
 
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
         <div tal:condition="view/empty_selection_field">

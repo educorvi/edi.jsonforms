@@ -26,24 +26,6 @@
     />
 
   <browser:page
-    name="form-element-json-schema"
-    for="edi.jsonforms.content.common.IFormElement"
-    class=".form_element_json_schema.FormElementJsonSchema"
-    permission="zope2.View"
-    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
-    />
-
-  <browser:page
-    name="form-element-ui-schema"
-    for="edi.jsonforms.content.common.IFormElement"
-    class=".form_element_ui_schema.FormElementUiSchema"
-    permission="zope2.View"
-    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
-    />
-
-
-
-  <browser:page
     name="form-view"
     for="edi.jsonforms.content.form.IForm"
     class=".form_view.FormView"
