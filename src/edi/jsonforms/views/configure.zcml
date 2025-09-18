@@ -8,6 +8,15 @@
   -*- extra stuff goes here -*-
 
   <browser:page
+    name="wizard-view"
+    for="Wizard"
+    class=".wizard_view.WizardView"
+    template="wizard_view.pt"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
     name="form-element-view"
     for="edi.jsonforms.content.common.IFormElement"
     class=".form_element_view.FormElementView"
