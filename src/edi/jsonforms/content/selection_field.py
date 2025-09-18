@@ -14,7 +14,7 @@ selection_answer_types = [
     SimpleTerm('radio', 'radio', _('Radiobuttons (single selection)')),             # input
     SimpleTerm('checkbox', 'checkbox', _('Checkboxes (multi-selection)')),        # input
     SimpleTerm('select', 'select', _('Selection (single selection)')),             # select
-    SimpleTerm('selectmultiple', 'selectmultiple', _('Selection (multi-selection)')),  # select (with attribute multiple)
+    # SimpleTerm('selectmultiple', 'selectmultiple', _('Selection (multi-selection)')),  # select (with attribute multiple)
 ]
 Selection_answer_types = SimpleVocabulary(selection_answer_types)
 
