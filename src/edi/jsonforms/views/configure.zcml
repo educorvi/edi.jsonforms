@@ -17,6 +17,22 @@
     />
 
   <browser:page
+    name="wizard-json-schema"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardJsonSchemaView"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    name="wizard-ui-schema"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardUiSchemaView"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
     name="form-element-view"
     for="edi.jsonforms.content.common.IFormElement"
     class=".form_element_view.FormElementView"
