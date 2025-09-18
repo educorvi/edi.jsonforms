@@ -21,6 +21,7 @@ class WizardView(BrowserView):
         self.uischema = WizardUiSchemaView(self.context, self.request)()
         return self.index()
 
+
 class WizardUiSchemaView(UiSchemaView):
 
     def __init__(self, context, request):
