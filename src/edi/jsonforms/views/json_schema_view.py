@@ -175,8 +175,8 @@ class JsonSchemaView(BrowserView):
                 uploadfield_schema['items'] = {
                     'type': 'string',
                     'format': 'uri',
-                    'maxContains': uploadfield.max_number_of_files
                 }
+                uploadfield_schema['maxItems'] = uploadfield.max_number_of_files
 
                 if uploadfield.min_number_of_files:
                     uploadfield_schema['minItems'] = uploadfield.min_number_of_files
@@ -185,9 +185,9 @@ class JsonSchemaView(BrowserView):
             uploadfield_schema['items'] = {
                 'type': 'string',
                 'format': 'uri',
-                'minContains': uploadfield.min_number_of_files
             }
-        
+            uploadfield_schema['minItems'] = uploadfield.min_number_of_files
+
         if uploadfield.required_choice == 'required':
             uploadfield_schema['minItems'] = 1
 
