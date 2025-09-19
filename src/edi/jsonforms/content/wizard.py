@@ -17,7 +17,6 @@ class IWizard(model.Schema):
     """ Marker interface and Dexterity Python Schema for Wizard
     """
 
-
 @implementer(IWizard)
 class Wizard(Container):
     """ Content-type class for IWizard

@@ -165,6 +165,20 @@ class UiSchemaView(BrowserView):
         else:
             uploadfield_schema['options']['acceptedFileType'] = '*'
 
+        if uploadfield.max_file_size:
+            uploadfield_schema['options']['maxFileSize'] = uploadfield.max_file_size * 1024 * 1024 # in bytes
+
+        # if uploadfield.max_number_of_files:
+        #     uploadfield_schema['options']['maxNumberOfFiles'] = uploadfield.max_number_of_files
+        # if uploadfield.min_number_of_files:
+        #     uploadfield_schema['options']['minNumberOfFiles'] = uploadfield.min_number_of_files
+
+        #     if uploadfield.min_number_of_files > 1:
+        #         uploadfield_schema['options']['allowMultipleFiles'] = True
+
+
+
+
         # if uploadfield.answer_type == 'file-multi':
         #     uploadfield_schema['options']['allowMultipleFiles'] = True
 

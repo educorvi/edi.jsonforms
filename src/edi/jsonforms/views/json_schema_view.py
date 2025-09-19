@@ -164,16 +164,33 @@ class JsonSchemaView(BrowserView):
 
     def get_schema_for_uploadfield(self, uploadfield):
         uploadfield_schema = self.create_base_schema__field({}, uploadfield)
-        answer_type = uploadfield.answer_type
-        if answer_type == 'file':
-            uploadfield_schema['type'] = 'string'
-            uploadfield_schema['format'] = 'uri'
-        elif answer_type == 'file-multi':
+        # answer_type = uploadfield.answer_type
+
+        if uploadfield.max_number_of_files:
+            if uploadfield.max_number_of_files == 1:
+                uploadfield_schema['type'] = 'string'
+                uploadfield_schema['format'] = 'uri'
+            else:
+                uploadfield_schema['type'] = 'array'
+                uploadfield_schema['items'] = {
+                    'type': 'string',
+                    'format': 'uri',
+                    'maxContains': uploadfield.max_number_of_files
+                }
+
+                if uploadfield.min_number_of_files:
+                    uploadfield_schema['minItems'] = uploadfield.min_number_of_files
+        elif uploadfield.min_number_of_files:
             uploadfield_schema['type'] = 'array'
             uploadfield_schema['items'] = {
                 'type': 'string',
-                'format': 'uri'
+                'format': 'uri',
+                'minContains': uploadfield.min_number_of_files
             }
+        
+        if uploadfield.required_choice == 'required':
+            uploadfield_schema['minItems'] = 1
+
         return uploadfield_schema
 
     def get_schema_for_reference(self, reference):
