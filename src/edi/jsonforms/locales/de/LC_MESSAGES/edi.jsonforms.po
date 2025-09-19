@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-09-19 08:55+0000\n"
+"POT-Creation-Date: 2025-09-19 09:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,7 @@ msgstr "Checkboxen (Mehrfachauswahl)"
 #: ./content/field.py:45
 #: ./content/selection_field.py:29
 msgid "Choose the answer type"
-msgstr "Auswahl des Antworttypen"
+msgstr "Auswahl des Antworttyps"
 
 #: ./profiles/default/types/Complex.xml
 msgid "Complex"
@@ -139,13 +139,10 @@ msgstr "Abhängigkeiten"
 msgid "Dependent from this answer option:"
 msgstr "Abhängig von folgender Antwortoption:"
 
+#: ./content/common.py:164
 #: ./content/helptext.py:23
 msgid "Description"
 msgstr "Beschreibung"
-
-#: ./content/common.py:164
-msgid "Description of the field/question"
-msgstr "Beschreibung des Feldes / der Fragestellung"
 
 #: ./profiles/default/types/Array.xml
 #: ./profiles/default/types/Complex.xml
@@ -352,7 +349,7 @@ msgstr "Auswahlmenü (Einfachauswahl)"
 #: ./content/array.py:24
 #: ./content/common.py:167
 msgid "Selection of Field Requirement"
-msgstr "Auswahl zwischen optionalem und Pflichtfeld"
+msgstr "Auswahl zwischen optionalem Feld und Pflichtfeld"
 
 #: ./profiles/default/types/SelectionField.xml
 msgid "SelectionField"
@@ -427,13 +424,10 @@ msgstr "Dies ist eine Referenz."
 msgid "Time"
 msgstr "Uhrzeit"
 
+#: ./content/common.py:162
 #: ./content/helptext.py:21
 msgid "Title"
 msgstr "Titel"
-
-#: ./content/common.py:162
-msgid "Title of the field/question"
-msgstr "Titel des Feldes / der Fragegestellung"
 
 #: ./views/ui_schema_view.pt:9
 msgid "UI-Schema"

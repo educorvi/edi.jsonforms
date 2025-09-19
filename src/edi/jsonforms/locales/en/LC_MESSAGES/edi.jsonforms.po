@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-09-19 08:55+0000\n"
+"POT-Creation-Date: 2025-09-19 09:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -139,13 +139,10 @@ msgstr "Dependencies"
 msgid "Dependent from this answer option:"
 msgstr "Dependent from this answer option:"
 
+#: ./content/common.py:164
 #: ./content/helptext.py:23
 msgid "Description"
 msgstr ""
-
-#: ./content/common.py:164
-msgid "Description of the field/question"
-msgstr "Description of the field/question"
 
 #: ./profiles/default/types/Array.xml
 #: ./profiles/default/types/Complex.xml
@@ -427,13 +424,10 @@ msgstr ""
 msgid "Time"
 msgstr "Time"
 
+#: ./content/common.py:162
 #: ./content/helptext.py:21
 msgid "Title"
 msgstr ""
-
-#: ./content/common.py:162
-msgid "Title of the field/question"
-msgstr "Title of the field/question"
 
 #: ./views/ui_schema_view.pt:9
 msgid "UI-Schema"
