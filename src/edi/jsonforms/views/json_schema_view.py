@@ -245,7 +245,7 @@ class JsonSchemaView(BrowserView):
                     if_then = {
                         'if': {
                             'properties': {
-                                create_id(selection_parent): {'const': get_title(self.request, dep)}
+                                create_id(selection_parent): {'const': get_title(dep, self.request)}
                             }
                         },
                         'then': {
