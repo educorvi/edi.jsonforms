@@ -428,35 +428,30 @@ class UiSchemaView(BrowserView):
         return descendantControlOverrides
 
     def get_tools_html(self, child_object):
-        # html_links = ['<span>\
-        #             <a href="{view_url}" title="View"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">\
-        #                 <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>\
-        #                 <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>\
-        #             </svg></a>\
-        #             <a href="{edit_url}" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">\
-        #                 <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>\
-        #             </svg></a>',
+        aria_view = _("View element")
+        aria_edit = _("Edit element")
+        aria_content = _("Show element content")
+        aria_delete = _("Delete element")
 
-        #             '<a href="{content_url}" title="Content"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-list" viewBox="0 0 16 16">\
-        #                 <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>\
-        #                 <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>\
-        #             </svg></a>',
-
-        #             '<a href={delete_url}" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">\
-        #                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>\
-        #                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>\
-        #             </svg></a>\
-        #         </span>']
-        html_links = ['<span><a href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
-                        <a href="{edit_url}" title="{edit}"><i class="bi bi-pen-fill"></a>\n',
-                        '<a href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
-                        '<a href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>'
+        html_links = ['<span><a aria-label="{aria_view}" href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
+                        <a aria-label="{aria_edit}" href="{edit_url}" title="{edit}"><i class="bi bi-pen-fill"></a>\n',
+                        '<a aria-label="{aria_content}" href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
+                        '<a aria-label="{aria_delete}" href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>'
                         ]
 
-        tools = html_links[0].format(view_url=get_view_url(child_object), view=_('View'), edit_url=get_edit_url(child_object), edit=_('Edit'))
+        tools = html_links[0].format(aria_view=aria_view,
+                                     view_url=get_view_url(child_object),
+                                     view=_('View'),
+                                     aria_edit=aria_edit,
+                                     edit_url=get_edit_url(child_object),
+                                     edit=_('Edit'))
         if has_content(child_object):
-            tools += html_links[1].format(content_url=get_content_url(child_object), content=_('Content'))
-        tools += html_links[2].format(delete_url=get_delete_url(child_object), delete=_('Delete'))
+            tools += html_links[1].format(aria_content=aria_content,
+                                          content_url=get_content_url(child_object),
+                                          content=_('Content'))
+        tools += html_links[2].format(aria_delete=aria_delete,
+                                      delete_url=get_delete_url(child_object),
+                                      delete=_('Delete'))
         return tools
 
     def add_tools_to_schema(self, child_schema, child_object):
