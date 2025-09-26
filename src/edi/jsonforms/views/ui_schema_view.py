@@ -10,6 +10,7 @@ from edi.jsonforms import _
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 
+from parts.omelette.nva.folderbehaviors.titelbild import display
 
 
 class UiSchemaView(BrowserView):
@@ -22,24 +23,24 @@ class UiSchemaView(BrowserView):
 
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
-    
+
     def __call__(self):
         self.get_schema()
         return json.dumps(self.uischema, ensure_ascii=False, indent=4)
-    
+
     def set_tools(self, tools_on):
         self.tools_on = tools_on
-    
+
     def get_schema(self):
         self.set_ui_base_schema()
-        
+
         form = self.context
         children = form.getFolderContents()
         for child in children:
             self.add_child_to_schema(child.getObject(), self.uischema)
 
         return self.uischema
-    
+
     def set_ui_base_schema(self):
         self.uischema = {}
         self.lookup_scopes = {}
@@ -151,7 +152,7 @@ class UiSchemaView(BrowserView):
             selectionfield_schema['options']['enumTitles'] = {}
             for option in selectionfield.getFolderContents():
                 selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
-        
+
         if selectionfield_schema['options'] == {}:
             del selectionfield_schema['options']
 
@@ -168,6 +169,8 @@ class UiSchemaView(BrowserView):
         if uploadfield.max_file_size:
             uploadfield_schema['options']['maxFileSize'] = uploadfield.max_file_size * 1024 * 1024 # in bytes
 
+        if uploadfield.display_as_single_field:
+            uploadfield_schema['options']['displayAsSingleUploadField'] = True
         # if uploadfield.max_number_of_files:
         #     uploadfield_schema['options']['maxNumberOfFiles'] = uploadfield.max_number_of_files
         # if uploadfield.min_number_of_files:
@@ -200,12 +203,12 @@ class UiSchemaView(BrowserView):
                     obj_schema['showOn'] = reference_schema['showOn']
                 elif 'showOn' in obj_schema:
                     del obj_schema['showOn']
-                
+
                 self.add_tools_to_schema(obj_schema, reference)
                 if self.tools_on:
                     obj_schema['options']['preHtml'] = "<i class=\"bi bi-arrow-90deg-left\"></i> \n " + obj_schema['options']['preHtml']
                     self.add_option_to_schema(obj_schema, {"help": {"text": _("This is a reference.") }})
-                
+
                 return obj_schema
         except:
             return {} # referenced object got deleted, ignore
@@ -249,11 +252,11 @@ class UiSchemaView(BrowserView):
                 }
             },
         }
-        
+
         buttons = button_handler.getFolderContents()
         if len(buttons) == 0:
             return {}
-        
+
         buttons_schema = {
             "type": "Buttongroup",
             "buttons": []
@@ -354,7 +357,7 @@ class UiSchemaView(BrowserView):
         #     del array_schema['options']
 
         # return array_schema
-    
+
     def get_schema_for_object(self, complex, scope, recursive=True, overwrite_scope=None):
         # don't save scope because one cannot depend on a complex object
         complex_schema = self.get_base_schema(complex, scope, save_scope=False, has_user_helptext=False)
@@ -383,7 +386,7 @@ class UiSchemaView(BrowserView):
         if child_object.portal_type in ["Field", "SelectionField", "UploadField", "Complex", "Array"]:
             # descendantControlOverrides = add_control(descendantControlOverrides, child_object, scope)
             child_tmp_schema = self.get_schema_for_child(child_object, base_scope, False)
-            
+
             child_schema = {}
             if "options" in child_tmp_schema:
                 child_schema['options'] = child_tmp_schema['options']
@@ -424,7 +427,7 @@ class UiSchemaView(BrowserView):
             if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
                 continue
             descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, child_object, base_scope)
-    
+
         return descendantControlOverrides
 
     def get_tools_html(self, child_object):
@@ -506,7 +509,7 @@ class UiSchemaView(BrowserView):
         base_schema = self.add_option_to_schema(base_schema, {})
 
         return base_schema
-    
+
     def add_user_helptext(self, child, child_schema):
         user_helptext = get_user_helptext(child, self.request)
         if user_helptext:
