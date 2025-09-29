@@ -213,7 +213,7 @@ msgstr "Hier können zusätzliche Informationen für das Software-Team bereitges
 
 #: ../content/common.py:152
 msgid "Hint or helptext for the user"
-msgstr "Hinweis oder Hilfetext für den Nutzer"
+msgstr "Tooltip (Icon mit Popup-Fenster für Benutzerhinweise)"
 
 #: ../content/upload_field.py:73
 msgid "If no file type is selected, the default is * (all file types are accepted)."
