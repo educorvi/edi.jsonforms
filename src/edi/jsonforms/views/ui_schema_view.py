@@ -10,9 +10,6 @@ from edi.jsonforms import _
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 
-from parts.omelette.nva.folderbehaviors.titelbild import display
-
-
 class UiSchemaView(BrowserView):
 
     tools_on = False
