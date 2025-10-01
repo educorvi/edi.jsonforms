@@ -166,7 +166,9 @@ class UiSchemaView(BrowserView):
         if uploadfield.max_file_size:
             uploadfield_schema['options']['maxFileSize'] = uploadfield.max_file_size * 1024 * 1024 # in bytes
 
-        if uploadfield.display_as_single_field:
+        if uploadfield.display_as_array:
+            uploadfield_schema['options']['displayAsSingleUploadField'] = False
+        else:
             uploadfield_schema['options']['displayAsSingleUploadField'] = True
         # if uploadfield.max_number_of_files:
         #     uploadfield_schema['options']['maxNumberOfFiles'] = uploadfield.max_number_of_files

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from plone.dexterity.content import Item
-from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 from zope import schema
 from zope.interface import implementer, Invalid, invariant
@@ -92,10 +91,12 @@ class IUploadField(IDependentExtended):
                                      description=_('Minimum number of files that must be uploaded.'),
                                      required=False,
                                      min=1)
-    display_as_single_field = schema.Bool(title=_('Display as single field'),
-                                          description=_('Display as single upload field that allows to upload multiple files instead of the array view for multiple files.'),
-                                          required=False,
-                                          default=True)
+    display_as_array = schema.Bool(
+        title=_("Display upload field as array"),
+        description=_("The user will be forced to upload files individually."),
+        required=False,
+        default=False,
+    )
 
 
     @invariant
