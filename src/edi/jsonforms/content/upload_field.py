@@ -89,8 +89,9 @@ class IUploadField(IDependentExtended):
 
     min_number_of_files = schema.Int(title=_('Minimum number of files'),
                                      description=_('Minimum number of files that must be uploaded.'),
-                                     required=False,
-                                     min=1)
+                                     required=True,
+                                     min=1,
+                                     default=1)
     display_as_array = schema.Bool(
         title=_("Display upload field as array"),
         description=_("The user will be forced to upload files individually."),

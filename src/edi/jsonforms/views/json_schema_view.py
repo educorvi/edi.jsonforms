@@ -21,10 +21,10 @@ class JsonSchemaView(BrowserView):
     def __call__(self):
         self.get_schema()
         return json.dumps(self.jsonschema, ensure_ascii=False, indent=4)
-    
+
     def set_is_extended_schema(self, value=True):
         self.is_extended_schema = value
-    
+
     def get_schema(self):
         form = self.context
         self.set_json_base_schema()
@@ -34,7 +34,7 @@ class JsonSchemaView(BrowserView):
             self.add_child_to_schema(child.getObject(), self.jsonschema)
 
         return self.jsonschema
-    
+
     def set_json_base_schema(self):
         self.jsonschema = {
             'type': 'object'
@@ -166,6 +166,8 @@ class JsonSchemaView(BrowserView):
         uploadfield_schema = self.create_base_schema__field({}, uploadfield)
         # answer_type = uploadfield.answer_type
 
+        uploadfield_schema["minItems"] = uploadfield.min_number_of_files
+
         if uploadfield.max_number_of_files:
             if uploadfield.max_number_of_files == 1:
                 uploadfield_schema['type'] = 'string'
@@ -177,19 +179,12 @@ class JsonSchemaView(BrowserView):
                     'format': 'uri',
                 }
                 uploadfield_schema['maxItems'] = uploadfield.max_number_of_files
-
-                if uploadfield.min_number_of_files:
-                    uploadfield_schema['minItems'] = uploadfield.min_number_of_files
-        elif uploadfield.min_number_of_files:
+        else:
             uploadfield_schema['type'] = 'array'
             uploadfield_schema['items'] = {
                 'type': 'string',
                 'format': 'uri',
             }
-            uploadfield_schema['minItems'] = uploadfield.min_number_of_files
-
-        if uploadfield.required_choice == 'required':
-            uploadfield_schema['minItems'] = 1
 
         return uploadfield_schema
 
@@ -228,7 +223,7 @@ class JsonSchemaView(BrowserView):
             self.add_child_to_schema(child_object, complex_schema)
 
         return complex_schema
-    
+
     def add_dependent_required(self, schema, child_object, child_id):
         dependencies = child_object.dependencies
 
@@ -268,20 +263,20 @@ class JsonSchemaView(BrowserView):
             except:
                 # dependency got deleted, plone error, ignore this dependency
                 continue
-        
+
         # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
         # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
         if schema_allof_copy == schema['allOf'] and schema_dependentrequired_copy == schema['dependentRequired']:
             schema['required'].append(child_id)
         return schema
-    
+
     # left over of duplicate check. method not deleted in case of other stuff with ids in the future
     def create_and_check_id(self, object):
         id = create_id(object)
         if id not in self.ids:
             self.ids.add(id)
         return id
-    
+
     """
     create base schema for a field, selectionfield or an uploadfield
     """
@@ -289,7 +284,7 @@ class JsonSchemaView(BrowserView):
         base_schema = self.add_title_and_description(schema, child)
         # base_schema = add_userhelptext(base_schema, child)
         base_schema = add_interninformation(base_schema, child)
-        return base_schema    
+        return base_schema
 
     def add_title_and_description(self, schema, child):
         schema['title'] = get_title(child, self.request)
