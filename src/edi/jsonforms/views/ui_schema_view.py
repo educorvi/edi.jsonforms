@@ -288,6 +288,8 @@ class UiSchemaView(BrowserView):
                 button_schema['text'] = button.button_label
                 button_schema['options']['submitOptions']['request']['url'] = request_url
 
+                button_schema['options']['variant'] = button.button_variant
+
                 buttons_schema['buttons'].append(button_schema)
             elif button.portal_type == 'Reset Button':
                 button_schema = {
@@ -298,6 +300,7 @@ class UiSchemaView(BrowserView):
                         "variant": "danger"
                     }
                 }
+                button_schema['options']['variant'] = button.button_variant
                 buttons_schema['buttons'].append(button_schema)
             elif button.portal_type == 'Webservice Handler':
                 request_url = self.context.absolute_url() + '/@webservice-request'
@@ -321,6 +324,8 @@ class UiSchemaView(BrowserView):
                 button_schema = deepcopy(request_button_schema)
                 button_schema['text'] = button.button_label
                 button_schema['options']['submitOptions']['request']['url'] = request_url
+
+                button_schema['options']['variant'] = button.button_variant
 
                 buttons_schema['buttons'].append(button_schema)
 
