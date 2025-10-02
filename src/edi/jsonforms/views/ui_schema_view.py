@@ -237,7 +237,7 @@ class UiSchemaView(BrowserView):
             "buttonType": "submit",
             "text": "", # FILL
             "options": {
-                "variant": "success",
+                "variant": "primary",
                 "submitOptions": {
                     "action": "request",
                     "request": {
