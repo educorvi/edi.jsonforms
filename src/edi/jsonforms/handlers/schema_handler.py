@@ -10,15 +10,14 @@ def schema_handler(context, event):
 
     @param event: Subclass of event.
     """
-    print('hello')
     request = getRequest()
     schema_view = ploneapi.content.get_view(name='json-schema-view', context=context, request=request)
-    print(schema_view)
-    print('schema_view')
-    # if getattr(context, 'REQUEST', None):
-    #     changeNote = get_change_note(context.REQUEST, None)
-    #     if changeNote:
-    #         objschema = schema_view.get_schema(idtyp='shortname', new_version=True)
-    #         #print(objschema)
-    #         context.json_schema = objschema
+    ui_schema_view = ploneapi.content.get_view(name='ui-schema-view', context=context, request=request)
+    if getattr(context, 'REQUEST', None):
+        changeNote = get_change_note(context.REQUEST, None)
+        if changeNote:
+            json_schema = schema_view.get_schema()
+            ui_schema = ui_schema_view.get_schema()
+            context.json_schema_rev = json_schema
+            context.ui_schema_rev = ui_schema
 
