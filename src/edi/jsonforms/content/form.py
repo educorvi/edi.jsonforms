@@ -7,6 +7,8 @@ from plone.supermodel import model
 # from plone.supermodel.directives import fieldset
 # from z3c.form.browser.radio import RadioFieldWidget
 # from zope import schema
+from zope import schema
+from edi.jsonforms import _
 from zope.interface import implementer
 
 
@@ -17,7 +19,8 @@ class IForm(model.Schema):
     """ Marker interface and Dexterity Python Schema for Form
     """
 
-
+    json_schema = schema.SourceText(title=_("JSON Schema"))
+    ui_schema = schema.SourceText(title=_("UI Schema"),readonly=True)
 @implementer(IForm)
 class Form(Container):
     """

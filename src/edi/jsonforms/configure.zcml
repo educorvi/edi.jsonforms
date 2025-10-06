@@ -47,6 +47,7 @@
   <include package=".api" />
 
   <include package=".views" />
+  <include package=".handlers" />
 
   <!--<plone:static
     name="edi.jsonforms"
