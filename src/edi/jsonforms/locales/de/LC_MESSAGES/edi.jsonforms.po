@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-10-01 12:18+0000\n"
+"POT-Creation-Date: 2025-10-06 14:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,7 +53,7 @@ msgstr "Akzeptierte Dateitypen für den Upload"
 msgid "Add button label"
 msgstr "Label des Hinzufügeknopfes"
 
-#: ../content/common.py:120
+#: ../content/common.py:118
 msgid "Additional Information"
 msgstr "Zusatzinformationen"
 
@@ -70,11 +70,15 @@ msgstr "Ein Array ist ein strukturiertes Element, das die wiederholte Eingabe ve
 msgid "An Option represents a specific choice available to users within a Form. Options define the predefined values that users can select from, such as specific items, categories, or responses."
 msgstr "Eine Option repräsentiert eine spezifische Auswahlmöglichkeit. Über sie kann ein Wert vordefiniert werden, wie Kategorien oder Antwortmöglichkeiten, die der Nutzer auswählen kann."
 
+#: ../profiles/default/types/OptionList.xml
+msgid "An OptionList represents a collection of predefined choices available to users within a Form. OptionLists define the predefined values that users can select from, such as specific items, categories, or responses."
+msgstr ""
+
 #: ../profiles/default/types/Array.xml
 msgid "Array"
 msgstr "Array"
 
-#: ../content/common.py:94
+#: ../content/common.py:92
 msgid "Cannot be dependent from itself or a child from itself."
 msgstr "Eine Abhängigkeit von sich selbst oder einem eigenen Kindobjekt ist nicht möglich."
 
@@ -99,11 +103,11 @@ msgstr "Auswahl des Antworttyps"
 msgid "Complex"
 msgstr "Objekt"
 
-#: ../content/common.py:130
+#: ../content/common.py:128
 msgid "Condition for showing this field"
 msgstr "Bedingung, um dieses Feld anzuzeigen"
 
-#: ../views/ui_schema_view.py:453
+#: ../views/ui_schema_view.py:463
 msgid "Content"
 msgstr "Inhalt"
 
@@ -123,19 +127,19 @@ msgstr "Datum und Uhrzeit"
 msgid "Decimal number"
 msgstr "Dezimalzahl"
 
-#: ../views/ui_schema_view.py:456
+#: ../views/ui_schema_view.py:466
 msgid "Delete"
 msgstr "Löschen"
 
-#: ../views/ui_schema_view.py:436
+#: ../views/ui_schema_view.py:446
 msgid "Delete element"
 msgstr "Element löschen"
 
-#: ../content/common.py:57
+#: ../content/common.py:55
 msgid "Dependencies"
 msgstr "Abhängigkeiten"
 
-#: ../content/common.py:62
+#: ../content/common.py:60
 msgid "Dependent from this answer option:"
 msgstr "Abhängig von folgender Antwortoption:"
 
@@ -143,11 +147,11 @@ msgstr "Abhängig von folgender Antwortoption:"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: ../content/common.py:164
+#: ../content/common.py:162
 msgid "Description of the field/question"
 msgstr "Beschreibung des Feldes bzw. der Frage"
 
-#: ../content/upload_field.py:94
+#: ../content/upload_field.py:96
 msgid "Display upload field as array"
 msgstr "Upload-Feld als Array darstellen"
 
@@ -157,7 +161,7 @@ msgstr "Upload-Feld als Array darstellen"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: ../views/ui_schema_view.py:434
+#: ../views/ui_schema_view.py:444
 msgid "Edit element"
 msgstr "Element bearbeiten"
 
@@ -203,11 +207,11 @@ msgstr ""
 msgid "Helptext"
 msgstr "Hinweistext"
 
-#: ../content/common.py:126
+#: ../content/common.py:124
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Hier können zusätzliche Informationen für das Software-Team bereitgestellt werden, die beachtet werden sollen, wenn der Fragebogen erstellt wird."
 
-#: ../content/common.py:152
+#: ../content/common.py:150
 msgid "Hint or helptext for the user"
 msgstr "Tooltip (Icon mit Popup-Fenster für Benutzerhinweise)"
 
@@ -215,11 +219,11 @@ msgstr "Tooltip (Icon mit Popup-Fenster für Benutzerhinweise)"
 msgid "If no file type is selected, the default is * (all file types are accepted)."
 msgstr "Wenn keine Dateitypen ausgewählt werden, ist der Default * (alle Dateitypen werden akzeptiert)."
 
-#: ../content/common.py:63
+#: ../content/common.py:61
 msgid "If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."
 msgstr "Wenn dieses Feld (oder diese Feldgruppe) nur basierend auf der Antwort auf eine andere Frage oder einer spezifischen Option, die bei einer anderen Frage gewählt wurde, angezeigt werden soll, geben Sie bitte die Frage oder Option an, von der es abhängt. Zum Beispiel wird dieses Feld nur angezeigt, wenn die Textzeile nicht leer ist, falls das andere Feld eine Textzeile ist. Falls das andere Feld ein Zahlenfeld ist, wird dieses Feld nur angezeigt, wenn eine Zahl in das Feld eingetragen wurde und diese Zahl nicht null ist."
 
-#: ../content/common.py:138
+#: ../content/common.py:136
 msgid "If this option is checked, all show conditions will be negated. This means that if any of the conditions is present in the request URL, the field will not be displayed."
 msgstr "Wenn diese Option aktiviert ist, werden alle Anzeige-Bedingungen negiert. Das bedeutet, wenn eine der Bedingungen in der URL enthalten ist, wird das Feld nicht angezeigt."
 
@@ -243,6 +247,10 @@ msgstr "Label der Antwortoption"
 msgid "Label of the button to add new elements. Default: +"
 msgstr "Label des Knopfes, um neue Elemente hinzuzufügen. Default: +"
 
+#: ../content/option_list.py:15
+msgid "List of options. Every line contains one option. Options can either be values only or have an id in the format \"id:value\". IDs are only used if \"Use id of options in schema\" is checked in the parent field."
+msgstr "Liste der Optionen. Jede Zeile enthält eine Option. Optionen können entweder nur Werte sein oder eine ID im Format „id:wert“ haben. IDs werden nur verwendet, wenn „Nutze die ID der Optionen im Schema“ im übergeordneten Feld aktiviert ist."
+
 #: ../content/field.py:62
 msgid "Maximum"
 msgstr "Maximum"
@@ -252,7 +260,7 @@ msgid "Maximum cannot be smaller or equal to zero."
 msgstr "Das Maximum kann nicht kleiner oder gleich 0 sein."
 
 #: ../content/field.py:88
-#: ../content/upload_field.py:105
+#: ../content/upload_field.py:107
 msgid "Maximum cannot be smaller than Minimum."
 msgstr "Das Maximum kann nicht kleiner als das Minimum sein."
 
@@ -288,11 +296,11 @@ msgstr "Minimale Anzahl an Dateien, die hochgeladen werden müssen."
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 msgstr "Minimum/Maximum sind nur gültige Optionen für die folgenden Antworttypen: Textzeile, Textfeld, Passwort, Dezimalzahl, Ganzzahl."
 
-#: ../content/common.py:137
+#: ../content/common.py:135
 msgid "Negate all show conditions"
 msgstr "Alle Anzeige-Bedingungen negieren"
 
-#: ../content/common.py:89
+#: ../content/common.py:87
 msgid "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
 msgstr "Eine Abhängigkeit ist nur im selben komplexen Objekt, Array, Formular oder derselben Feldgruppe möglich."
 
@@ -308,13 +316,22 @@ msgstr "Diese Option gilt nur für die Antworttypen Textzeile und Textfeld."
 msgid "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."
 msgstr "Diese Option gilt nur für die Antworttypen Textzeile/-feld, Passwort, Telefonnummer, URL, Email."
 
+#: ../content/option_list.py:17
 #: ../profiles/default/types/Option.xml
 msgid "Option"
 msgstr "Option"
 
-#: ../content/common.py:20
+#: ../profiles/default/types/OptionList.xml
+msgid "OptionList"
+msgstr "Optionenliste"
+
+#: ../content/common.py:18
 msgid "Optional"
 msgstr "Optionales Feld"
+
+#: ../content/option_list.py:14
+msgid "Options"
+msgstr "Optionen"
 
 #: ../content/field.py:21
 msgid "Password"
@@ -345,7 +362,7 @@ msgstr "Referenz auf ein anderes Fragebogenelement (z. B. Feld oder Array)"
 msgid "Regular expression to validate a Textline/-area field."
 msgstr "Regulärer Ausdruck gegen den die/das Textzeile/-feld validiert wird."
 
-#: ../content/common.py:21
+#: ../content/common.py:19
 msgid "Required"
 msgstr "Pflichtfeld"
 
@@ -354,7 +371,7 @@ msgid "Selection (single selection)"
 msgstr "Auswahlmenü (Einfachauswahl)"
 
 #: ../content/array.py:24
-#: ../content/common.py:167
+#: ../content/common.py:165
 msgid "Selection of Field Requirement"
 msgstr "Auswahl zwischen optionalem Feld und Pflichtfeld"
 
@@ -362,7 +379,7 @@ msgstr "Auswahl zwischen optionalem Feld und Pflichtfeld"
 msgid "SelectionField"
 msgstr "Auswahlfeld"
 
-#: ../views/ui_schema_view.py:435
+#: ../views/ui_schema_view.py:445
 msgid "Show element content"
 msgstr "Elementinhalt anzeigen"
 
@@ -387,7 +404,7 @@ msgstr "Textzeile"
 msgid "The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets."
 msgstr "Der Fragebogen ermöglicht es Felder / Fragestellungen zu erstellen und in Feldgruppen, Arrays oder Objekten zu organisieren. "
 
-#: ../content/common.py:96
+#: ../content/common.py:94
 msgid "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 msgstr "Die Abhängigkeiten haben eine und-Verbindung (Default: oder). Diese Option wird ignoriert, wenn weniger als zwei Abhängigkeiten bestehen."
 
@@ -415,11 +432,11 @@ msgstr "Das referenzierte Objekt befindet sich nicht im gleichen Fragebogen."
 msgid "The title won't be shown in the form."
 msgstr "Der Titel wird nicht im Fragebogen angezeigt."
 
-#: ../content/upload_field.py:95
+#: ../content/upload_field.py:97
 msgid "The user will be forced to upload files individually."
 msgstr "Der Formularbenutzer wird gezwungen, Dateien einzeln hochzuladen."
 
-#: ../content/common.py:131
+#: ../content/common.py:129
 msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt werden soll. Wenn keine Bedingung angegeben ist, wird das Feld immer angegeben. Wenn \"bedingung\" angegeben ist, wird das Feld nur angezeigt, wenn die Bedingung erfüllt ist. Die Bedingung wird mit dem Query-Parameter \"fork\" der URL überprüft. Mehrere Bedingungen können durch ein Komma getrennt werden. Beispiel: \"bedingung1, bedingung2, bedingung3\". Wenn eine der Bedingungen erfüllt ist, wird das Feld angezeigt, ansonsten nicht."
 
@@ -427,7 +444,7 @@ msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr "Dieser Hinweistext kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden und als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
 
-#: ../views/ui_schema_view.py:209
+#: ../views/ui_schema_view.py:214
 msgid "This is a reference."
 msgstr "Dies ist eine Referenz."
 
@@ -439,7 +456,7 @@ msgstr "Uhrzeit"
 msgid "Title"
 msgstr "Titel"
 
-#: ../content/common.py:162
+#: ../content/common.py:160
 msgid "Title of the field/question"
 msgstr "Titel des Feldes bzw. der Frage"
 
@@ -451,7 +468,7 @@ msgstr "UI-Schema"
 msgid "URL"
 msgstr "URL"
 
-#: ../content/common.py:125
+#: ../content/common.py:123
 msgid "Unformatted intern information for the JSON-Schema"
 msgstr "Unformatierte interne Information für das JSON-Schema"
 
@@ -481,7 +498,7 @@ msgstr "Nutze die ID der Optionen im Schema"
 msgid "View"
 msgstr "View"
 
-#: ../views/ui_schema_view.py:433
+#: ../views/ui_schema_view.py:443
 msgid "View element"
 msgstr "Element anzeigen"
 
