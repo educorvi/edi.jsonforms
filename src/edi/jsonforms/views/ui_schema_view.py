@@ -166,7 +166,9 @@ class UiSchemaView(BrowserView):
         if uploadfield.max_file_size:
             uploadfield_schema['options']['maxFileSize'] = uploadfield.max_file_size * 1024 * 1024 # in bytes
 
-        if uploadfield.display_as_single_field:
+        if uploadfield.display_as_array:
+            uploadfield_schema['options']['displayAsSingleUploadField'] = False
+        else:
             uploadfield_schema['options']['displayAsSingleUploadField'] = True
         # if uploadfield.max_number_of_files:
         #     uploadfield_schema['options']['maxNumberOfFiles'] = uploadfield.max_number_of_files
@@ -235,7 +237,7 @@ class UiSchemaView(BrowserView):
             "buttonType": "submit",
             "text": "", # FILL
             "options": {
-                "variant": "success",
+                "variant": "primary",
                 "submitOptions": {
                     "action": "request",
                     "request": {
@@ -286,6 +288,8 @@ class UiSchemaView(BrowserView):
                 button_schema['text'] = button.button_label
                 button_schema['options']['submitOptions']['request']['url'] = request_url
 
+                button_schema['options']['variant'] = button.button_variant
+
                 buttons_schema['buttons'].append(button_schema)
             elif button.portal_type == 'Reset Button':
                 button_schema = {
@@ -296,6 +300,7 @@ class UiSchemaView(BrowserView):
                         "variant": "danger"
                     }
                 }
+                button_schema['options']['variant'] = button.button_variant
                 buttons_schema['buttons'].append(button_schema)
             elif button.portal_type == 'Webservice Handler':
                 request_url = self.context.absolute_url() + '/@webservice-request'
@@ -319,6 +324,8 @@ class UiSchemaView(BrowserView):
                 button_schema = deepcopy(request_button_schema)
                 button_schema['text'] = button.button_label
                 button_schema['options']['submitOptions']['request']['url'] = request_url
+
+                button_schema['options']['variant'] = button.button_variant
 
                 buttons_schema['buttons'].append(button_schema)
 
