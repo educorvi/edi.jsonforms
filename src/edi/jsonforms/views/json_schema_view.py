@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from edi.jsonforms import _
 from Products.Five.browser import BrowserView
-from plone import api
 
 import copy
 import json
 
 from edi.jsonforms.views.common import *
+
+from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+
 
 class JsonSchemaView(BrowserView):
     is_extended_schema = False # True if schema is generated for an api call and not for the usual form view
@@ -144,12 +145,19 @@ class JsonSchemaView(BrowserView):
         options = selectionfield.getFolderContents()
 
         options_list = []
-        if selectionfield.use_id_in_schema:
-            for o in options:
-                options_list.append(create_id(o))
-        else:
-            for o in options:
-                options_list.append(o.Title)
+        for o in options:
+            if o.portal_type == 'Option':
+               if selectionfield.use_id_in_schema:
+                  options_list.append(create_id(o))
+               else:
+                  options_list.append(o.Title)
+            elif o.portal_type == 'OptionList':
+                keys,vals = get_keys_and_values_for_options_list(o.getObject())
+                if selectionfield.use_id_in_schema:
+                    local_options_list = keys
+                else:
+                    local_options_list = vals
+                options_list.extend(local_options_list)
 
         if answer_type == 'radio' or answer_type == 'select':
             selectionfield_schema['type'] = 'string'
