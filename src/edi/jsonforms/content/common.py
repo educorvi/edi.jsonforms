@@ -1,5 +1,4 @@
 # from plone.app.textfield import RichText
-from plone.app.vocabularies.catalog import CatalogSource
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
@@ -14,7 +13,6 @@ from z3c.relationfield.schema import RelationChoice, RelationList
 from z3c.form.browser.radio import RadioFieldWidget
 
 from edi.jsonforms import _
-
 
 required_categories = [
     SimpleTerm('optional', 'optional', _('Optional')),
@@ -125,7 +123,7 @@ class IDependent(IFormElement):
     intern_information = schema.Text(title=_('Unformatted intern information for the JSON-Schema'),
                                      description=_('Here you can provide additional information that the Software-Team should to take into account while creating the Form.'),
                                      required=False)
-    
+
     show_condition = schema.TextLine(
         title=_('Condition for showing this field'),
         description=_('This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If "condition" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter "fork" of the request URL. Multiple conditions can be separated by commas. Example: "condition1, condition2, condition3". If any of the conditions is met, the field will be displayed; otherwise it will not.'),
@@ -139,7 +137,7 @@ class IDependent(IFormElement):
         required=False,
         default=False
     )
-    
+
     # # TODO no added to ui-schema yet (version 3.1)
     # # TODO translate
     # user_info = schema.Text(title=_('Helptext for the user'),
@@ -151,7 +149,7 @@ class IDependentElements(IDependent):
     # previously tipp
     user_helptext = schema.TextLine(title=_('Hint or helptext for the user'),
                              required=False)
-    
+
     fieldset(
         'additional-information',
         label=_('Additional Information'),

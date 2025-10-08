@@ -9,6 +9,7 @@ import json
 from edi.jsonforms import _
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
+from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 
 class UiSchemaView(BrowserView):
 
@@ -148,7 +149,11 @@ class UiSchemaView(BrowserView):
         if selectionfield.use_id_in_schema:
             selectionfield_schema['options']['enumTitles'] = {}
             for option in selectionfield.getFolderContents():
-                selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
+                if option.portal_type == 'Option':
+                    selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
+                elif option.portal_type == 'OptionList':
+                    keys, vals = get_keys_and_values_for_options_list(option.getObject())
+                    selectionfield_schema['options']['enumTitles'] = dict(zip(keys, vals))
 
         if selectionfield_schema['options'] == {}:
             del selectionfield_schema['options']
