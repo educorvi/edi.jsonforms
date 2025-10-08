@@ -78,14 +78,12 @@ class IUploadField(IDependentExtended):
 
     max_file_size = schema.Int(title=_('Maximum file size (in MB)'),
                                description=_('Maximum file size for each uploaded file. If empty, there is no limit.'),
-                               required=False,
-                               default=5)
+                               required=False)
 
     max_number_of_files = schema.Int(title=_('Maximum number of files'),
                                      description=_('Maximum number of files that can be uploaded. If empty, there is no limit.'),
                                      required=False,
-                                     min=1,
-                                     default=1)
+                                     min=1)
 
     min_number_of_files = schema.Int(title=_('Minimum number of files'),
                                      description=_('Minimum number of files that must be uploaded.'),
