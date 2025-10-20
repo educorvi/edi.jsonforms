@@ -8,6 +8,14 @@
   -*- extra stuff goes here -*-
 
   <browser:page
+    name="version-view"
+    for="*"
+    class=".version_view.VersionView"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
     name="wizard-view"
     for="edi.jsonforms.content.wizard.IWizard"
     class=".wizard_view.WizardView"
