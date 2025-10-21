@@ -63,7 +63,7 @@
   <browser:page
     name="form-tools-view"
     for="edi.jsonforms.content.form.IForm"
-    class=".form_view.FormView"
+    class=".form_view.FormToolsView"
     template="form_tools_view.pt"
     permission="zope2.View"
     title="Form view with tools"
