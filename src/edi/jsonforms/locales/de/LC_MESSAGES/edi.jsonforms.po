@@ -207,7 +207,7 @@ msgstr "Fragebogen"
 
 #: ./views/configure.zcml:61
 msgid "Form View"
-msgstr "Standard-Ansicht"
+msgstr "Web-Ansicht"
 
 #: ./views/configure.zcml:72
 msgid "Form view with tools"
