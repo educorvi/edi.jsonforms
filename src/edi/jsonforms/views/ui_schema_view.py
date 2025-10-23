@@ -308,23 +308,23 @@ class UiSchemaView(BrowserView):
                 button_schema['options']['variant'] = button.button_variant
                 buttons_schema['buttons'].append(button_schema)
             elif button.portal_type == 'Webservice Handler':
-                request_url = self.context.absolute_url() + '/@webservice-request'
+                request_url = button.absolute_url() + '/@webservice-request'
                 i = 1
                 query_params = {}
                 endpoints = button.getFolderContents()
-                for endpoint in endpoints:
-                    endpoint = endpoint.getObject()
-                    if endpoint.portal_type == 'Endpoint':
-                        query_params[f'endpoint_{i}_url'] = endpoint.url
-                        if endpoint.api_key_header_name and endpoint.api_key:
-                            query_params[f'endpoint_{i}_api_key_header_name'] = endpoint.api_key_header_name
-                            query_params[f'endpoint_{i}_api_key'] = endpoint.api_key
-                    i += 1
+                #for endpoint in endpoints:
+                #    endpoint = endpoint.getObject()
+                #    if endpoint.portal_type == 'Endpoint':
+                #        query_params[f'endpoint_{i}_url'] = endpoint.url
+                #        if endpoint.api_key_header_name and endpoint.api_key:
+                #            query_params[f'endpoint_{i}_api_key_header_name'] = endpoint.api_key_header_name
+                #            query_params[f'endpoint_{i}_api_key'] = endpoint.api_key
+                #    i += 1
 
-                if button.page_after_success:
-                    query_params['page_after_success'] = button.page_after_success
-                encoded_query = urlencode(query_params)
-                request_url = f"{request_url}?{encoded_query}"
+                #if button.page_after_success:
+                #    query_params['page_after_success'] = button.page_after_success
+                #encoded_query = urlencode(query_params)
+                #request_url = f"{request_url}?{encoded_query}"
 
                 button_schema = deepcopy(request_button_schema)
                 button_schema['text'] = button.button_label
