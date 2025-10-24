@@ -42,7 +42,7 @@
               </div>
             </div>
           </div>
-          <div class="row mt-3" tal:define="versions view/get_versions" tal:condition="versions">
+          <div class="row mt-5" tal:define="versions view/get_versions" tal:condition="versions">
             <div class="col-12">
               <h3 i18n:translate="">Stable-Versions</h3>
               <ul>
