@@ -539,6 +539,8 @@ class UiSchemaView(BrowserView):
         }
         if group.show_title:
             group_schema = self.add_option_to_schema(group_schema, {'label': get_title(group, self.request)})
+        if group.description is not None:
+            group_schema = self.add_option_to_schema(group_schema, {'description': group.description})
 
         # group_schema = self.add_tools_to_schema(group_schema, group) # gets ignored, add html element before group instead
         group_schema = self.add_dependencies_to_schema(group_schema, group)
