@@ -127,6 +127,15 @@ class UiSchemaView(BrowserView):
         if placeholder and field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
             field_schema['options']['placeholder'] = placeholder
 
+        if hasattr(field, 'pre_html') and field.pre_html is not None:
+            existing_pre = field_schema['options'].get('preHtml')
+            if existing_pre:
+                field_schema['options']['preHtml'] = f"{existing_pre}<br>{field.pre_html}"
+            else:
+                field_schema['options']['preHtml'] = field.pre_html
+        if hasattr(field, 'post_html'):
+            field_schema['options']['postHtml'] = field.post_html
+
         # remove unnecessary options
         if field_schema['options'] == {}:
             del field_schema['options']
