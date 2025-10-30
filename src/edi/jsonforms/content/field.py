@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
-from plone.app.vocabularies.catalog import CatalogSource
-from plone.autoform import directives
 from plone.dexterity.content import Item
-from plone.supermodel import model
 from plone.supermodel.directives import fieldset
-from z3c.relationfield.schema import RelationChoice, RelationList
 from zope import schema
 from zope.interface import implementer, Invalid, invariant
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -50,7 +46,7 @@ class IField(IDependentExtended):
     fieldset(
         'advanced-options',
         label=_('Advanced Options'),
-        fields=['minimum', 'maximum', 'placeholder', 'unit', 'pattern']
+        fields=['minimum', 'maximum', 'placeholder', 'unit', 'pattern', 'pre_html', 'post_html']
     )
 
     minimum = schema.Int(title=_('Minimum'),
@@ -58,24 +54,32 @@ class IField(IDependentExtended):
                                        For a Textline/-area/Password this is the minimal length the \
                                        text must have. (>=)'),
                          required = False)
-    
+
     maximum = schema.Int(title=_('Maximum'),
                          description=_('For a number/integer this is the maximal value it can have.\
                                        For a Textline/-area/Password this is the maximal length the \
                                        text can have.'),
                          required = False)
-    
+
     unit = schema.TextLine(title=_('Unit of the answer'),
                            description=_('Only use this for the answer types Decimal and Whole number (e.g. km, kg).'),
                            required=False)
-    
+
     placeholder = schema.TextLine(title=_('Placeholder'),
                                   description=_('Only use this for the answer types Textline/-area, Password, Telephone, URL, Email.'),
                                   required=False)
-    
+
     pattern = schema.TextLine(title=_('Regular expression to validate a Textline/-area field.'),
                               description=_('Only use this for the answer types Textline and Textarea.'),
                               constraint=check_regex, required=False)
+
+    pre_html = schema.Text(title=_('HTML before the field'),
+                           description=_('HTML that will be inserted before the field.'),
+                           required=False)
+
+    post_html = schema.Text(title=_('HTML after the field'),
+                            description=_('HTML that will be inserted after the field.'),
+                            required=False)
 
     @invariant
     def min_max_invariant(data):
@@ -90,13 +94,13 @@ class IField(IDependentExtended):
             if data.maximum <= 0:
                 # TODO translate this string
                 raise Invalid(_('Maximum cannot be smaller or equal to zero.'))
-    
+
     @invariant
     def placeholder_invariant(data):
         if data.placeholder:
             if data.answer_type not in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
                 raise Invalid(_('A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email.'))
-    
+
     @invariant
     def unit_invariant(data):
         if data.unit:
