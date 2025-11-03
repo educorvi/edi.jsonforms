@@ -48,6 +48,7 @@
 
   <include package=".views" />
   <include package=".handlers" />
+  <include package=".viewlets" />
 
   <!--<plone:static
     name="edi.jsonforms"

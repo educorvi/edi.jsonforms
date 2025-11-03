@@ -9,61 +9,6 @@
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
       </div>
 
-      <div class="p-3 mb-4 bg-body-tertiary rounded-3">
-        <div class="container-fluid py-5">
-          <h2 class="display-5 fw-bold" i18n:translate="">Developer Area</h2>
-          <div class="accordion" id="accordionDevelper">
-            <div class="accordion-item">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSchema" aria-expanded="true" aria-controls="collapseSchema" i18n:translate="">
-                  Current JSON-Schema (Draft)
-                </button>
-              </h2>
-              <div id="collapseSchema" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
-                <div class="accordion-body">
-                  <pre class="bg-dark text-light p-3 rounded">
-                    <code tal:content="context/@@json-schema-view"></code>
-                  </pre>
-                </div>
-              </div>
-            </div>
-            <div class="accordion-item">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUI" aria-expanded="true" aria-controls="collapseUI" i18n:translate="">
-                  Current UI-Schema (Draft)
-                </button>
-              </h2>
-              <div id="collapseUI" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
-                <div class="accordion-body">
-                  <pre class="bg-dark text-light p-3 rounded">
-                    <code tal:content="context/@@ui-schema-view"></code>
-                  </pre>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row mt-5" tal:define="versions view/get_versions" tal:condition="versions">
-            <div class="col-12">
-              <h3 i18n:translate="">Stable-Versions</h3>
-              <ul>
-                <li tal:define="version python:versions[0]">
-                  <span tal:content="python: version[0]"/>
-                  <a tal:attributes="href python:version[2]">[JSON-Schema (Stable)]</a>
-                  <a tal:attributes="href python:version[3]">[UI-Schema]</a>
-                  <small tal:content="python: version[1]"/>
-                </li>
-                <li tal:repeat="version python:versions[1:]">
-                  <span tal:content="python: version[0]"/>
-                  <a tal:attributes="href python:version[2]">[JSON-Schema]</a>
-                  <a tal:attributes="href python:version[3]">[UI-Schema]</a>
-                  <small tal:content="python: version[1]"/>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </metal:block>
   </body>
 </html>
