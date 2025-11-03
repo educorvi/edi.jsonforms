@@ -11,8 +11,8 @@ from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 
-class UiSchemaView(BrowserView):
 
+class UiSchemaView(BrowserView):
     tools_on = False
 
     def __init__(self, context, request):
@@ -44,52 +44,56 @@ class UiSchemaView(BrowserView):
         self.lookup_scopes = {}
 
         self.uischema = {
-            'version': '2.0',
-            'layout': {
-                'type': 'VerticalLayout',
-                'elements': []
-            }
+            "version": "2.0",
+            "layout": {"type": "VerticalLayout", "elements": []},
         }
 
-    def add_child_to_schema(self, child_object, schema, scope='/properties/'):
+    def add_child_to_schema(self, child_object, schema, scope="/properties/"):
         """
         schema needs the key 'elements' or 'layout' with the key 'elements'
         """
-        if child_object.portal_type != 'Button Handler' and not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+        if (
+            child_object.portal_type != "Button Handler"
+            and not check_show_condition_in_request(
+                self.request, child_object.show_condition, child_object.negate_condition
+            )
+        ):
             return schema
 
         # add children to the schema
         child_schema = self.get_schema_for_child(child_object, scope)
         if child_schema != None and child_schema != {}:
-            if 'layout' in schema:
-                schema['layout']['elements'].append(child_schema)
-            elif 'elements' in schema:
-                schema['elements'].append(child_schema)
+            if "layout" in schema:
+                schema["layout"]["elements"].append(child_schema)
+            elif "elements" in schema:
+                schema["elements"].append(child_schema)
             else:
-                print("Error in UiSchemaView: could not add child to schema, no layout or elements found in schema")
+                print(
+                    "Error in UiSchemaView: could not add child to schema, no layout or elements found in schema"
+                )
 
         # return schema
 
     def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):
         type = child.portal_type
 
-        if type == 'Field':
+        if type == "Field":
             return self.get_schema_for_field(child, scope)
-        elif type == 'SelectionField':
+        elif type == "SelectionField":
             return self.get_schema_for_selectionfield(child, scope)
-        elif type == 'UploadField':
+        elif type == "UploadField":
             return self.get_schema_for_uploadfield(child, scope)
-        elif type == 'Reference':
+        elif type == "Reference":
             return self.get_schema_for_reference(child, scope)
-        elif type == 'Helptext':
+        elif type == "Helptext":
             return self.get_schema_for_helptext(child)
-        elif type == 'Button Handler':
+        elif type == "Button Handler":
             return self.get_schema_for_buttons(child)
-        elif type == 'Array':
+        elif type == "Array":
             return self.get_schema_for_array(child, scope, recursive, overwrite_scope)
-        elif type == 'Complex':
+        elif type == "Complex":
             return self.get_schema_for_object(child, scope, recursive, overwrite_scope)
-        elif type == 'Fieldset':
+        elif type == "Fieldset":
             return self.get_schema_for_fieldset(child, scope)
         return {}
 
@@ -97,48 +101,68 @@ class UiSchemaView(BrowserView):
         field_schema = self.get_base_schema(field, scope)
 
         answer_type = field.answer_type
-        if answer_type == 'text':
+        if answer_type == "text":
             pass
-        elif answer_type == 'textarea':
-            field_schema['options']['multi'] = True
-        elif answer_type == 'password':
-            field_schema['options']['format'] = 'password'
-        elif answer_type == 'tel':
-            field_schema['options']['format'] = 'tel'
-        elif answer_type == 'url':
-            field_schema['options']['format'] = 'url'
-        elif answer_type == 'email':
-            field_schema['options']['format'] = 'email'
-        elif answer_type == 'date':
-            field_schema['options']['format'] = 'date'
-        elif answer_type == 'datetime-local':
-            field_schema['options']['format'] = 'datetime-local'
-        elif answer_type == 'time':
-            field_schema['options']['format'] = 'time'
-        elif answer_type in ['number', 'integer']:
+        elif answer_type == "textarea":
+            field_schema["options"]["multi"] = True
+        elif answer_type == "password":
+            field_schema["options"]["format"] = "password"
+        elif answer_type == "tel":
+            field_schema["options"]["format"] = "tel"
+        elif answer_type == "url":
+            field_schema["options"]["format"] = "url"
+        elif answer_type == "email":
+            field_schema["options"]["format"] = "email"
+        elif answer_type == "date":
+            field_schema["options"]["format"] = "date"
+        elif answer_type == "datetime-local":
+            field_schema["options"]["format"] = "datetime-local"
+        elif answer_type == "time":
+            field_schema["options"]["format"] = "time"
+        elif answer_type in ["number", "integer"]:
             unit = get_unit(field, self.request)
             if unit:
-                field_schema['options']['append'] = unit
-        elif answer_type == 'boolean':
+                field_schema["options"]["append"] = unit
+        elif answer_type == "boolean":
             pass
             # TODO
 
         placeholder = get_placeholder(field, self.request)
-        if placeholder and field.answer_type in ['text', 'textarea', 'password', 'tel', 'url', 'email']:
-            field_schema['options']['placeholder'] = placeholder
+        if placeholder and field.answer_type in [
+            "text",
+            "textarea",
+            "password",
+            "tel",
+            "url",
+            "email",
+        ]:
+            field_schema["options"]["placeholder"] = placeholder
 
-        if hasattr(field, 'pre_html') and field.pre_html is not None:
-            existing_pre = field_schema['options'].get('preHtml')
+        if hasattr(field, "pre_html") and field.pre_html is not None:
+            existing_pre = field_schema["options"].get("preHtml")
             if existing_pre:
-                field_schema['options']['preHtml'] = f"{existing_pre}<br>{field.pre_html}"
+                field_schema["options"]["preHtml"] = (
+                    f"{existing_pre}<br>{field.pre_html}"
+                )
             else:
-                field_schema['options']['preHtml'] = field.pre_html
-        if hasattr(field, 'post_html'):
-            field_schema['options']['postHtml'] = field.post_html
+                field_schema["options"]["preHtml"] = field.pre_html
+        if hasattr(field, "post_html"):
+            field_schema["options"]["postHtml"] = field.post_html
+
+        if hasattr(field, "pre_html") and field.pre_html is not None:
+            existing_pre = field_schema["options"].get("preHtml")
+            if existing_pre:
+                field_schema["options"]["preHtml"] = (
+                    f"{existing_pre}<br>{field.pre_html}"
+                )
+            else:
+                field_schema["options"]["preHtml"] = field.pre_html
+        if hasattr(field, "post_html"):
+            field_schema["options"]["postHtml"] = field.post_html
 
         # remove unnecessary options
-        if field_schema['options'] == {}:
-            del field_schema['options']
+        if field_schema["options"] == {}:
+            del field_schema["options"]
 
         return field_schema
 
@@ -146,26 +170,32 @@ class UiSchemaView(BrowserView):
         selectionfield_schema = self.get_base_schema(selectionfield, scope)
 
         answer_type = selectionfield.answer_type
-        if answer_type == 'radio':
-            selectionfield_schema['options']['displayAs'] = 'radiobuttons'
-            selectionfield_schema['options']['stacked'] = True
-        elif answer_type in ['checkbox', 'selectmultiple']:
+        if answer_type == "radio":
+            selectionfield_schema["options"]["displayAs"] = "radiobuttons"
+            selectionfield_schema["options"]["stacked"] = True
+        elif answer_type in ["checkbox", "selectmultiple"]:
             # TODO differentiate between checkbox and selectmultiple, both are displayed as checkboxes
-            selectionfield_schema['options']['stacked'] = True
-        elif answer_type == 'select':
+            selectionfield_schema["options"]["stacked"] = True
+        elif answer_type == "select":
             pass
 
         if selectionfield.use_id_in_schema:
-            selectionfield_schema['options']['enumTitles'] = {}
+            selectionfield_schema["options"]["enumTitles"] = {}
             for option in selectionfield.getFolderContents():
-                if option.portal_type == 'Option':
-                    selectionfield_schema['options']['enumTitles'][create_id(option)] = option.Title
-                elif option.portal_type == 'OptionList':
-                    keys, vals = get_keys_and_values_for_options_list(option.getObject())
-                    selectionfield_schema['options']['enumTitles'] = dict(zip(keys, vals))
+                if option.portal_type == "Option":
+                    selectionfield_schema["options"]["enumTitles"][
+                        create_id(option)
+                    ] = option.Title
+                elif option.portal_type == "OptionList":
+                    keys, vals = get_keys_and_values_for_options_list(
+                        option.getObject()
+                    )
+                    selectionfield_schema["options"]["enumTitles"] = dict(
+                        zip(keys, vals)
+                    )
 
-        if selectionfield_schema['options'] == {}:
-            del selectionfield_schema['options']
+        if selectionfield_schema["options"] == {}:
+            del selectionfield_schema["options"]
 
         return selectionfield_schema
 
@@ -173,17 +203,21 @@ class UiSchemaView(BrowserView):
         uploadfield_schema = self.get_base_schema(uploadfield, scope)
 
         if uploadfield.accepted_file_types:
-            uploadfield_schema['options']['acceptedFileType'] = uploadfield.accepted_file_types
+            uploadfield_schema["options"]["acceptedFileType"] = (
+                uploadfield.accepted_file_types
+            )
         else:
-            uploadfield_schema['options']['acceptedFileType'] = '*'
+            uploadfield_schema["options"]["acceptedFileType"] = "*"
 
         if uploadfield.max_file_size:
-            uploadfield_schema['options']['maxFileSize'] = uploadfield.max_file_size * 1024 * 1024 # in bytes
+            uploadfield_schema["options"]["maxFileSize"] = (
+                uploadfield.max_file_size * 1024 * 1024
+            )  # in bytes
 
         if uploadfield.display_as_array:
-            uploadfield_schema['options']['displayAsSingleUploadField'] = False
+            uploadfield_schema["options"]["displayAsSingleUploadField"] = False
         else:
-            uploadfield_schema['options']['displayAsSingleUploadField'] = True
+            uploadfield_schema["options"]["displayAsSingleUploadField"] = True
         # if uploadfield.max_number_of_files:
         #     uploadfield_schema['options']['maxNumberOfFiles'] = uploadfield.max_number_of_files
         # if uploadfield.min_number_of_files:
@@ -191,9 +225,6 @@ class UiSchemaView(BrowserView):
 
         #     if uploadfield.min_number_of_files > 1:
         #         uploadfield_schema['options']['allowMultipleFiles'] = True
-
-
-
 
         # if uploadfield.answer_type == 'file-multi':
         #     uploadfield_schema['options']['allowMultipleFiles'] = True
@@ -204,33 +235,44 @@ class UiSchemaView(BrowserView):
         try:
             obj = reference.reference.to_object
             if obj:
-                reference_schema = self.get_base_schema(reference, scope, has_user_helptext=False)
+                reference_schema = self.get_base_schema(
+                    reference, scope, has_user_helptext=False
+                )
                 tools = self.tools_on
-                self.set_tools(False) # to deactivate tools for children of referenced object
-                obj_schema = self.get_schema_for_child(obj, scope, overwrite_scope=reference_schema['scope'])
+                self.set_tools(
+                    False
+                )  # to deactivate tools for children of referenced object
+                obj_schema = self.get_schema_for_child(
+                    obj, scope, overwrite_scope=reference_schema["scope"]
+                )
                 self.set_tools(tools)  # reactivate tools
 
                 # replace scope and showon of referenced object with the one of the reference
-                obj_schema['scope'] = reference_schema['scope']
-                if 'showOn' in reference_schema:
-                    obj_schema['showOn'] = reference_schema['showOn']
-                elif 'showOn' in obj_schema:
-                    del obj_schema['showOn']
+                obj_schema["scope"] = reference_schema["scope"]
+                if "showOn" in reference_schema:
+                    obj_schema["showOn"] = reference_schema["showOn"]
+                elif "showOn" in obj_schema:
+                    del obj_schema["showOn"]
 
                 self.add_tools_to_schema(obj_schema, reference)
                 if self.tools_on:
-                    obj_schema['options']['preHtml'] = "<i class=\"bi bi-arrow-90deg-left\"></i> \n " + obj_schema['options']['preHtml']
-                    self.add_option_to_schema(obj_schema, {"help": {"text": _("This is a reference.") }})
+                    obj_schema["options"]["preHtml"] = (
+                        '<i class="bi bi-arrow-90deg-left"></i> \n '
+                        + obj_schema["options"]["preHtml"]
+                    )
+                    self.add_option_to_schema(
+                        obj_schema, {"help": {"text": _("This is a reference.")}}
+                    )
 
                 return obj_schema
         except:
-            return {} # referenced object got deleted, ignore
+            return {}  # referenced object got deleted, ignore
 
     def helptext_schema(self, htmlData):
         # helptext as html-element
         helptext_schema = {
-            'type': 'HTML',
-            'htmlData': htmlData,
+            "type": "HTML",
+            "htmlData": htmlData,
         }
         return helptext_schema
 
@@ -249,20 +291,20 @@ class UiSchemaView(BrowserView):
         request_button_schema = {
             "type": "Button",
             "buttonType": "submit",
-            "text": "", # FILL
+            "text": "",  # FILL
             "options": {
                 "variant": "primary",
                 "submitOptions": {
                     "action": "request",
                     "request": {
-                        "url": "", # FILL
+                        "url": "",  # FILL
                         "method": "POST",
                         "headers": {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                }
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    },
+                },
             },
         }
 
@@ -270,27 +312,22 @@ class UiSchemaView(BrowserView):
         if len(buttons) == 0:
             return {}
 
-        buttons_schema = {
-            "type": "Buttongroup",
-            "buttons": []
-        }
+        buttons_schema = {"type": "Buttongroup", "buttons": []}
 
         for button in buttons:
             button = button.getObject()
 
-            if button.portal_type == 'Email Handler':
-                request_url = self.context.absolute_url() + '/@send-email'
+            if button.portal_type == "Email Handler":
+                request_url = self.context.absolute_url() + "/@send-email"
 
-                query_params = {
-                    "to_address": button.to_address
-                }
+                query_params = {"to_address": button.to_address}
 
                 if button.reply_to_address:
-                    query_params['reply_to_address'] = button.reply_to_address
+                    query_params["reply_to_address"] = button.reply_to_address
                 if button.email_subject:
-                    query_params['subject'] = button.email_subject
+                    query_params["subject"] = button.email_subject
                 if button.email_text:
-                    query_params['email_text'] = button.email_text
+                    query_params["email_text"] = button.email_text
 
                 # Encode the query parameters
                 encoded_query = urlencode(query_params)
@@ -299,61 +336,68 @@ class UiSchemaView(BrowserView):
                 request_url = f"{request_url}?{encoded_query}"
 
                 button_schema = request_button_schema.copy()
-                button_schema['text'] = button.button_label
-                button_schema['options']['submitOptions']['request']['url'] = request_url
+                button_schema["text"] = button.button_label
+                button_schema["options"]["submitOptions"]["request"]["url"] = (
+                    request_url
+                )
 
-                button_schema['options']['variant'] = button.button_variant
+                button_schema["options"]["variant"] = button.button_variant
 
-                buttons_schema['buttons'].append(button_schema)
-            elif button.portal_type == 'Reset Button':
+                buttons_schema["buttons"].append(button_schema)
+            elif button.portal_type == "Reset Button":
                 button_schema = {
                     "type": "Button",
                     "buttonType": "reset",
                     "text": button.button_label,
-                    "options": {
-                        "variant": "danger"
-                    }
+                    "options": {"variant": "danger"},
                 }
-                button_schema['options']['variant'] = button.button_variant
-                buttons_schema['buttons'].append(button_schema)
-            elif button.portal_type == 'Webservice Handler':
-                request_url = self.context.absolute_url() + '/@webservice-request'
+                button_schema["options"]["variant"] = button.button_variant
+                buttons_schema["buttons"].append(button_schema)
+            elif button.portal_type == "Webservice Handler":
+                request_url = self.context.absolute_url() + "/@webservice-request"
                 i = 1
                 query_params = {}
                 endpoints = button.getFolderContents()
                 for endpoint in endpoints:
                     endpoint = endpoint.getObject()
-                    if endpoint.portal_type == 'Endpoint':
-                        query_params[f'endpoint_{i}_url'] = endpoint.url
+                    if endpoint.portal_type == "Endpoint":
+                        query_params[f"endpoint_{i}_url"] = endpoint.url
                         if endpoint.api_key_header_name and endpoint.api_key:
-                            query_params[f'endpoint_{i}_api_key_header_name'] = endpoint.api_key_header_name
-                            query_params[f'endpoint_{i}_api_key'] = endpoint.api_key
+                            query_params[f"endpoint_{i}_api_key_header_name"] = (
+                                endpoint.api_key_header_name
+                            )
+                            query_params[f"endpoint_{i}_api_key"] = endpoint.api_key
                     i += 1
 
                 if button.page_after_success:
-                    query_params['page_after_success'] = button.page_after_success
+                    query_params["page_after_success"] = button.page_after_success
                 encoded_query = urlencode(query_params)
                 request_url = f"{request_url}?{encoded_query}"
 
                 button_schema = deepcopy(request_button_schema)
-                button_schema['text'] = button.button_label
-                button_schema['options']['submitOptions']['request']['url'] = request_url
+                button_schema["text"] = button.button_label
+                button_schema["options"]["submitOptions"]["request"]["url"] = (
+                    request_url
+                )
 
-                button_schema['options']['variant'] = button.button_variant
+                button_schema["options"]["variant"] = button.button_variant
 
-                buttons_schema['buttons'].append(button_schema)
+                buttons_schema["buttons"].append(button_schema)
 
         return buttons_schema
 
-
     def get_schema_for_array(self, array, scope, recursive=True, overwrite_scope=None):
-        array_schema = self.get_schema_for_object(array, scope, recursive, overwrite_scope)
+        array_schema = self.get_schema_for_object(
+            array, scope, recursive, overwrite_scope
+        )
 
         if not array.show_title:
             self.add_option_to_schema(array_schema, {"label": False})
 
         if array.button_label:
-            self.add_option_to_schema(array_schema, {"addButtonText": array.button_label})
+            self.add_option_to_schema(
+                array_schema, {"addButtonText": array.button_label}
+            )
 
         return array_schema
         # # don't save scope because one cannot depend on an array
@@ -376,9 +420,13 @@ class UiSchemaView(BrowserView):
 
         # return array_schema
 
-    def get_schema_for_object(self, complex, scope, recursive=True, overwrite_scope=None):
+    def get_schema_for_object(
+        self, complex, scope, recursive=True, overwrite_scope=None
+    ):
         # don't save scope because one cannot depend on a complex object
-        complex_schema = self.get_base_schema(complex, scope, save_scope=False, has_user_helptext=False)
+        complex_schema = self.get_base_schema(
+            complex, scope, save_scope=False, has_user_helptext=False
+        )
         if overwrite_scope:
             complex_scope = overwrite_scope
         else:
@@ -386,48 +434,64 @@ class UiSchemaView(BrowserView):
 
         # add children of complex to the schema
         if recursive:
-            complex_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(complex_scope, complex)
+            complex_schema["options"]["descendantControlOverrides"] = (
+                self.create_descendantControlOverrides(complex_scope, complex)
+            )
 
         self.add_user_helptext(complex, complex_schema)
 
-        if complex_schema['options'] == {}:
-            del complex_schema['options']
+        if complex_schema["options"] == {}:
+            del complex_schema["options"]
 
         return complex_schema
 
-
-
-    def add_child_to_descendantControlOverrides(self, descendantControlOverrides, child_object, base_scope):
+    def add_child_to_descendantControlOverrides(
+        self, descendantControlOverrides, child_object, base_scope
+    ):
         child_tmp_schema = {}
 
         # add options and showon to the descendantControlOverrides
-        if child_object.portal_type in ["Field", "SelectionField", "UploadField", "Complex", "Array"]:
+        if child_object.portal_type in [
+            "Field",
+            "SelectionField",
+            "UploadField",
+            "Complex",
+            "Array",
+        ]:
             # descendantControlOverrides = add_control(descendantControlOverrides, child_object, scope)
-            child_tmp_schema = self.get_schema_for_child(child_object, base_scope, False)
+            child_tmp_schema = self.get_schema_for_child(
+                child_object, base_scope, False
+            )
 
             child_schema = {}
             if "options" in child_tmp_schema:
-                child_schema['options'] = child_tmp_schema['options']
+                child_schema["options"] = child_tmp_schema["options"]
             if "showOn" in child_tmp_schema:
-                child_schema['showOn'] = child_tmp_schema['showOn']
+                child_schema["showOn"] = child_tmp_schema["showOn"]
 
             if child_schema != {}:
-                descendantControlOverrides[child_tmp_schema['scope']] = child_schema
-        else:   # ignore this type
+                descendantControlOverrides[child_tmp_schema["scope"]] = child_schema
+        else:  # ignore this type
             pass
 
         # add it recursively if child_object is a container type
         if child_object.portal_type in ["Complex", "Array"]:
-            container_base_scope = child_tmp_schema['scope']
+            container_base_scope = child_tmp_schema["scope"]
             if child_object.portal_type == "Array":
                 container_base_scope += "/items/properties/"
             elif child_object.portal_type == "Complex":
                 container_base_scope += "/properties/"
             for c in child_object.getFolderContents():
                 c_object = c.getObject()
-                if not check_show_condition_in_request(self.request, c_object.show_condition, c_object.negate_condition):
+                if not check_show_condition_in_request(
+                    self.request, c_object.show_condition, c_object.negate_condition
+                ):
                     continue
-                descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, c_object, container_base_scope)
+                descendantControlOverrides = (
+                    self.add_child_to_descendantControlOverrides(
+                        descendantControlOverrides, c_object, container_base_scope
+                    )
+                )
 
         return descendantControlOverrides
 
@@ -442,9 +506,13 @@ class UiSchemaView(BrowserView):
 
         for child in parent_object.getFolderContents():
             child_object = child.getObject()
-            if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+            if not check_show_condition_in_request(
+                self.request, child_object.show_condition, child_object.negate_condition
+            ):
                 continue
-            descendantControlOverrides = self.add_child_to_descendantControlOverrides(descendantControlOverrides, child_object, base_scope)
+            descendantControlOverrides = self.add_child_to_descendantControlOverrides(
+                descendantControlOverrides, child_object, base_scope
+            )
 
         return descendantControlOverrides
 
@@ -454,31 +522,38 @@ class UiSchemaView(BrowserView):
         aria_content = _("Show element content")
         aria_delete = _("Delete element")
 
-        html_links = ['<span><a aria-label="{aria_view}" href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
+        html_links = [
+            '<span><a aria-label="{aria_view}" href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
                         <a aria-label="{aria_edit}" href="{edit_url}" title="{edit}"><i class="bi bi-pen-fill"></a>\n',
-                        '<a aria-label="{aria_content}" href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
-                        '<a aria-label="{aria_delete}" href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>'
-                        ]
+            '<a aria-label="{aria_content}" href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
+            '<a aria-label="{aria_delete}" href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>',
+        ]
 
-        tools = html_links[0].format(aria_view=aria_view,
-                                     view_url=get_view_url(child_object),
-                                     view=_('View'),
-                                     aria_edit=aria_edit,
-                                     edit_url=get_edit_url(child_object),
-                                     edit=_('Edit'))
+        tools = html_links[0].format(
+            aria_view=aria_view,
+            view_url=get_view_url(child_object),
+            view=_("View"),
+            aria_edit=aria_edit,
+            edit_url=get_edit_url(child_object),
+            edit=_("Edit"),
+        )
         if has_content(child_object):
-            tools += html_links[1].format(aria_content=aria_content,
-                                          content_url=get_content_url(child_object),
-                                          content=_('Content'))
-        tools += html_links[2].format(aria_delete=aria_delete,
-                                      delete_url=get_delete_url(child_object),
-                                      delete=_('Delete'))
+            tools += html_links[1].format(
+                aria_content=aria_content,
+                content_url=get_content_url(child_object),
+                content=_("Content"),
+            )
+        tools += html_links[2].format(
+            aria_delete=aria_delete,
+            delete_url=get_delete_url(child_object),
+            delete=_("Delete"),
+        )
         return tools
 
     def add_tools_to_schema(self, child_schema, child_object):
         if self.tools_on:
             tools = self.get_tools_html(child_object)
-            child_schema = self.add_option_to_schema(child_schema, {'preHtml': tools})
+            child_schema = self.add_option_to_schema(child_schema, {"preHtml": tools})
         return child_schema
 
     def add_dependencies_to_schema(self, child_schema, child_object):
@@ -486,17 +561,16 @@ class UiSchemaView(BrowserView):
         if child_object.dependencies:
             showOn = create_showon_properties(child_object, self.lookup_scopes)
             if showOn != {}:
-                child_schema['showOn'] = showOn
+                child_schema["showOn"] = showOn
         return child_schema
 
     def add_option_to_schema(self, child_schema, options: dict):
-        if 'options' not in child_schema:
-            child_schema['options'] = options
+        if "options" not in child_schema:
+            child_schema["options"] = options
         else:
             for key, value in options.items():
-                child_schema['options'][key] = value
+                child_schema["options"][key] = value
         return child_schema
-
 
     # ????????
     def get_schema_for_fieldset(self, fieldset, scope, recursive=True):
@@ -507,13 +581,12 @@ class UiSchemaView(BrowserView):
 
         return self.create_group(fieldset, scope, recursive)
 
-
     def get_base_schema(self, child, scope, save_scope=True, has_user_helptext=True):
         child_id = create_id(child)
         child_scope = scope + child_id
         base_schema = {
-            'type': 'Control',
-            'scope': child_scope,
+            "type": "Control",
+            "scope": child_scope,
         }
 
         if save_scope:
@@ -531,38 +604,54 @@ class UiSchemaView(BrowserView):
     def add_user_helptext(self, child, child_schema):
         user_helptext = get_user_helptext(child, self.request)
         if user_helptext:
-            child_schema = self.add_option_to_schema(child_schema, {'help': {'text': user_helptext}})
+            child_schema = self.add_option_to_schema(
+                child_schema, {"help": {"text": user_helptext}}
+            )
 
     def create_group(self, group, scope, recursive):
         group_schema = {
-            'type': 'Group',
+            "type": "Group",
         }
         if group.show_title:
-            group_schema = self.add_option_to_schema(group_schema, {'label': get_title(group, self.request)})
+            group_schema = self.add_option_to_schema(
+                group_schema, {"label": get_title(group, self.request)}
+            )
         if group.description is not None:
-            group_schema = self.add_option_to_schema(group_schema, {'description': group.description})
+            group_schema = self.add_option_to_schema(
+                group_schema, {"description": group.description}
+            )
 
         # group_schema = self.add_tools_to_schema(group_schema, group) # gets ignored, add html element before group instead
         group_schema = self.add_dependencies_to_schema(group_schema, group)
 
-        if self.tools_on and group.aq_parent.portal_type == 'Form':
+        if self.tools_on and group.aq_parent.portal_type == "Form":
             helptext_schema = self.helptext_schema(self.get_tools_html(group))
-            helptext_schema = self.add_dependencies_to_schema(helptext_schema, group)       # helptext has same showOn as group
-            self.uischema['layout']['elements'].append(helptext_schema)
+            helptext_schema = self.add_dependencies_to_schema(
+                helptext_schema, group
+            )  # helptext has same showOn as group
+            self.uischema["layout"]["elements"].append(helptext_schema)
 
         if recursive:
-            group_schema['elements'] = []
+            group_schema["elements"] = []
 
             children = group.getFolderContents()
             for child in children:
                 child_object = child.getObject()
-                if not check_show_condition_in_request(self.request, child_object.show_condition, child_object.negate_condition):
+                if not check_show_condition_in_request(
+                    self.request,
+                    child_object.show_condition,
+                    child_object.negate_condition,
+                ):
                     continue
 
-                if self.tools_on and child_object.portal_type == 'Fieldset':
-                    helptext_schema = self.helptext_schema(self.get_tools_html(child_object))
-                    helptext_schema = self.add_dependencies_to_schema(helptext_schema, child_object)
-                    group_schema['elements'].append(helptext_schema)
+                if self.tools_on and child_object.portal_type == "Fieldset":
+                    helptext_schema = self.helptext_schema(
+                        self.get_tools_html(child_object)
+                    )
+                    helptext_schema = self.add_dependencies_to_schema(
+                        helptext_schema, child_object
+                    )
+                    group_schema["elements"].append(helptext_schema)
                 self.add_child_to_schema(child_object, group_schema, scope)
 
         return group_schema
