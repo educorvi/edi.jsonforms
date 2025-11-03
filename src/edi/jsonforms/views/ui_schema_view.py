@@ -76,26 +76,44 @@ class UiSchemaView(BrowserView):
 
     def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):
         type = child.portal_type
+        child_schema = {}
 
         if type == "Field":
-            return self.get_schema_for_field(child, scope)
+            child_schema = self.get_schema_for_field(child, scope)
         elif type == "SelectionField":
-            return self.get_schema_for_selectionfield(child, scope)
+            child_schema = self.get_schema_for_selectionfield(child, scope)
         elif type == "UploadField":
-            return self.get_schema_for_uploadfield(child, scope)
+            child_schema = self.get_schema_for_uploadfield(child, scope)
         elif type == "Reference":
-            return self.get_schema_for_reference(child, scope)
+            child_schema = self.get_schema_for_reference(child, scope)
         elif type == "Helptext":
-            return self.get_schema_for_helptext(child)
+            child_schema = self.get_schema_for_helptext(child)
         elif type == "Button Handler":
-            return self.get_schema_for_buttons(child)
+            child_schema = self.get_schema_for_buttons(child)
         elif type == "Array":
-            return self.get_schema_for_array(child, scope, recursive, overwrite_scope)
+            child_schema = self.get_schema_for_array(
+                child, scope, recursive, overwrite_scope
+            )
         elif type == "Complex":
-            return self.get_schema_for_object(child, scope, recursive, overwrite_scope)
+            child_schema = self.get_schema_for_object(
+                child, scope, recursive, overwrite_scope
+            )
         elif type == "Fieldset":
-            return self.get_schema_for_fieldset(child, scope)
-        return {}
+            child_schema = self.get_schema_for_fieldset(child, scope)
+
+        # add pre_html and post_html to the schema
+        if hasattr(child, "pre_html") and child.pre_html is not None:
+            existing_pre = child_schema["options"].get("preHtml")
+            if existing_pre:
+                child_schema["options"]["preHtml"] = (
+                    f"{existing_pre}<br>{child.pre_html.output}"
+                )
+            else:
+                child_schema["options"]["preHtml"] = child.pre_html.output
+        if hasattr(child, "post_html") and child.post_html is not None:
+            child_schema["options"]["postHtml"] = child.post_html.output
+
+        return child_schema
 
     def get_schema_for_field(self, field, scope):
         field_schema = self.get_base_schema(field, scope)
@@ -137,28 +155,6 @@ class UiSchemaView(BrowserView):
             "email",
         ]:
             field_schema["options"]["placeholder"] = placeholder
-
-        if hasattr(field, "pre_html") and field.pre_html is not None:
-            existing_pre = field_schema["options"].get("preHtml")
-            if existing_pre:
-                field_schema["options"]["preHtml"] = (
-                    f"{existing_pre}<br>{field.pre_html}"
-                )
-            else:
-                field_schema["options"]["preHtml"] = field.pre_html
-        if hasattr(field, "post_html"):
-            field_schema["options"]["postHtml"] = field.post_html
-
-        if hasattr(field, "pre_html") and field.pre_html is not None:
-            existing_pre = field_schema["options"].get("preHtml")
-            if existing_pre:
-                field_schema["options"]["preHtml"] = (
-                    f"{existing_pre}<br>{field.pre_html}"
-                )
-            else:
-                field_schema["options"]["preHtml"] = field.pre_html
-        if hasattr(field, "post_html"):
-            field_schema["options"]["postHtml"] = field.post_html
 
         # remove unnecessary options
         if field_schema["options"] == {}:

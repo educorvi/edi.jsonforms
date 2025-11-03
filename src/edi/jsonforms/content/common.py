@@ -1,4 +1,4 @@
-# from plone.app.textfield import RichText
+from plone.app.textfield import RichText
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
@@ -170,14 +170,33 @@ class IDependent(IFormElement):
 
 class IDependentElements(IDependent):
     # previously tipp
-    user_helptext = schema.TextLine(
-        title=_("Hint or helptext for the user"), required=False
-    )
 
     fieldset(
         "additional-information",
         label=_("Additional Information"),
         fields=["user_helptext"],
+    )
+
+    user_helptext = schema.TextLine(
+        title=_("Hint or helptext for the user"), required=False
+    )
+
+    fieldset(
+        "advanced-options",
+        label=_("Advanced Options"),
+        fields=["pre_html", "post_html"],
+    )
+
+    pre_html = RichText(
+        title=_("HTML before the field"),
+        description=_("HTML that will be inserted before the field."),
+        required=False,
+    )
+
+    post_html = RichText(
+        title=_("HTML after the field"),
+        description=_("HTML that will be inserted after the field."),
+        required=False,
     )
 
 
