@@ -11,7 +11,7 @@
                 <div id="collapseSchema" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
                     <div class="accordion-body">
                         <pre class="bg-dark text-light p-3 rounded">
-                            <code tal:content="context/@@json-schema-view"></code>
+                            <code tal:content="view/get_json_schema"></code>
                         </pre>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
                 <div id="collapseUI" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
                     <div class="accordion-body">
                         <pre class="bg-dark text-light p-3 rounded">
-                            <code tal:content="context/@@ui-schema-view"></code>
+                            <code tal:content="view/get_ui_schema"></code>
                         </pre>
                     </div>
                 </div>

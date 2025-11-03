@@ -1,17 +1,36 @@
 # -*- coding: utf-8 -*-
 
 from plone.app.layout.viewlets import ViewletBase
-from plone.protect.interfaces import IDisableCSRFProtection
-from zope.interface import Interface, implementer, alsoProvides
 from plone.app.layout.viewlets.content import ContentHistoryView
-from edi.jsonforms.views.form_view import IFormToolsView
+from edi.jsonforms.views.json_schema_view import JsonSchemaView
+from edi.jsonforms.views.ui_schema_view import UiSchemaView
+from edi.jsonforms.views.wizard_view import WizardJsonSchemaView, WizardUiSchemaView
 from plone import api
 
 
 class DeveloperViewlet(ViewletBase):
     def render(self):
-        if self.request.get("URL", "").endswith("form-tools-view"):
+        url = self.request.get("URL", "")
+        if url.endswith("form-tools-view") or url.endswith("wizard-tools-view"):
             return super().render()
+        return ""
+
+    def get_json_schema(self):
+        if self.context.portal_type == "Form":
+            json_schema = JsonSchemaView(self.context, self.request)
+            return json_schema()
+        elif self.context.portal_type == "Wizard":
+            json_schema = WizardJsonSchemaView(self.context, self.request)
+            return json_schema()
+        return ""
+
+    def get_ui_schema(self):
+        if self.context.portal_type == "Form":
+            ui_schema = UiSchemaView(self.context, self.request)
+            return ui_schema()
+        elif self.context.portal_type == "Wizard":
+            ui_schema = WizardUiSchemaView(self.context, self.request)
+            return ui_schema()
         return ""
 
     def get_versions(self):
