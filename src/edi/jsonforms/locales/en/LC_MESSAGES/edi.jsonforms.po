@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-10-21 08:54+0000\n"
+"POT-Creation-Date: 2025-10-30 12:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,544 +17,560 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: edi.jsonforms\n"
 
-#: ./profiles/default/types/Complex.xml
+#: ../profiles/default/types/Complex.xml
 msgid "A Complex is used to group fields together that are connected. Unlike normal fieldsets, a complex doesn't only group to enhance clarity and structure but to encapsulate related data or concepts. A Complex (including all contained fields, fieldsets, arrays, ...) can be dependent from the option of another field but a normal fieldset not."
 msgstr "A Complex is used to group fields together that are connected. Unlike normal fieldsets, a complex doesn't only group to enhance clarity and structure but to encapsulate related data or concepts. A Complex (including all contained fields, fieldsets, arrays, ...) can be dependent from the option of another field but a normal fieldset not."
 
-#: ./profiles/default/types/Field.xml
+#: ../profiles/default/types/Field.xml
 msgid "A Field represents a specific data entry point within a Form where users input information. Various types are possible, such as textline, number, email and more."
 msgstr "A Field represents a specific data entry point within a Form where users input information. Various types are possible, such as textline, number, email and more."
 
-#: ./profiles/default/types/Fieldset.xml
+#: ../profiles/default/types/Fieldset.xml
 msgid "A Fieldset is used to logically group fields inside a Form, allowing users to organize related fields together. By encapsulating fields within a fieldset, users can enhance the clarity and structure of their questionnaires or forms. Fieldsets provide a means to categorize and visually organize fields, improving the usability."
 msgstr "A Fieldset is used to logically group fields inside a Form, allowing users to organize related fields together. By encapsulating fields within a fieldset, users can enhance the clarity and structure of their questionnaires or forms. Fieldsets provide a means to categorize and visually organize fields, improving the usability."
 
-#: ./content/field.py:98
+#: ../content/field.py:102
 msgid "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
 msgstr "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
 
-#: ./profiles/default/types/SelectionField.xml
+#: ../profiles/default/types/SelectionField.xml
 msgid "A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible."
 msgstr "A SelectionField offers users a range of options to choose from within a Form. These options consist of predefined values such as radio buttons, checkboxes, or dropdown lists. The type defines wether single or multiple selections are possible."
 
-#: ./profiles/default/types/Wizard.xml
+#: ../profiles/default/types/Wizard.xml
 msgid "A container for forms."
 msgstr ""
 
-#: ./profiles/default/types/Reference.xml
+#: ../profiles/default/types/Reference.xml
 msgid "A reference of a form element with new dependencies."
 msgstr ""
 
-#: ./content/upload_field.py:71
+#: ../content/upload_field.py:71
 msgid "Accepted file types for file upload"
 msgstr "Accepted file types for file upload"
 
-#: ./content/array.py:33
+#: ../content/array.py:33
 msgid "Add button label"
 msgstr ""
 
-#: ./content/common.py:133
+#: ../content/common.py:133
 msgid "Additional Information"
 msgstr "Additional Information"
 
-#: ./content/field.py:52
-#: ./content/upload_field.py:67
+#: ../content/field.py:48
+#: ../content/upload_field.py:67
 msgid "Advanced Options"
 msgstr "Advanced Options"
 
-#: ./profiles/default/types/Array.xml
+#: ../profiles/default/types/Array.xml
 msgid "An Array is a structured element that allows the repeated entry of related information by providing a template for a set of fields. It allows users to dynamically add additional sets of the same fields as needed. Arrays are particularly useful for capturing repetitive data entries, such as multiple contact or items in a list. An Array can be dependent from another field."
 msgstr "An Array is a structured element that allows the repeated entry of related information by providing a template for a set of fields. It allows users to dynamically add additional sets of the same fields as needed. Arrays are particularly useful for capturing repetitive data entries, such as multiple contact or items in a list. An Array can be dependent from another field."
 
-#: ./profiles/default/types/Option.xml
+#: ../profiles/default/types/Option.xml
 msgid "An Option represents a specific choice available to users within a Form. Options define the predefined values that users can select from, such as specific items, categories, or responses."
 msgstr "An Option represents a specific choice available to users within a Form. Options define the predefined values that users can select from, such as specific items, categories, or responses."
 
-#: ./profiles/default/types/OptionList.xml
+#: ../profiles/default/types/OptionList.xml
 msgid "An OptionList represents a collection of predefined choices available to users within a Form. OptionLists define the predefined values that users can select from, such as specific items, categories, or responses."
 msgstr ""
 
-#: ./profiles/default/types/Array.xml
+#: ../profiles/default/types/Array.xml
 msgid "Array"
 msgstr "Array"
 
-#: ./content/common.py:102
+#: ../content/common.py:102
 msgid "Cannot be dependent from itself or a child from itself."
 msgstr "Cannot be dependent from itself or a child from itself."
 
-#: ./content/selection_field.py:36
+#: ../content/selection_field.py:36
 msgid "Check if you want to use the id of the options instead of the label/title in the schema"
 msgstr ""
 
-#: ./content/field.py:30
+#: ../content/field.py:26
 msgid "Checkbox (yes/no)"
 msgstr "Checkbox (yes/no)"
 
-#: ./content/selection_field.py:15
+#: ../content/selection_field.py:15
 msgid "Checkboxes (multi-selection)"
 msgstr "Checkboxes (multi-selection)"
 
-#: ./content/field.py:45
-#: ./content/selection_field.py:29
+#: ../content/field.py:41
+#: ../content/selection_field.py:29
 msgid "Choose the answer type"
 msgstr "Choose the answer type"
 
-#: ./profiles/default/types/Complex.xml
+#: ../profiles/default/types/Complex.xml
 msgid "Complex"
 msgstr "Complex"
 
-#: ./content/common.py:147
+#: ../content/common.py:147
 msgid "Condition for showing this field"
 msgstr ""
 
-#: ./views/ui_schema_view.py:463
+#: ../views/ui_schema_view.py:472
 msgid "Content"
 msgstr ""
 
-#: ./content/reference.py:63
+#: ../content/reference.py:63
 msgid "Could not determine the parent Form."
 msgstr ""
 
-#: ./views/form_tools_view.pt:18
+#: ../views/form_tools_view.pt:18
 msgid "Current JSON-Schema (Draft)"
 msgstr ""
 
-#: ./views/form_tools_view.pt:32
+#: ../views/form_tools_view.pt:32
 msgid "Current UI-Schema (Draft)"
 msgstr ""
 
-#: ./content/field.py:25
+#: ../content/field.py:21
 msgid "Date"
 msgstr "Date"
 
-#: ./content/field.py:26
+#: ../content/field.py:22
 msgid "Date and time"
 msgstr "Date and time"
 
-#: ./content/field.py:28
+#: ../content/field.py:24
 msgid "Decimal number"
 msgstr "Decimal number"
 
-#: ./views/ui_schema_view.py:466
+#: ../views/ui_schema_view.py:475
 msgid "Delete"
 msgstr ""
 
-#: ./views/ui_schema_view.py:446
+#: ../views/ui_schema_view.py:455
 msgid "Delete element"
 msgstr ""
 
-#: ./content/common.py:55
+#: ../content/common.py:55
 msgid "Dependencies"
 msgstr "Dependencies"
 
-#: ./content/common.py:60
+#: ../content/common.py:60
 msgid "Dependent from this answer option:"
 msgstr "Dependent from this answer option:"
 
-#: ./content/helptext.py:23
+#: ../content/helptext.py:23
 msgid "Description"
 msgstr ""
 
-#: ./content/common.py:188
+#: ../content/common.py:188
 msgid "Description of the field/question"
 msgstr ""
 
-#: ./views/form_tools_view.pt:14
+#: ../views/form_tools_view.pt:14
 msgid "Developer Area"
 msgstr ""
 
-#: ./content/form.py:24
+#: ../content/form.py:24
 msgid "Developer Fields"
 msgstr ""
 
-#: ./content/upload_field.py:94
+#: ../content/upload_field.py:94
 msgid "Display upload field as array"
 msgstr ""
 
-#: ./profiles/default/types/Array.xml
-#: ./profiles/default/types/Complex.xml
-#: ./profiles/default/types/Field.xml
+#: ../profiles/default/types/Array.xml
+#: ../profiles/default/types/Complex.xml
+#: ../profiles/default/types/Field.xml
 msgid "Edit"
 msgstr "Edit"
 
-#: ./views/ui_schema_view.py:444
+#: ../views/ui_schema_view.py:453
 msgid "Edit element"
 msgstr ""
 
-#: ./content/field.py:24
+#: ../content/field.py:20
 msgid "Email"
 msgstr "Email"
 
-#: ./profiles/default/types/Field.xml
+#: ../profiles/default/types/Field.xml
 msgid "Field"
 msgstr "Field"
 
-#: ./profiles/default/types/Fieldset.xml
+#: ../profiles/default/types/Fieldset.xml
 msgid "Fieldset"
 msgstr "Fieldset"
 
-#: ./content/field.py:63
+#: ../content/field.py:59
 msgid "For a number/integer this is the maximal value it can have.                                       For a Textline/-area/Password this is the maximal length the                                        text can have."
 msgstr "For a number/integer this is the maximal value it can have.                                       For a Textline/-area/Password this is the maximal length the                                        text can have."
 
-#: ./content/field.py:57
+#: ../content/field.py:53
 msgid "For a number/integer this is the minimal value it must have.                                        For a Textline/-area/Password this is the minimal length the                                        text must have. (>=)"
 msgstr "For a number/integer this is the minimal value it must have.                                        For a Textline/-area/Password this is the minimal length the                                        text must have. (>=)"
 
-#: ./profiles/default/types/Form.xml
+#: ../profiles/default/types/Form.xml
 msgid "Form"
 msgstr "Form"
 
-#: ./views/configure.zcml:61
+#: ../views/configure.zcml:61
 msgid "Form View"
 msgstr ""
 
-#: ./views/configure.zcml:72
+#: ../views/configure.zcml:72
 msgid "Form view with tools"
 msgstr ""
 
-#: ./content/helptext.py:26
-#: ./profiles/default/types/Helptext.xml
+#: ../content/field.py:80
+msgid "HTML after the field"
+msgstr ""
+
+#: ../content/field.py:76
+msgid "HTML before the field"
+msgstr ""
+
+#: ../content/field.py:81
+msgid "HTML that will be inserted after the field."
+msgstr ""
+
+#: ../content/field.py:77
+msgid "HTML that will be inserted before the field."
+msgstr ""
+
+#: ../content/helptext.py:26
+#: ../profiles/default/types/Helptext.xml
 msgid "Helptext"
 msgstr ""
 
-#: ./content/common.py:140
+#: ../content/common.py:140
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 
-#: ./content/common.py:174
+#: ../content/common.py:174
 msgid "Hint or helptext for the user"
 msgstr "Hint or helptext for the user"
 
-#: ./content/upload_field.py:72
+#: ../content/upload_field.py:72
 msgid "If no file type is selected, the default is * (all file types are accepted)."
 msgstr "If no file type is selected, the default is * (all file types are accepted)."
 
-#: ./content/common.py:61
+#: ../content/common.py:61
 msgid "If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."
 msgstr "If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."
 
-#: ./content/common.py:157
+#: ../content/common.py:157
 msgid "If this option is checked, all show conditions will be negated. This means that if any of the conditions is present in the request URL, the field will not be displayed."
 msgstr ""
 
-#: ./profiles/default/types/UploadField.xml
+#: ../profiles/default/types/UploadField.xml
 msgid "In an UploadField an user can upload one or multiple files."
 msgstr "In an UploadField an user can upload one or multiple files."
 
-#: ./configure.zcml:29
+#: ../configure.zcml:29
 msgid "Installs the edi.jsonforms add-on."
 msgstr "Installs the edi.jsonforms add-on."
 
-#: ./content/form.py:28
-#: ./views/json_schema_view.pt:9
+#: ../content/form.py:28
+#: ../views/json_schema_view.pt:9
 msgid "JSON-Schema"
 msgstr "JSON-Schema"
 
-#: ./content/option.py:21
+#: ../content/option.py:21
 msgid "Label of the answer option"
 msgstr "Label of the answer option"
 
-#: ./content/array.py:34
+#: ../content/array.py:34
 msgid "Label of the button to add new elements. Default: +"
 msgstr ""
 
-#: ./content/option_list.py:15
+#: ../content/option_list.py:15
 msgid "List of options. Every line contains one option. Options can either be values only or have an id in the format \"id:value\". IDs are only used if \"Use id of options in schema\" is checked in the parent field."
 msgstr ""
 
-#: ./content/field.py:62
+#: ../content/field.py:58
 msgid "Maximum"
 msgstr "Maximum"
 
-#: ./content/field.py:92
+#: ../content/field.py:96
 msgid "Maximum cannot be smaller or equal to zero."
 msgstr ""
 
-#: ./content/field.py:88
-#: ./content/upload_field.py:105
+#: ../content/field.py:92
+#: ../content/upload_field.py:105
 msgid "Maximum cannot be smaller than Minimum."
 msgstr ""
 
-#: ./content/upload_field.py:79
+#: ../content/upload_field.py:79
 msgid "Maximum file size (in MB)"
 msgstr ""
 
-#: ./content/upload_field.py:80
+#: ../content/upload_field.py:80
 msgid "Maximum file size for each uploaded file. If empty, there is no limit."
 msgstr ""
 
-#: ./content/upload_field.py:83
+#: ../content/upload_field.py:83
 msgid "Maximum number of files"
 msgstr ""
 
-#: ./content/upload_field.py:84
+#: ../content/upload_field.py:84
 msgid "Maximum number of files that can be uploaded. If empty, there is no limit."
 msgstr ""
 
-#: ./content/field.py:56
+#: ../content/field.py:52
 msgid "Minimum"
 msgstr "Minimum"
 
-#: ./content/upload_field.py:88
+#: ../content/upload_field.py:88
 msgid "Minimum number of files"
 msgstr ""
 
-#: ./content/upload_field.py:89
+#: ../content/upload_field.py:89
 msgid "Minimum number of files that must be uploaded."
 msgstr ""
 
-#: ./content/field.py:84
+#: ../content/field.py:88
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 msgstr "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 
-#: ./content/common.py:156
+#: ../content/common.py:156
 msgid "Negate all show conditions"
 msgstr ""
 
-#: ./content/common.py:91
+#: ../content/common.py:91
 msgid "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
 msgstr "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
 
-#: ./content/field.py:69
+#: ../content/field.py:65
 msgid "Only use this for the answer types Decimal and Whole number (e.g. km, kg)."
 msgstr ""
 
-#: ./content/field.py:77
+#: ../content/field.py:73
 msgid "Only use this for the answer types Textline and Textarea."
 msgstr "Only use this for the answer types Textline and Textarea."
 
-#: ./content/field.py:73
+#: ../content/field.py:69
 msgid "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."
 msgstr "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."
 
-#: ./content/option_list.py:17
-#: ./profiles/default/types/Option.xml
+#: ../content/option_list.py:17
+#: ../profiles/default/types/Option.xml
 msgid "Option"
 msgstr "Option"
 
-#: ./profiles/default/types/OptionList.xml
+#: ../profiles/default/types/OptionList.xml
 msgid "OptionList"
 msgstr ""
 
-#: ./content/common.py:19
+#: ../content/common.py:19
 msgid "Optional"
 msgstr "Optional"
 
-#: ./content/option_list.py:14
+#: ../content/option_list.py:14
 msgid "Options"
 msgstr ""
 
-#: ./content/field.py:21
+#: ../content/field.py:17
 msgid "Password"
 msgstr "Password"
 
-#: ./content/field.py:72
+#: ../content/field.py:68
 msgid "Placeholder"
 msgstr "Placeholder"
 
-#: ./views/form_element_view.pt:13
+#: ../views/form_element_view.pt:13
 msgid "Please add options to this selection field."
 msgstr ""
 
-#: ./content/selection_field.py:14
+#: ../content/selection_field.py:14
 msgid "Radiobuttons (single selection)"
 msgstr "Radiobuttons (single selection)"
 
-#: ./content/reference.py:24
-#: ./profiles/default/types/Reference.xml
+#: ../content/reference.py:24
+#: ../profiles/default/types/Reference.xml
 msgid "Reference"
 msgstr ""
 
-#: ./content/reference.py:26
+#: ../content/reference.py:26
 msgid "Reference to another Form Element (e.g. Field or Array)"
 msgstr ""
 
-#: ./content/field.py:76
+#: ../content/field.py:72
 msgid "Regular expression to validate a Textline/-area field."
 msgstr "Regular expression to validate a Textline/-area field."
 
-#: ./content/common.py:20
+#: ../content/common.py:20
 msgid "Required"
 msgstr "Required"
 
-#: ./content/selection_field.py:16
+#: ../content/selection_field.py:16
 msgid "Selection (single selection)"
 msgstr "Selection (single selection)"
 
-#: ./content/array.py:24
-#: ./content/common.py:193
+#: ../content/array.py:24
+#: ../content/common.py:193
 msgid "Selection of Field Requirement"
 msgstr "Selection of Field Requirement"
 
-#: ./profiles/default/types/SelectionField.xml
+#: ../profiles/default/types/SelectionField.xml
 msgid "SelectionField"
 msgstr "SelectionField"
 
-#: ./views/ui_schema_view.py:445
+#: ../views/ui_schema_view.py:454
 msgid "Show element content"
 msgstr ""
 
-#: ./content/array.py:29
-#: ./content/fieldset.py:26
+#: ../content/array.py:29
+#: ../content/fieldset.py:26
 msgid "Show title in form"
 msgstr ""
 
-#: ./views/form_tools_view.pt:47
+#: ../views/form_tools_view.pt:47
 msgid "Stable-Versions"
 msgstr ""
 
-#: ./content/field.py:22
+#: ../content/field.py:18
 msgid "Telephone"
 msgstr "Telephone"
 
-#: ./content/field.py:20
+#: ../content/field.py:16
 msgid "Textarea"
 msgstr "Textarea"
 
-#: ./content/field.py:19
+#: ../content/field.py:15
 msgid "Textline"
 msgstr "Textline"
 
-#: ./profiles/default/types/Form.xml
+#: ../profiles/default/types/Form.xml
 msgid "The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets."
 msgstr "The Form enables users to create and manage structured questionnaires, surveys or data collection forms. It can contain various field types such as radio buttons, simple text fields and more, organizing them into fieldsets."
 
-#: ./content/form.py:30
+#: ../content/form.py:30
 msgid "The contents of this field are autogenerated on save with change note. Do not edit it manually."
 msgstr ""
 
-#: ./content/common.py:106
+#: ../content/common.py:106
 msgid "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 msgstr "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 
-#: ./content/helptext.py:25
+#: ../content/helptext.py:25
 msgid "The description won't be shown in the form."
 msgstr ""
 
-#: ./content/field.py:39
+#: ../content/field.py:35
 msgid "The provided regular expression isn't valid."
 msgstr "The provided regular expression isn't valid."
 
-#: ./content/reference.py:37
+#: ../content/reference.py:37
 msgid "The referenced object is either empty or deleted/invalid."
 msgstr ""
 
-#: ./content/reference.py:69
+#: ../content/reference.py:69
 msgid "The referenced object is not within a Form."
 msgstr ""
 
-#: ./content/reference.py:76
+#: ../content/reference.py:76
 msgid "The referenced object is not within the same Form."
 msgstr ""
 
-#: ./content/helptext.py:22
+#: ../content/helptext.py:22
 msgid "The title won't be shown in the form."
 msgstr ""
 
-#: ./content/upload_field.py:95
+#: ../content/upload_field.py:95
 msgid "The user will be forced to upload files individually."
 msgstr ""
 
-#: ./content/common.py:148
+#: ../content/common.py:148
 msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr ""
 
-#: ./profiles/default/types/Helptext.xml
+#: ../profiles/default/types/Helptext.xml
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr ""
 
-#: ./views/ui_schema_view.py:214
+#: ../views/ui_schema_view.py:223
 msgid "This is a reference."
 msgstr ""
 
-#: ./content/field.py:27
+#: ../content/field.py:23
 msgid "Time"
 msgstr "Time"
 
-#: ./content/helptext.py:21
+#: ../content/helptext.py:21
 msgid "Title"
 msgstr ""
 
-#: ./content/common.py:185
+#: ../content/common.py:185
 msgid "Title of the field/question"
 msgstr ""
 
-#: ./content/form.py:35
-#: ./views/ui_schema_view.pt:9
+#: ../content/form.py:35
+#: ../views/ui_schema_view.pt:9
 msgid "UI-Schema"
 msgstr "UI-Schema"
 
-#: ./content/field.py:23
+#: ../content/field.py:19
 msgid "URL"
 msgstr "URL"
 
-#: ./content/common.py:139
+#: ../content/common.py:139
 msgid "Unformatted intern information for the JSON-Schema"
 msgstr "Unformatted intern information for the JSON-Schema"
 
-#: ./configure.zcml:38
+#: ../configure.zcml:38
 msgid "Uninstalls the edi.jsonforms add-on."
 msgstr "Uninstalls the edi.jsonforms add-on."
 
-#: ./content/field.py:104
+#: ../content/field.py:108
 msgid "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
 msgstr "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
 
-#: ./content/field.py:68
+#: ../content/field.py:64
 msgid "Unit of the answer"
 msgstr "Unit of the answer"
 
-#: ./profiles/default/types/UploadField.xml
+#: ../profiles/default/types/UploadField.xml
 msgid "UploadField"
 msgstr "UploadField"
 
-#: ./content/selection_field.py:35
+#: ../content/selection_field.py:35
 msgid "Use id of options in schema"
 msgstr ""
 
-#: ./profiles/default/types/Array.xml
-#: ./profiles/default/types/Complex.xml
-#: ./profiles/default/types/Field.xml
+#: ../profiles/default/types/Array.xml
+#: ../profiles/default/types/Complex.xml
+#: ../profiles/default/types/Field.xml
 msgid "View"
 msgstr "View"
 
-#: ./views/ui_schema_view.py:443
+#: ../views/ui_schema_view.py:452
 msgid "View element"
 msgstr ""
 
-#: ./content/field.py:29
+#: ../content/field.py:25
 msgid "Whole number"
 msgstr "Whole number"
 
-#: ./profiles/default/types/Wizard.xml
+#: ../profiles/default/types/Wizard.xml
 msgid "Wizard"
 msgstr ""
 
-#: ./content/reference.py:51
+#: ../content/reference.py:51
 msgid "You cannot depend on the object that is referenced."
 msgstr ""
 
-#: ./content/reference.py:40
+#: ../content/reference.py:40
 msgid "You cannot reference a Fieldset."
 msgstr ""
 
-#: ./content/reference.py:44
+#: ../content/reference.py:44
 msgid "You cannot reference a Form."
 msgstr ""
 
-#: ./content/reference.py:42
+#: ../content/reference.py:42
 msgid "You cannot reference a Reference."
 msgstr ""
 
-#: ./content/reference.py:46
+#: ../content/reference.py:46
 msgid "You cannot reference the object itself."
 msgstr ""
 
-#: ./configure.zcml:29
+#: ../configure.zcml:29
 msgid "edi.jsonforms"
 msgstr "edi.jsonforms"
 
-#: ./configure.zcml:38
+#: ../configure.zcml:38
 msgid "edi.jsonforms (uninstall)"
 msgstr "edi.jsonforms (uninstall)"
