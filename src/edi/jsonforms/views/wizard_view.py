@@ -24,6 +24,11 @@ class WizardView(BrowserView):
         return self.index()
 
 
+class IWizardToolsView(Interface):
+    """Marker Interface for IWizardView"""
+
+
+@implementer(IWizardToolsView)
 class WizardToolsView(BrowserView):
     def __call__(self):
         # TODO add tools functionality
