@@ -4,11 +4,15 @@
   xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:domain="edi.jsonforms" metal:use-macro="context/main_template/macros/master">
   <body>
     <metal:block fill-slot="content-core">
+      <div class="m-3" tal:define="json view/jsonschema; ui view/uischema">
 
-      <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-tools-view">
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
-      </div>
 
+        <!-- <h4>JSON-Schema</h4>
+        <p tal:content="json" />
+        <h4>UI-Schema</h4>
+        <p tal:content="ui" /> -->
+      </div>
     </metal:block>
   </body>
 </html>
