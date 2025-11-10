@@ -25,20 +25,35 @@ class IOption(IDependent):
 
     title = schema.TextLine(title=_("Label of the answer option"))
 
-    connection_type = schema.Bool(
-        title=_(
-            "The dependencies have an AND-connection (default: (inklusive) OR). "
-            "This option is ignored if less than two dependencies are given."
-        ),
-        readonly=True,
-    )
+    # connection_type = schema.Bool(
+    #     title=_(
+    #         "The dependencies have an AND-connection (default: (inklusive) OR). "
+    #         "This option is ignored if less than two dependencies are given."
+    #     ),
+    #     readonly=True,
+    # )
 
     @invariant
     def check_dependencies(data):
-        def get_parent_form(context):
+        # def get_parent_form(context):
+        #     current = context
+        #     try:
+        #         while current.portal_type != "Form":
+        #             current = current.aq_parent
+        #     except Exception:
+        #         return None
+        #     return current
+        def get_parent(context):
             current = context
             try:
-                while current.portal_type != "Form":
+                i = 0
+                current = current.aq_parent
+                while current.portal_type == "Fieldset":
+                    i += 1
+                    if i > 100:
+                        raise Invalid(
+                            _("Could not determine parent SelectionField.")
+                        )  # avoid infinite loop]:
                     current = current.aq_parent
             except Exception:
                 return None
@@ -58,8 +73,14 @@ class IOption(IDependent):
                 dep_parent = dep.aq_parent
                 if dep.portal_type != "Option":
                     raise Invalid(_("Dependency must be an option."))
-                if get_parent_form(dep) != get_parent_form(context):
-                    raise Invalid(_("Dependency must be in the same Form."))
+                if get_parent(dep.aq_parent) != get_parent(
+                    context.aq_parent
+                ):  # get parents of the SelectionFields
+                    raise Invalid(
+                        _(
+                            "Selectionfields of the option and the dependent option must be in the same container."
+                        )
+                    )
                 if dep_parent == option_parent:
                     raise Invalid(
                         _("Dependency must not be in the same SelectionField.")
