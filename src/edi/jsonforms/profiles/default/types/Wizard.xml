@@ -63,6 +63,7 @@
   <property name="immediate_view">wizard-view</property>
   <property name="view_methods">
     <element value="wizard-view"/>
+    <element value="wizard-tools-view"/>
   </property>
 
   <!-- Method aliases -->

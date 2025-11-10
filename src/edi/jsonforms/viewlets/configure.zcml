@@ -1,0 +1,29 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="edi.jsonforms">
+
+ <!-- -*- extra stuff goes here -*- -->
+
+  <browser:viewlet
+     name="developer-viewlet"
+     for="edi.jsonforms.content.form.IForm"
+     manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
+     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+     class=".developer_viewlet.DeveloperViewlet"
+     template="developer_viewlet.pt"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="developer-viewlet"
+     for="edi.jsonforms.content.wizard.IWizard"
+     manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
+     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+     class=".developer_viewlet.DeveloperViewlet"
+     template="developer_viewlet.pt"
+     permission="zope2.View"
+     />
+
+</configure>
