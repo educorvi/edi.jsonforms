@@ -3,6 +3,7 @@
 from Products.Five.browser import BrowserView
 
 import copy
+import itertools
 import json
 
 from edi.jsonforms.views.common import *
@@ -83,6 +84,10 @@ class JsonSchemaView(BrowserView):
                 )
                 return
 
+        # handle dependencies for Option content type
+        if child_object.portal_type == "SelectionField":
+            schema["allOf"].extend(self.get_dependent_options(child_object))
+
     def modify_schema_for_fieldset(self, schema, fieldset):
         children = fieldset.getFolderContents()
         for child in children:
@@ -160,7 +165,8 @@ class JsonSchemaView(BrowserView):
         for o in options:
             if o.portal_type == "Option":
                 o = o.getObject()
-                options_list.append(self.get_option_name(o))
+                if not check_for_dependencies(o):
+                    options_list.append(self.get_option_name(o))
                 # dependencies of options are handled in add_child_to_schema
             elif o.portal_type == "OptionList":
                 keys, vals = get_keys_and_values_for_options_list(o.getObject())
@@ -286,6 +292,125 @@ class JsonSchemaView(BrowserView):
         ):
             schema["required"].append(child_id)
         return schema
+
+    def get_dependent_options(self, parent_object):
+        """
+        parent_object: SelectionField
+        """
+
+        def add_to_dict(option, dependency, dict):
+            parent_key = "SHOWALWAYS"
+            if dependency:
+                parent_key = create_id(dependency.aq_parent)
+                dependency_key = self.get_option_name(dependency)
+                option_value = self.get_option_name(option)
+
+                answer_type = (
+                    "multi"
+                    if dependency.aq_parent.answer_type
+                    in ["checkbox", "selectmultiple"]
+                    else "single"
+                )
+
+                parent_key = f"{answer_type}_{parent_key}"
+                if parent_key in dict:
+                    if dependency_key in dict[parent_key]:
+                        dict[parent_key][dependency_key].append(option_value)
+                    else:
+                        dict[parent_key][dependency_key] = [option_value]
+                else:
+                    dict[parent_key] = {}
+                    dict[parent_key][dependency_key] = [option_value]
+            else:
+                dict["SHOWALWAYS"].append(self.get_option_name(option))
+
+        allof_list = []
+        options = parent_object.getFolderContents()
+        parent_object_id = create_id(parent_object)
+        dependency_dict = {"SHOWALWAYS": []}
+        for option in options:
+            if option.portal_type == "Option":
+                option = option.getObject()
+                if check_for_dependencies(option):
+                    dependencies = option.dependencies
+                    for dep in dependencies:
+                        try:
+                            add_to_dict(option, dep.to_object, dependency_dict)
+                        except:
+                            # dependency got deleted, plone error, ignore this dependency
+                            continue
+
+                else:
+                    add_to_dict(option, None, dependency_dict)
+
+        if dependency_dict["SHOWALWAYS"]:
+            showalways_list = [entry for entry in dependency_dict["SHOWALWAYS"]]
+        else:
+            showalways_list = []
+
+        possibilities = []
+
+        for selectionfield_id in dependency_dict:
+            if selectionfield_id == "SHOWALWAYS":
+                continue
+            if selectionfield_id.startswith("multi_"):
+                # possibilities.append([[(selectionfield_id, None)], [selectionfield_id]])
+                subsets = []
+                for r in range(len(dependency_dict[selectionfield_id]) + 1):
+                    subsets.extend(
+                        itertools.combinations(dependency_dict[selectionfield_id], r)
+                    )
+                possibilities.append(
+                    [list((selectionfield_id, sub)) for sub in subsets]
+                )
+            else:
+                possibilities.append(
+                    [[selectionfield_id, None]]
+                    + [
+                        [selectionfield_id, option_id]
+                        for option_id in dependency_dict[selectionfield_id]
+                    ]
+                )
+        if possibilities:
+            all_combinations = list(itertools.product(*possibilities))
+        else:
+            return []
+
+        for combination in all_combinations:
+            if_dict = {"properties": {}, "required": []}
+            then_enum = dependency_dict["SHOWALWAYS"][:]
+            for sublist in combination:
+                if sublist[1] is None or sublist[1] == ():
+                    continue
+                selectionfield_id = sublist[0]
+                selectionfield_id_clean = selectionfield_id.replace(
+                    "multi_", ""
+                ).replace("single_", "")
+
+                if selectionfield_id.startswith("multi_"):
+                    if_dict["properties"][selectionfield_id_clean] = {
+                        "contains": {"enum": [o for o in sublist[1]]}
+                    }
+                    for o in sublist[1]:
+                        then_enum.extend(dependency_dict[selectionfield_id][o])
+                else:
+                    if_dict["properties"][selectionfield_id_clean] = {
+                        "const": sublist[1]
+                    }
+                    then_enum.extend(dependency_dict[selectionfield_id][sublist[1]])
+                if_dict["required"].append(selectionfield_id_clean)
+            if len(then_enum) > len(dependency_dict["SHOWALWAYS"]):
+                if selectionfield_id.startswith("multi_"):
+                    then_enum = {"items": {"enum": list(set(then_enum))}}
+                else:
+                    then_enum = {"enum": list(set(then_enum))}
+                allof_list.append(
+                    {
+                        "if": if_dict,
+                        "then": {"properties": {parent_object_id: then_enum}},
+                    }
+                )
+        return allof_list
 
     # left over of duplicate check. method not deleted in case of other stuff with ids in the future
     def create_and_check_id(self, object):

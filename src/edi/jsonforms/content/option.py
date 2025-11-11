@@ -25,13 +25,13 @@ class IOption(IDependent):
 
     title = schema.TextLine(title=_("Label of the answer option"))
 
-    # connection_type = schema.Bool(
-    #     title=_(
-    #         "The dependencies have an AND-connection (default: (inklusive) OR). "
-    #         "This option is ignored if less than two dependencies are given."
-    #     ),
-    #     readonly=True,
-    # )
+    connection_type = schema.Bool(
+        title=_(
+            "The dependencies have an AND-connection (default: (inklusive) OR). "
+            "This option is ignored if less than two dependencies are given."
+        ),
+        readonly=True,
+    )
 
     @invariant
     def check_dependencies(data):
