@@ -50,7 +50,7 @@ def get_delete_url(object):
 def has_content(object):
     return object.portal_type in [
         "Array",
-        "Selection Field",
+        "SelectionField",
         "Button Handler",
         "Fieldset",
         "Complex",
