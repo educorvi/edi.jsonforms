@@ -25,6 +25,15 @@
     />
 
   <browser:page
+    name="wizard-tools-view"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardToolsView"
+    template="wizard_tools_view.pt"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
     name="wizard-json-schema"
     for="edi.jsonforms.content.wizard.IWizard"
     class=".wizard_view.WizardJsonSchemaView"
@@ -55,6 +64,7 @@
     class=".form_view.FormView"
     template="form_view.pt"
     permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
     title="Form View"
     menu="plone_displayviews"
     i18n:domain="edi.jsonforms"
@@ -66,6 +76,7 @@
     class=".form_view.FormToolsView"
     template="form_tools_view.pt"
     permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
     title="Form view with tools"
     menu="plone_displayviews"
     i18n:domain="edi.jsonforms"
