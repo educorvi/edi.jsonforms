@@ -158,13 +158,12 @@ class JsonSchemaView(BrowserView):
 
         options_list = []
         for o in options:
-            if o.portal_type == 'Option':
-               if selectionfield.use_id_in_schema:
-                  options_list.append(create_id(o))
-               else:
-                  options_list.append(o.Title)
-            elif o.portal_type == 'OptionList':
-                keys,vals = get_keys_and_values_for_options_list(o.getObject())
+            if o.portal_type == "Option":
+                o = o.getObject()
+                options_list.append(self.get_option_name(o))
+                # dependencies of options are handled in add_child_to_schema
+            elif o.portal_type == "OptionList":
+                keys, vals = get_keys_and_values_for_options_list(o.getObject())
                 if selectionfield.use_id_in_schema:
                     local_options_list = keys
                 else:
@@ -250,13 +249,13 @@ class JsonSchemaView(BrowserView):
         for dep in dependencies:
             try:
                 dep = dep.to_object
-                dep_id = create_id(dep)
-                if dep.portal_type == 'Option':
+                if dep.portal_type == "Option":
+                    dep_id = self.get_option_name(dep)
                     selection_parent = dep.aq_parent
                     if_then = {
-                        'if': {
-                            'properties': {
-                                create_id(selection_parent): {'const': get_title(dep, self.request)}
+                        "if": {
+                            "properties": {
+                                create_id(selection_parent): {"const": dep_id}
                             }
                         },
                         "then": {"required": [child_id]},
@@ -270,8 +269,9 @@ class JsonSchemaView(BrowserView):
                     #     schema['allOf'] = [if_then]
                     schema["allOf"].append(if_then)
                 else:
-                    if dep_id in schema['dependentRequired']:
-                        schema['dependentRequired'][dep_id].append(child_id)
+                    dep_id = create_id(dep)
+                    if dep_id in schema["dependentRequired"]:
+                        schema["dependentRequired"][dep_id].append(child_id)
                     else:
                         schema["dependentRequired"][dep_id] = [child_id]
             except:
@@ -293,6 +293,13 @@ class JsonSchemaView(BrowserView):
         if id not in self.ids:
             self.ids.add(id)
         return id
+
+    def get_option_name(self, option):
+        parent_selectionfield = option.aq_parent
+        if parent_selectionfield.use_id_in_schema:
+            return create_id(option)
+        else:
+            return option.title
 
     """
     create base schema for a field, selectionfield or an uploadfield
