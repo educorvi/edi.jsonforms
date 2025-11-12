@@ -83,6 +83,9 @@ class IDependent(IFormElement):
                 self_base_path = get_base_path_parent(context)
                 self_path = ""  # irrelevant, cannot depend on itself because it doesn't exist yet
 
+            if context.portal_type == "Option":
+                return
+
             for dep in dependencies:
                 # check that self and object on which dependent are in the same group (complex, array or fieldset. Or Form)
                 dep_base_path = get_base_path(dep)

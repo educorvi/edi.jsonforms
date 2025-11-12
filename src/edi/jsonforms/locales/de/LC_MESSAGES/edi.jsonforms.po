@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-10-30 12:53+0000\n"
+"POT-Creation-Date: 2025-11-12 12:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Ein Feld repräsentiert ein spezifisches Eingabefeld innerhalb eines Fra
 msgid "A Fieldset is used to logically group fields inside a Form, allowing users to organize related fields together. By encapsulating fields within a fieldset, users can enhance the clarity and structure of their questionnaires or forms. Fieldsets provide a means to categorize and visually organize fields, improving the usability."
 msgstr "Eine Feldgruppe wird verwendet, um Felder innerhalb eines Fragebogens zu gruppieren und verwandte Felder zu ordnen. Durch die Kapselung / Kategorisierung der Felder kann die Struktur des Fragebogens oder Formulars visuell verbessert werden."
 
-#: ../content/field.py:102
+#: ../content/field.py:136
 msgid "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
 msgstr "Ein Platzhalter ist nur möglich, wenn der Antworttyp einer der folgenden ist: Textzeile, Textfeld, Passwort, Telefonnummer, URL, Email."
 
@@ -53,11 +53,12 @@ msgstr "Akzeptierte Dateitypen für den Upload"
 msgid "Add button label"
 msgstr "Label des Hinzufügeknopfes"
 
-#: ../content/common.py:133
+#: ../content/common.py:136
 msgid "Additional Information"
 msgstr "Zusatzinformationen"
 
-#: ../content/field.py:48
+#: ../content/common.py:189
+#: ../content/field.py:53
 #: ../content/upload_field.py:67
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
@@ -78,7 +79,7 @@ msgstr "Eine Optionenliste stellt eine Sammlung vordefinierter Auswahlmöglichke
 msgid "Array"
 msgstr "Array"
 
-#: ../content/common.py:102
+#: ../content/common.py:105
 msgid "Cannot be dependent from itself or a child from itself."
 msgstr "Eine Abhängigkeit von sich selbst oder einem eigenen Kindobjekt ist nicht möglich."
 
@@ -94,7 +95,7 @@ msgstr "Checkbox (ja/nein)"
 msgid "Checkboxes (multi-selection)"
 msgstr "Checkboxen (Mehrfachauswahl)"
 
-#: ../content/field.py:41
+#: ../content/field.py:45
 #: ../content/selection_field.py:29
 msgid "Choose the answer type"
 msgstr "Auswahl des Antworttyps"
@@ -103,43 +104,40 @@ msgstr "Auswahl des Antworttyps"
 msgid "Complex"
 msgstr "Objekt"
 
-#: ../content/common.py:147
+#: ../content/common.py:150
 msgid "Condition for showing this field"
 msgstr "Bedingung, um dieses Feld anzuzeigen"
 
-#: ../views/ui_schema_view.py:472
+#: ../views/ui_schema_view.py:540
 msgid "Content"
 msgstr "Inhalt"
 
+#: ../content/option.py:70
+msgid "Could not determine parent SelectionField."
+msgstr ""
+
+#: ../content/option.py:88
 #: ../content/reference.py:63
 msgid "Could not determine the parent Form."
 msgstr "Der Elternfragebogen konnte nicht gefunden werden."
 
-#: ../views/form_tools_view.pt:18
-msgid "Current JSON-Schema (Draft)"
-msgstr "Aktuelles JSON-Schema (Entwurf)"
-
-#: ../views/form_tools_view.pt:32
-msgid "Current UI-Schema (Draft)"
-msgstr "Aktuelles UI-Schema (Entwurf)"
-
-#: ../content/field.py:21
+#: ../content/field.py:20
 msgid "Date"
 msgstr "Datum"
 
-#: ../content/field.py:22
+#: ../content/field.py:21
 msgid "Date and time"
 msgstr "Datum und Uhrzeit"
 
-#: ../content/field.py:24
+#: ../content/field.py:23
 msgid "Decimal number"
 msgstr "Dezimalzahl"
 
-#: ../views/ui_schema_view.py:475
+#: ../views/ui_schema_view.py:545
 msgid "Delete"
 msgstr "Löschen"
 
-#: ../views/ui_schema_view.py:455
+#: ../views/ui_schema_view.py:519
 msgid "Delete element"
 msgstr "Element löschen"
 
@@ -147,7 +145,16 @@ msgstr "Element löschen"
 msgid "Dependencies"
 msgstr "Abhängigkeiten"
 
+#: ../content/option.py:94
+msgid "Dependency must be an option."
+msgstr ""
+
+#: ../content/option.py:105
+msgid "Dependency must not be in the same SelectionField."
+msgstr ""
+
 #: ../content/common.py:60
+#: ../content/option.py:40
 msgid "Dependent from this answer option:"
 msgstr "Abhängig von folgender Antwortoption:"
 
@@ -155,13 +162,9 @@ msgstr "Abhängig von folgender Antwortoption:"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: ../content/common.py:188
+#: ../content/common.py:210
 msgid "Description of the field/question"
 msgstr "Beschreibung des Feldes bzw. der Frage"
-
-#: ../views/form_tools_view.pt:14
-msgid "Developer Area"
-msgstr "Entwicklerbereich"
 
 #: ../content/form.py:24
 msgid "Developer Fields"
@@ -177,11 +180,11 @@ msgstr "Upload-Feld als Array darstellen"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: ../views/ui_schema_view.py:453
+#: ../views/ui_schema_view.py:517
 msgid "Edit element"
 msgstr "Element bearbeiten"
 
-#: ../content/field.py:20
+#: ../content/field.py:19
 msgid "Email"
 msgstr "Email"
 
@@ -193,11 +196,11 @@ msgstr "Feld"
 msgid "Fieldset"
 msgstr "Feldgruppe"
 
-#: ../content/field.py:59
+#: ../content/field.py:69
 msgid "For a number/integer this is the maximal value it can have.                                       For a Textline/-area/Password this is the maximal length the                                        text can have."
 msgstr "Für eine Dezimal-/Ganzzahl ist dies der maximale Wert, den sie haben kann. Für ein/eine Textzeile/Textfeld/Passwort ist dies die maximale Länge, die der Text haben kann."
 
-#: ../content/field.py:53
+#: ../content/field.py:59
 msgid "For a number/integer this is the minimal value it must have.                                        For a Textline/-area/Password this is the minimal length the                                        text must have. (>=)"
 msgstr "Für eine Dezimal-/Ganzzahl ist dies der minimale Wert, den sie haben muss. Für ein/eine Textzeile/Textfeld/Passwort ist dies die minimale Länge, die der Text haben muss. (>=)"
 
@@ -205,27 +208,27 @@ msgstr "Für eine Dezimal-/Ganzzahl ist dies der minimale Wert, den sie haben mu
 msgid "Form"
 msgstr "Fragebogen"
 
-#: ../views/configure.zcml:61
+#: ../views/configure.zcml:71
 msgid "Form View"
 msgstr "Web-Ansicht"
 
-#: ../views/configure.zcml:72
+#: ../views/configure.zcml:83
 msgid "Form view with tools"
 msgstr "Werkzeug-Ansicht"
 
-#: ../content/field.py:80
+#: ../content/common.py:200
 msgid "HTML after the field"
 msgstr "HTML nach dem Feld"
 
-#: ../content/field.py:76
+#: ../content/common.py:194
 msgid "HTML before the field"
 msgstr "HTML vor dem Feld"
 
-#: ../content/field.py:81
+#: ../content/common.py:201
 msgid "HTML that will be inserted after the field."
 msgstr "HTML, das nach dem Feld eingefügt wird."
 
-#: ../content/field.py:77
+#: ../content/common.py:195
 msgid "HTML that will be inserted before the field."
 msgstr "HTML, das vor dem Feld eingefügt wird."
 
@@ -234,11 +237,11 @@ msgstr "HTML, das vor dem Feld eingefügt wird."
 msgid "Helptext"
 msgstr "Hinweistext"
 
-#: ../content/common.py:140
+#: ../content/common.py:143
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Hier können zusätzliche Informationen für das Software-Team bereitgestellt werden, die beachtet werden sollen, wenn der Fragebogen erstellt wird."
 
-#: ../content/common.py:174
+#: ../content/common.py:184
 msgid "Hint or helptext for the user"
 msgstr "Tooltip (Icon mit Popup-Fenster für Benutzerhinweise)"
 
@@ -250,9 +253,13 @@ msgstr "Wenn keine Dateitypen ausgewählt werden, ist der Default * (alle Dateit
 msgid "If this field(set) should only be displayed based on the answer to another question or a specific option chosen from another question, please specify the question or option it depends on. For example, if the other field is a text line, this field will only be shown if the text line is not empty. If the other field is a number field, this field will only be shown if there is a number in the field and the number is not zero."
 msgstr "Wenn dieses Feld (oder diese Feldgruppe) nur basierend auf der Antwort auf eine andere Frage oder einer spezifischen Option, die bei einer anderen Frage gewählt wurde, angezeigt werden soll, geben Sie bitte die Frage oder Option an, von der es abhängt. Zum Beispiel wird dieses Feld nur angezeigt, wenn die Textzeile nicht leer ist, falls das andere Feld eine Textzeile ist. Falls das andere Feld ein Zahlenfeld ist, wird dieses Feld nur angezeigt, wenn eine Zahl in das Feld eingetragen wurde und diese Zahl nicht null ist."
 
-#: ../content/common.py:157
+#: ../content/common.py:160
 msgid "If this option is checked, all show conditions will be negated. This means that if any of the conditions is present in the request URL, the field will not be displayed."
 msgstr "Wenn diese Option aktiviert ist, werden alle Anzeige-Bedingungen negiert. Das bedeutet, wenn eine der Bedingungen in der URL enthalten ist, wird das Feld nicht angezeigt."
+
+#: ../content/option.py:41
+msgid "If this option should only be displayed based on the selection of an option in another question, please specify the option it depends on here. If multiple options are selected as dependencies, this option will be displayed if either of the dependencies is chosen."
+msgstr "Wenn diese Option nur basierend auf der Auswahl einer Option in einer anderen Frage angezeigt werden soll, geben Sie bitte hier die Option an, von der sie abhängt. Wenn mehrere Optionen als Abhängigkeiten ausgewählt sind, wird diese Option angezeigt, wenn eine der Abhängigkeiten oder beide ausgewählt werden."
 
 #: ../profiles/default/types/UploadField.xml
 msgid "In an UploadField an user can upload one or multiple files."
@@ -267,7 +274,7 @@ msgstr "Installiert die edi.jsonforms Erweiterung."
 msgid "JSON-Schema"
 msgstr "JSON-Schema"
 
-#: ../content/option.py:21
+#: ../content/option.py:28
 msgid "Label of the answer option"
 msgstr "Label der Antwortoption"
 
@@ -279,15 +286,15 @@ msgstr "Label des Knopfes, um neue Elemente hinzuzufügen. Default: +"
 msgid "List of options. Every line contains one option. Options can either be values only or have an id in the format \"id:value\". IDs are only used if \"Use id of options in schema\" is checked in the parent field."
 msgstr "Liste der Optionen. Jede Zeile enthält eine Option. Optionen können entweder nur Werte sein oder eine ID im Format „id:wert“ haben. IDs werden nur verwendet, wenn „Nutze die ID der Optionen im Schema“ im übergeordneten Feld aktiviert ist."
 
-#: ../content/field.py:58
+#: ../content/field.py:68
 msgid "Maximum"
 msgstr "Maximum"
 
-#: ../content/field.py:96
+#: ../content/field.py:122
 msgid "Maximum cannot be smaller or equal to zero."
 msgstr "Das Maximum kann nicht kleiner oder gleich 0 sein."
 
-#: ../content/field.py:92
+#: ../content/field.py:118
 #: ../content/upload_field.py:105
 msgid "Maximum cannot be smaller than Minimum."
 msgstr "Das Maximum kann nicht kleiner als das Minimum sein."
@@ -308,7 +315,7 @@ msgstr "Maximale Anzahl an Dateien"
 msgid "Maximum number of files that can be uploaded. If empty, there is no limit."
 msgstr "Maximale Anzahl an Dateien, die hochgeladen werden können. Wenn keine angegeben ist, gibt es kein Limit."
 
-#: ../content/field.py:52
+#: ../content/field.py:58
 msgid "Minimum"
 msgstr "Minimum"
 
@@ -320,27 +327,27 @@ msgstr "Minimale Anzahl an Dateien"
 msgid "Minimum number of files that must be uploaded."
 msgstr "Minimale Anzahl an Dateien, die hochgeladen werden müssen."
 
-#: ../content/field.py:88
+#: ../content/field.py:111
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 msgstr "Minimum/Maximum sind nur gültige Optionen für die folgenden Antworttypen: Textzeile, Textfeld, Passwort, Dezimalzahl, Ganzzahl."
 
-#: ../content/common.py:156
+#: ../content/common.py:159
 msgid "Negate all show conditions"
 msgstr "Alle Anzeige-Bedingungen negieren"
 
-#: ../content/common.py:91
+#: ../content/common.py:94
 msgid "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
 msgstr "Eine Abhängigkeit ist nur im selben komplexen Objekt, Array, Formular oder derselben Feldgruppe möglich."
 
-#: ../content/field.py:65
+#: ../content/field.py:79
 msgid "Only use this for the answer types Decimal and Whole number (e.g. km, kg)."
 msgstr "Diese Option gilt nur für die Antworttypen Dezimal- und Ganzzahl (z. B. km, kg)."
 
-#: ../content/field.py:73
+#: ../content/field.py:95
 msgid "Only use this for the answer types Textline and Textarea."
 msgstr "Diese Option gilt nur für die Antworttypen Textzeile und Textfeld."
 
-#: ../content/field.py:69
+#: ../content/field.py:87
 msgid "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."
 msgstr "Diese Option gilt nur für die Antworttypen Textzeile/-feld, Passwort, Telefonnummer, URL, Email."
 
@@ -361,11 +368,11 @@ msgstr "Optionales Feld"
 msgid "Options"
 msgstr "Optionen"
 
-#: ../content/field.py:17
+#: ../content/field.py:16
 msgid "Password"
 msgstr "Passwort"
 
-#: ../content/field.py:68
+#: ../content/field.py:86
 msgid "Placeholder"
 msgstr "Platzhalter"
 
@@ -386,7 +393,7 @@ msgstr "Referenz"
 msgid "Reference to another Form Element (e.g. Field or Array)"
 msgstr "Referenz auf ein anderes Fragebogenelement (z. B. Feld oder Array)"
 
-#: ../content/field.py:72
+#: ../content/field.py:94
 msgid "Regular expression to validate a Textline/-area field."
 msgstr "Regulärer Ausdruck gegen den die/das Textzeile/-feld validiert wird."
 
@@ -399,7 +406,7 @@ msgid "Selection (single selection)"
 msgstr "Auswahlmenü (Einfachauswahl)"
 
 #: ../content/array.py:24
-#: ../content/common.py:193
+#: ../content/common.py:215
 msgid "Selection of Field Requirement"
 msgstr "Auswahl zwischen optionalem Feld und Pflichtfeld"
 
@@ -407,7 +414,11 @@ msgstr "Auswahl zwischen optionalem Feld und Pflichtfeld"
 msgid "SelectionField"
 msgstr "Auswahlfeld"
 
-#: ../views/ui_schema_view.py:454
+#: ../content/option.py:99
+msgid "Selectionfields of the option and the dependent option must be in the same container."
+msgstr ""
+
+#: ../views/ui_schema_view.py:518
 msgid "Show element content"
 msgstr "Elementinhalt anzeigen"
 
@@ -416,19 +427,15 @@ msgstr "Elementinhalt anzeigen"
 msgid "Show title in form"
 msgstr "Titel im Fragebogen anzeigen"
 
-#: ../views/form_tools_view.pt:47
-msgid "Stable-Versions"
-msgstr "Stable-Versionen"
-
-#: ../content/field.py:18
+#: ../content/field.py:17
 msgid "Telephone"
 msgstr "Telefonnummer"
 
-#: ../content/field.py:16
+#: ../content/field.py:15
 msgid "Textarea"
 msgstr "Textfeld"
 
-#: ../content/field.py:15
+#: ../content/field.py:14
 msgid "Textline"
 msgstr "Textzeile"
 
@@ -440,7 +447,8 @@ msgstr "Der Fragebogen ermöglicht es Felder / Fragestellungen zu erstellen und 
 msgid "The contents of this field are autogenerated on save with change note. Do not edit it manually."
 msgstr "Der Inhalt dieses Feldes wird beim Speichern mit Änderungshinweis automatisch generiert. Bitte nicht manuell bearbeiten."
 
-#: ../content/common.py:106
+#: ../content/common.py:109
+#: ../content/option.py:31
 msgid "The dependencies have an AND-connection (default: (inklusive) OR). This option is ignored if less than two dependencies are given."
 msgstr "Die Abhängigkeiten haben eine und-Verbindung (Default: oder). Diese Option wird ignoriert, wenn weniger als zwei Abhängigkeiten bestehen."
 
@@ -448,7 +456,7 @@ msgstr "Die Abhängigkeiten haben eine und-Verbindung (Default: oder). Diese Opt
 msgid "The description won't be shown in the form."
 msgstr "Die Beschreibung wird nicht im Fragebogen angezeigt."
 
-#: ../content/field.py:35
+#: ../content/field.py:37
 msgid "The provided regular expression isn't valid."
 msgstr "Der angegebene reguläre Ausdruck ist nicht valide."
 
@@ -472,7 +480,7 @@ msgstr "Der Titel wird nicht im Fragebogen angezeigt."
 msgid "The user will be forced to upload files individually."
 msgstr "Der Formularbenutzer wird gezwungen, Dateien einzeln hochzuladen."
 
-#: ../content/common.py:148
+#: ../content/common.py:151
 msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt werden soll. Wenn keine Bedingung angegeben ist, wird das Feld immer angegeben. Wenn \"bedingung\" angegeben ist, wird das Feld nur angezeigt, wenn die Bedingung erfüllt ist. Die Bedingung wird mit dem Query-Parameter \"fork\" der URL überprüft. Mehrere Bedingungen können durch ein Komma getrennt werden. Beispiel: \"bedingung1, bedingung2, bedingung3\". Wenn eine der Bedingungen erfüllt ist, wird das Feld angezeigt, ansonsten nicht."
 
@@ -480,11 +488,11 @@ msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr "Dieser Hinweistext kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden und als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
 
-#: ../views/ui_schema_view.py:223
+#: ../views/ui_schema_view.py:260
 msgid "This is a reference."
 msgstr "Dies ist eine Referenz."
 
-#: ../content/field.py:23
+#: ../content/field.py:22
 msgid "Time"
 msgstr "Uhrzeit"
 
@@ -492,7 +500,7 @@ msgstr "Uhrzeit"
 msgid "Title"
 msgstr "Titel"
 
-#: ../content/common.py:185
+#: ../content/common.py:207
 msgid "Title of the field/question"
 msgstr "Titel des Feldes bzw. der Frage"
 
@@ -501,11 +509,11 @@ msgstr "Titel des Feldes bzw. der Frage"
 msgid "UI-Schema"
 msgstr "UI-Schema"
 
-#: ../content/field.py:19
+#: ../content/field.py:18
 msgid "URL"
 msgstr "URL"
 
-#: ../content/common.py:139
+#: ../content/common.py:142
 msgid "Unformatted intern information for the JSON-Schema"
 msgstr "Unformatierte interne Information für das JSON-Schema"
 
@@ -513,11 +521,11 @@ msgstr "Unformatierte interne Information für das JSON-Schema"
 msgid "Uninstalls the edi.jsonforms add-on."
 msgstr "Deinstalliert die edi.jsonforms Erweiterung."
 
-#: ../content/field.py:108
+#: ../content/field.py:146
 msgid "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
 msgstr "Eine Einheit ist nur eine gültige Option für die folgenden Antworttypen: Dezimalzahl, Ganzzahl."
 
-#: ../content/field.py:64
+#: ../content/field.py:78
 msgid "Unit of the answer"
 msgstr "Einheit der Antwort"
 
@@ -535,11 +543,11 @@ msgstr "Nutze die ID der Optionen im Schema"
 msgid "View"
 msgstr "View"
 
-#: ../views/ui_schema_view.py:452
+#: ../views/ui_schema_view.py:516
 msgid "View element"
 msgstr "Element anzeigen"
 
-#: ../content/field.py:25
+#: ../content/field.py:24
 msgid "Whole number"
 msgstr "Ganzzahl"
 
