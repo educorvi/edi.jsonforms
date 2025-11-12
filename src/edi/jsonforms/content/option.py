@@ -19,6 +19,8 @@ from zope.interface import Invalid, invariant
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependent
 
+from z3c.relationfield.schema import RelationList, RelationChoice
+
 
 class IOption(IDependent):
     """Marker interface and Dexterity Python Schema for Option"""
@@ -31,6 +33,19 @@ class IOption(IDependent):
             "This option is ignored if less than two dependencies are given."
         ),
         readonly=True,
+        default=False,
+    )
+
+    dependencies = RelationList(
+        title=_("Dependent from this answer option:"),
+        description=_(
+            "If this option should only be displayed based on the selection of an option in another question, please specify the option it depends on here. If multiple options are selected as dependencies, this option will be displayed if either of the dependencies is chosen."
+        ),
+        value_type=RelationChoice(
+            vocabulary="plone.app.vocabularies.Catalog",
+        ),
+        default=[],
+        required=False,
     )
 
     @invariant
