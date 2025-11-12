@@ -305,6 +305,7 @@ class JsonSchemaView(BrowserView):
                 dependency_key = self.get_option_name(dependency)
                 option_value = self.get_option_name(option)
 
+                # todo: refactor into seperat method and call here and below
                 answer_type = (
                     "multi"
                     if dependency.aq_parent.answer_type
@@ -389,7 +390,7 @@ class JsonSchemaView(BrowserView):
 
                 if selectionfield_id.startswith("multi_"):
                     if_dict["properties"][selectionfield_id_clean] = {
-                        "contains": {"enum": [o for o in sublist[1]]}
+                        "const": [o for o in sublist[1]]
                     }
                     for o in sublist[1]:
                         then_enum.extend(dependency_dict[selectionfield_id][o])
@@ -400,7 +401,8 @@ class JsonSchemaView(BrowserView):
                     then_enum.extend(dependency_dict[selectionfield_id][sublist[1]])
                 if_dict["required"].append(selectionfield_id_clean)
             if len(then_enum) > len(dependency_dict["SHOWALWAYS"]):
-                if selectionfield_id.startswith("multi_"):
+                # todo: see todo above
+                if option.aq_parent.answer_type in ["checkbox", "selectmultiple"]:
                     then_enum = {"items": {"enum": list(set(then_enum))}}
                 else:
                     then_enum = {"enum": list(set(then_enum))}
