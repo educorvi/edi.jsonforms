@@ -299,103 +299,79 @@ class JsonSchemaView(BrowserView):
         parent_object: SelectionField
         """
 
-        def add_to_dict(option, dependency, dict):
-            parent_key = "SHOWALWAYS"
-            if dependency:
-                parent_key = create_id(dependency.aq_parent)
-                dependency_key = self.get_option_name(dependency)
-                option_value = self.get_option_name(option)
+        def register_dependency(option, dependency, mapping):
+            if dependency is None:
+                mapping["SHOWALWAYS"].append(self.get_option_name(option))
+                return
 
-                # todo: refactor isMultiField into seperat method and call here and below
-                answer_type = (
-                    "multi"
-                    if dependency.aq_parent.answer_type
-                    in ["checkbox", "selectmultiple"]
-                    else "single"
+            selectionfield = dependency.aq_parent
+            answer_type = (
+                "multi"
+                if selectionfield.answer_type in ["checkbox", "selectmultiple"]
+                else "single"
+            )
+            parent_key = f"{answer_type}_{create_id(selectionfield)}"
+            dependency_key = self.get_option_name(dependency)
+            option_value = self.get_option_name(option)
+
+            if parent_key not in dependency_option_order:
+                dependency_option_order[parent_key] = self._get_option_order_map(
+                    selectionfield
                 )
 
-                parent_key = f"{answer_type}_{parent_key}"
-                if parent_key not in dependency_option_order:
-                    dependency_option_order[parent_key] = self._get_option_order_map(
-                        dependency.aq_parent
-                    )
-                if parent_key in dict:
-                    if dependency_key in dict[parent_key]:
-                        dict[parent_key][dependency_key].append(option_value)
-                    else:
-                        dict[parent_key][dependency_key] = [option_value]
-                else:
-                    dict[parent_key] = {}
-                    dict[parent_key][dependency_key] = [option_value]
-            else:
-                dict["SHOWALWAYS"].append(self.get_option_name(option))
+            mapping.setdefault(parent_key, {})
+            mapping[parent_key].setdefault(dependency_key, []).append(option_value)
 
-        allof_list = []
         options = parent_object.getFolderContents()
         parent_object_id = create_id(parent_object)
         dependency_dict = {"SHOWALWAYS": []}
         parent_option_order = self._get_option_order_map(parent_object)
-        for option in options:
-            if option.portal_type == "Option":
-                option = option.getObject()
-                if check_for_dependencies(option):
-                    dependencies = option.dependencies
-                    for dep in dependencies:
-                        try:
-                            add_to_dict(option, dep.to_object, dependency_dict)
-                        except:
-                            # dependency got deleted, plone error, ignore this dependency
-                            continue
-
-                else:
-                    add_to_dict(option, None, dependency_dict)
-
-        if dependency_dict["SHOWALWAYS"]:
-            showalways_list = [entry for entry in dependency_dict["SHOWALWAYS"]]
-        else:
-            showalways_list = []
+        for option_brain in options:
+            if option_brain.portal_type != "Option":
+                continue
+            option = option_brain.getObject()
+            if not check_for_dependencies(option):
+                register_dependency(option, None, dependency_dict)
+                continue
+            for dep in option.dependencies:
+                try:
+                    register_dependency(option, dep.to_object, dependency_dict)
+                except:
+                    # dependency got deleted, plone error, ignore this dependency
+                    continue
 
         possibilities = []
-
-        for selectionfield_id in dependency_dict:
+        for selectionfield_id, dependency_map in dependency_dict.items():
             if selectionfield_id == "SHOWALWAYS":
                 continue
             if selectionfield_id.startswith("multi_"):
-                # possibilities.append([[(selectionfield_id, None)], [selectionfield_id]])
                 subsets = []
-                for r in range(len(dependency_dict[selectionfield_id]) + 1):
-                    subsets.extend(
-                        itertools.combinations(dependency_dict[selectionfield_id], r)
-                    )
+                for r in range(len(dependency_map) + 1):
+                    subsets.extend(itertools.combinations(dependency_map, r))
                 possibilities.append(
-                    [list((selectionfield_id, sub)) for sub in subsets]
+                    [[selectionfield_id, subset] for subset in subsets]
                 )
             else:
-                possibilities.append(
-                    [[selectionfield_id, None]]
-                    + [
-                        [selectionfield_id, option_id]
-                        for option_id in dependency_dict[selectionfield_id]
-                    ]
+                options_for_field = [[selectionfield_id, None]]
+                options_for_field.extend(
+                    [[selectionfield_id, option_id] for option_id in dependency_map]
                 )
-        if possibilities:
-            all_combinations = list(itertools.product(*possibilities))
-        else:
+                possibilities.append(options_for_field)
+
+        if not possibilities:
             return []
 
+        allof_list = []
+        all_combinations = list(itertools.product(*possibilities))
         for combination in all_combinations:
             if_dict = {"properties": {}, "required": []}
             then_enum = dependency_dict["SHOWALWAYS"][:]
-            for sublist in combination:
-                if sublist[1] is None or sublist[1] == ():
+            for selectionfield_id, selection in combination:
+                if selection in (None, ()):
                     continue
-                selectionfield_id = sublist[0]
-                selectionfield_id_clean = selectionfield_id.replace(
-                    "multi_", ""
-                ).replace("single_", "")
-
+                selectionfield_id_clean = selectionfield_id.split("_", 1)[1]
                 if selectionfield_id.startswith("multi_"):
-                    const_values = list(sublist[1])
+                    const_values = list(selection)
                     order_map = dependency_option_order.get(selectionfield_id)
                     if order_map:
                         const_values.sort(
@@ -404,25 +380,24 @@ class JsonSchemaView(BrowserView):
                     if_dict["properties"][selectionfield_id_clean] = {
                         "const": const_values
                     }
-                    for o in sublist[1]:
-                        then_enum.extend(dependency_dict[selectionfield_id][o])
+                    for value in selection:
+                        then_enum.extend(dependency_dict[selectionfield_id][value])
                 else:
                     if_dict["properties"][selectionfield_id_clean] = {
-                        "const": sublist[1]
+                        "const": selection
                     }
-                    then_enum.extend(dependency_dict[selectionfield_id][sublist[1]])
+                    then_enum.extend(dependency_dict[selectionfield_id][selection])
                 if_dict["required"].append(selectionfield_id_clean)
             if len(then_enum) > len(dependency_dict["SHOWALWAYS"]):
-                # todo: see todo above
                 ordered_then_enum = self._order_values(then_enum, parent_option_order)
-                if option.aq_parent.answer_type in ["checkbox", "selectmultiple"]:
-                    then_enum = {"items": {"enum": ordered_then_enum}}
+                if parent_object.answer_type in ["checkbox", "selectmultiple"]:
+                    then_schema = {"items": {"enum": ordered_then_enum}}
                 else:
-                    then_enum = {"enum": ordered_then_enum}
+                    then_schema = {"enum": ordered_then_enum}
                 allof_list.append(
                     {
                         "if": if_dict,
-                        "then": {"properties": {parent_object_id: then_enum}},
+                        "then": {"properties": {parent_object_id: then_schema}},
                     }
                 )
         return allof_list
