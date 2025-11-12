@@ -390,9 +390,7 @@ class JsonSchemaView(BrowserView):
                 if sublist[1] is None or sublist[1] == ():
                     continue
                 selectionfield_id = sublist[0]
-                selectionfield_id_clean = selectionfield_id.replace(
-                    "multi_", ""
-                ).replace("single_", "")
+                selectionfield_id_clean = selectionfield_id.split("_", 1)[1]
 
                 if selectionfield_id.startswith("multi_"):
                     const_values = list(sublist[1])
