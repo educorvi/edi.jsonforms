@@ -64,17 +64,21 @@ class IOption(IDependent):
             try:
                 # editing process, object already exists and has a context
                 context = data.__context__
+                option_parent = context.aq_parent
             except Exception:
-                # adding process, object doesn't exist yet and has no context attribute
+                pass
+            if context is None:
                 context = getRequest().PUBLISHED.context
+                if context is None:
+                    raise Invalid(_("Could not determine the parent Form."))
+                option_parent = context
 
-            option_parent = context.aq_parent
             for dep in dependencies:
                 dep_parent = dep.aq_parent
                 if dep.portal_type != "Option":
                     raise Invalid(_("Dependency must be an option."))
                 if get_parent(dep.aq_parent) != get_parent(
-                    context.aq_parent
+                    option_parent
                 ):  # get parents of the SelectionFields
                     raise Invalid(
                         _(
