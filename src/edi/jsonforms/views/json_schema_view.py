@@ -294,6 +294,7 @@ class JsonSchemaView(BrowserView):
         return schema
 
     def get_dependent_options(self, parent_object):
+        dependency_option_order = {}
         """
         parent_object: SelectionField
         """
@@ -305,7 +306,7 @@ class JsonSchemaView(BrowserView):
                 dependency_key = self.get_option_name(dependency)
                 option_value = self.get_option_name(option)
 
-                # todo: refactor into seperat method and call here and below
+                # todo: refactor isMultiField into seperat method and call here and below
                 answer_type = (
                     "multi"
                     if dependency.aq_parent.answer_type
@@ -314,6 +315,10 @@ class JsonSchemaView(BrowserView):
                 )
 
                 parent_key = f"{answer_type}_{parent_key}"
+                if parent_key not in dependency_option_order:
+                    dependency_option_order[parent_key] = self._get_option_order_map(
+                        dependency.aq_parent
+                    )
                 if parent_key in dict:
                     if dependency_key in dict[parent_key]:
                         dict[parent_key][dependency_key].append(option_value)
@@ -329,6 +334,7 @@ class JsonSchemaView(BrowserView):
         options = parent_object.getFolderContents()
         parent_object_id = create_id(parent_object)
         dependency_dict = {"SHOWALWAYS": []}
+        parent_option_order = self._get_option_order_map(parent_object)
         for option in options:
             if option.portal_type == "Option":
                 option = option.getObject()
@@ -389,8 +395,14 @@ class JsonSchemaView(BrowserView):
                 ).replace("single_", "")
 
                 if selectionfield_id.startswith("multi_"):
+                    const_values = list(sublist[1])
+                    order_map = dependency_option_order.get(selectionfield_id)
+                    if order_map:
+                        const_values.sort(
+                            key=lambda value: order_map.get(value, len(order_map))
+                        )
                     if_dict["properties"][selectionfield_id_clean] = {
-                        "const": [o for o in sublist[1]]
+                        "const": const_values
                     }
                     for o in sublist[1]:
                         then_enum.extend(dependency_dict[selectionfield_id][o])
@@ -402,10 +414,11 @@ class JsonSchemaView(BrowserView):
                 if_dict["required"].append(selectionfield_id_clean)
             if len(then_enum) > len(dependency_dict["SHOWALWAYS"]):
                 # todo: see todo above
+                ordered_then_enum = self._order_values(then_enum, parent_option_order)
                 if option.aq_parent.answer_type in ["checkbox", "selectmultiple"]:
-                    then_enum = {"items": {"enum": list(set(then_enum))}}
+                    then_enum = {"items": {"enum": ordered_then_enum}}
                 else:
-                    then_enum = {"enum": list(set(then_enum))}
+                    then_enum = {"enum": ordered_then_enum}
                 allof_list.append(
                     {
                         "if": if_dict,
@@ -427,6 +440,32 @@ class JsonSchemaView(BrowserView):
             return create_id(option)
         else:
             return option.title
+
+    def _get_option_order_map(self, selectionfield):
+        order_map = {}
+        index = 0
+        for option in selectionfield.getFolderContents():
+            if option.portal_type != "Option":
+                continue
+            option_obj = option.getObject()
+            order_map[self.get_option_name(option_obj)] = index
+            index += 1
+        return order_map
+
+    def _order_values(self, values, order_map):
+        deduped = []
+        seen = set()
+        for idx, value in enumerate(values):
+            if value in seen:
+                continue
+            seen.add(value)
+            deduped.append((value, idx))
+        if not order_map:
+            return [value for value, _ in deduped]
+        deduped.sort(
+            key=lambda item: (order_map.get(item[0], len(order_map)), item[1])
+        )
+        return [value for value, _ in deduped]
 
     """
     create base schema for a field, selectionfield or an uploadfield
