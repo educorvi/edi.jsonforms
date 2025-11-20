@@ -99,8 +99,7 @@ class WizardUiSchemaView(UiSchemaView):
         del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
         self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button
 
-        self.uischema["layout"]["pages"] = self.uischema["layout"]["elements"]
-        del self.uischema["layout"]["elements"]
+        self.uischema["layout"]["pages"] = self.uischema["layout"].pop("elements")
         self.uischema["layout"]["options"] = {}
         self.uischema["layout"]["options"]["pageTitles"] = page_titles
         return self.uischema
