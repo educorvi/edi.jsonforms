@@ -37,6 +37,37 @@ class WizardToolsView(BrowserView):
         return self.index()
 
 
+buttons = {
+    "type": "Buttongroup",
+    "buttons": [
+        {
+            "type": "Button",
+            "buttonType": "previousWizardPage",
+            "text": "Vorherige Seite",
+            "options": {
+                "variant": "outline-primary"
+            }
+        },
+        {
+            "type": "Button",
+            "buttonType": "nextWizardPage",
+            "text": "Nächste Seite",
+            "options": {
+                "variant": "outline-primary"
+            }
+        }
+    ]
+}
+
+submit_button = {
+    "type": "Button",
+    "buttonType": "submit",
+    "text": "Absenden",
+    "options": {
+        "variant": "primary"
+    }
+}
+
 class WizardUiSchemaView(UiSchemaView):
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -49,11 +80,12 @@ class WizardUiSchemaView(UiSchemaView):
         self.set_ui_base_schema()
         VERTICAL_LAYOUT = copy.deepcopy(self.uischema)
 
+        self.uischema["layout"]["type"] = "Wizard"
+        page_titles = []
         object = self.context
         for form in object.listFolderContents():
             if form.portal_type == "Form":
-                title_schema = self.helptext_schema(f"<h2>{form.title}</h1>")
-                self.uischema["layout"]["elements"].append(title_schema)
+                page_titles.append(form.title)
                 vertical_layout = copy.deepcopy(VERTICAL_LAYOUT)
                 form_id = create_id(form)
                 for child in form.getFolderContents():
@@ -61,9 +93,16 @@ class WizardUiSchemaView(UiSchemaView):
                         child.getObject(),
                         vertical_layout,
                         f"/properties/{form_id}/properties/",
+                        [copy.deepcopy(buttons)]
                     )
                 self.uischema["layout"]["elements"].append(vertical_layout["layout"])
+        del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
+        self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button
 
+        self.uischema["layout"]["pages"] = self.uischema["layout"]["elements"]
+        del self.uischema["layout"]["elements"]
+        self.uischema["layout"]["options"] = {}
+        self.uischema["layout"]["options"]["pageTitles"] = page_titles
         return self.uischema
 
 
