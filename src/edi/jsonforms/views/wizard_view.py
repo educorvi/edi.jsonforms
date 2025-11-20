@@ -92,9 +92,9 @@ class WizardUiSchemaView(UiSchemaView):
                     self.add_child_to_schema(
                         child.getObject(),
                         vertical_layout,
-                        f"/properties/{form_id}/properties/",
-                        [copy.deepcopy(buttons)]
+                        f"/properties/{form_id}/properties/"
                     )
+                vertical_layout["layout"]["elements"].append(copy.deepcopy(buttons))
                 self.uischema["layout"]["elements"].append(vertical_layout["layout"])
         del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
         self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button

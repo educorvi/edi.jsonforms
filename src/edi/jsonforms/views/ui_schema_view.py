@@ -48,7 +48,7 @@ class UiSchemaView(BrowserView):
             "layout": {"type": "VerticalLayout", "elements": []},
         }
 
-    def add_child_to_schema(self, child_object, schema, scope="/properties/", additional_elements=[]):
+    def add_child_to_schema(self, child_object, schema, scope="/properties/"):
         """
         schema needs the key 'elements' or 'layout' with the key 'elements'
         """
@@ -65,10 +65,8 @@ class UiSchemaView(BrowserView):
         if child_schema != None and child_schema != {}:
             if "layout" in schema:
                 schema["layout"]["elements"].append(child_schema)
-                schema["layout"]["elements"].extend(additional_elements)
             elif "elements" in schema:
                 schema["elements"].append(child_schema)
-                schema["elements"].extend(additional_elements)
             else:
                 print(
                     "Error in UiSchemaView: could not add child to schema, no layout or elements found in schema"
