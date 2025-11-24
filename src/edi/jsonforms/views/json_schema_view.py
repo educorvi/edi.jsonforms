@@ -335,6 +335,7 @@ class JsonSchemaView(BrowserView):
         parent_object_id = create_id(parent_object)
         dependency_dict = {"SHOWALWAYS": []}
         parent_option_order = self._get_option_order_map(parent_object)
+
         for option in options:
             if option.portal_type == "Option":
                 option = option.getObject()
@@ -350,10 +351,10 @@ class JsonSchemaView(BrowserView):
                 else:
                     add_to_dict(option, None, dependency_dict)
 
-        if dependency_dict["SHOWALWAYS"]:
-            showalways_list = [entry for entry in dependency_dict["SHOWALWAYS"]]
-        else:
-            showalways_list = []
+        # if dependency_dict["SHOWALWAYS"]:
+        #     showalways_list = [entry for entry in dependency_dict["SHOWALWAYS"]]
+        # else:
+        #     showalways_list = []
 
         possibilities = []
 
@@ -362,6 +363,7 @@ class JsonSchemaView(BrowserView):
                 continue
             if selectionfield_id.startswith("multi_"):
                 # possibilities.append([[(selectionfield_id, None)], [selectionfield_id]])
+                # selectionfield_options = []
                 subsets = []
                 for r in range(len(dependency_dict[selectionfield_id]) + 1):
                     subsets.extend(
@@ -378,6 +380,7 @@ class JsonSchemaView(BrowserView):
                         for option_id in dependency_dict[selectionfield_id]
                     ]
                 )
+
         if possibilities:
             all_combinations = list(itertools.product(*possibilities))
         else:
@@ -400,7 +403,8 @@ class JsonSchemaView(BrowserView):
                             key=lambda value: order_map.get(value, len(order_map))
                         )
                     if_dict["properties"][selectionfield_id_clean] = {
-                        "const": const_values
+                        # "const": const_values
+                        "contains": {"enum": const_values}
                     }
                     for o in sublist[1]:
                         then_enum.extend(dependency_dict[selectionfield_id][o])
@@ -460,9 +464,7 @@ class JsonSchemaView(BrowserView):
             deduped.append((value, idx))
         if not order_map:
             return [value for value, _ in deduped]
-        deduped.sort(
-            key=lambda item: (order_map.get(item[0], len(order_map)), item[1])
-        )
+        deduped.sort(key=lambda item: (order_map.get(item[0], len(order_map)), item[1]))
         return [value for value, _ in deduped]
 
     """
