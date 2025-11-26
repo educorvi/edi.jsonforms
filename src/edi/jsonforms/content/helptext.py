@@ -17,12 +17,6 @@ from edi.jsonforms.content.common import IDependent
 class IHelptext(IDependent):
     """ Marker interface and Dexterity Python Schema for Helptext
     """
-    # TODO translate these three
-    title = schema.TextLine(title=_("Title"),
-                            description=_("The title won't be shown in the form."))
-    description = schema.Text(title=_("Description"),
-                              required=False,
-                              description=_("The description won't be shown in the form."))
     helptext = RichText(title=_("Helptext"),
                              required=False)
 
