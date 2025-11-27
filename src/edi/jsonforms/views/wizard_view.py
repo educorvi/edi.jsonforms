@@ -96,8 +96,13 @@ class WizardUiSchemaView(UiSchemaView):
                     )
                 vertical_layout["layout"]["elements"].append(copy.deepcopy(buttons))
                 self.uischema["layout"]["elements"].append(vertical_layout["layout"])
-        del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
-        self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button
+
+        if self.uischema["layout"]["elements"]:
+            del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
+        if len(self.uischema["layout"]["elements"]) == 1:
+            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = submit_button
+        elif len(self.uischema["layout"]["elements"]) >1:
+            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button
 
         self.uischema["layout"]["pages"] = self.uischema["layout"].pop("elements")
         self.uischema["layout"]["options"] = {}
