@@ -199,8 +199,12 @@ class UiSchemaView(BrowserView):
         for option in options:
             o = option.getObject()
             if safe_hasattr(o, "ritarules"):
-                formatted_rita_rule = json.loads(o.ritarules)
-                option_filters[get_option_name(o)] = formatted_rita_rule
+                try:
+                    formatted_rita_rule = json.loads(o.ritarules)
+                    option_filters[get_option_name(o)] = formatted_rita_rule
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    # Optionally log the error or skip invalid ritarules
+                    pass
         if option_filters:
             selectionfield_schema["options"]["optionFilters"] = option_filters
 
