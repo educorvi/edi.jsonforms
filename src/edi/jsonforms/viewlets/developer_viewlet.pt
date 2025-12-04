@@ -49,6 +49,8 @@
     </div>
 </div>
 <script>
-  hljs.addPlugin(new CopyButtonPlugin());
-  hljs.highlightAll();
+  document.addEventListener('DOMContentLoaded', function() {
+    hljs.addPlugin(new CopyButtonPlugin());
+    hljs.highlightAll();
+  });
 </script>
