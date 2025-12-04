@@ -6,7 +6,6 @@ from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
 
-from edi.jsonforms import _
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
@@ -203,7 +202,7 @@ class UiSchemaView(BrowserView):
                     formatted_rita_rule = json.loads(o.ritarules)
                     option_filters[get_option_name(o)] = formatted_rita_rule
                 except (json.JSONDecodeError, TypeError, ValueError):
-                    # Optionally log the error or skip invalid ritarules
+                    print(f"Invalid rita rule for option {get_option_name(o)}")
                     pass
         if option_filters:
             selectionfield_schema["options"]["optionFilters"] = option_filters
