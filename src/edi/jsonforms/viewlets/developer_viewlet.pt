@@ -10,9 +10,7 @@
                 </h2>
                 <div id="collapseSchema" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
                     <div class="accordion-body">
-                        <pre class="bg-dark text-light p-3 rounded">
-                            <code tal:content="view/get_json_schema"></code>
-                        </pre>
+                      <pre class="rounded"><code tal:content="view/get_json_schema" class="language-json theme-atom-one-dark"></code></pre>
                     </div>
                 </div>
             </div>
@@ -24,9 +22,7 @@
                 </h2>
                 <div id="collapseUI" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
                     <div class="accordion-body">
-                        <pre class="bg-dark text-light p-3 rounded">
-                            <code tal:content="view/get_ui_schema"></code>
-                        </pre>
+                        <pre class="rounded"><code tal:content="view/get_ui_schema" class="language-json theme-atom-one-dark"></code></pre>
                     </div>
                 </div>
             </div>
@@ -52,3 +48,9 @@
         </div>
     </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    hljs.addPlugin(new CopyButtonPlugin());
+    hljs.highlightAll();
+  });
+</script>
