@@ -437,11 +437,7 @@ class JsonSchemaView(BrowserView):
         return id
 
     def get_option_name(self, option):
-        parent_selectionfield = option.aq_parent
-        if parent_selectionfield.use_id_in_schema:
-            return create_id(option)
-        else:
-            return option.title
+        return get_option_name(option)
 
     def _get_option_order_map(self, selectionfield):
         order_map = {}
@@ -485,6 +481,12 @@ class JsonSchemaView(BrowserView):
 
         return schema
 
+def get_option_name(option):
+    parent_selectionfield = option.aq_parent
+    if parent_selectionfield.use_id_in_schema:
+        return create_id(option)
+    else:
+        return option.title
 
 def check_for_dependencies(child_object):
     if child_object.dependencies is not None and child_object.dependencies != []:

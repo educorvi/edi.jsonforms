@@ -6,10 +6,13 @@ from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
 
-from edi.jsonforms import _
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+
+from plone.base.utils import safe_hasattr
+
+from edi.jsonforms.views.json_schema_view import get_option_name
 
 
 class UiSchemaView(BrowserView):
@@ -189,6 +192,20 @@ class UiSchemaView(BrowserView):
                     selectionfield_schema["options"]["enumTitles"] = dict(
                         zip(keys, vals)
                     )
+
+        option_filters = {}
+        options = selectionfield.getFolderContents()
+        for option in options:
+            o = option.getObject()
+            if safe_hasattr(o, "ritarules"):
+                try:
+                    formatted_rita_rule = json.loads(o.ritarules)
+                    option_filters[get_option_name(o)] = formatted_rita_rule
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    print(f"Invalid rita rule for option {get_option_name(o)}")
+                    pass
+        if option_filters:
+            selectionfield_schema["options"]["optionFilters"] = option_filters
 
         if selectionfield_schema["options"] == {}:
             del selectionfield_schema["options"]
