@@ -17,6 +17,7 @@ from edi.jsonforms.views.json_schema_view import get_option_name
 
 class UiSchemaView(BrowserView):
     tools_on = False
+    rita_dependent_options = {}
 
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -24,6 +25,8 @@ class UiSchemaView(BrowserView):
 
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
+
+        self.rita_dependent_options = {}
 
     def __call__(self):
         self.get_schema()
@@ -198,14 +201,16 @@ class UiSchemaView(BrowserView):
         for option in options:
             o = option.getObject()
             if safe_hasattr(o, "ritarules"):
-                try:
-                    formatted_rita_rule = json.loads(o.ritarules)
-                    option_filters[get_option_name(o)] = formatted_rita_rule
-                except (json.JSONDecodeError, TypeError, ValueError):
-                    print(f"Invalid rita rule for option {get_option_name(o)}")
-                    pass
-        if option_filters:
+                if o.ritarules is not "" and o.ritarules is not None:
+                    try:
+                        formatted_rita_rule = json.loads(o.ritarules)
+                        option_filters[get_option_name(o)] = formatted_rita_rule
+                    except (json.JSONDecodeError, TypeError, ValueError):
+                        print(f"Invalid rita rule for option {get_option_name(o)}")
+                        pass
+        if len(option_filters)>0:
             selectionfield_schema["options"]["optionFilters"] = option_filters
+            self.rita_dependent_options[scope+selectionfield.id] = option_filters
 
         if selectionfield_schema["options"] == {}:
             del selectionfield_schema["options"]
