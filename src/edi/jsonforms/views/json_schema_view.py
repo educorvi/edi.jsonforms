@@ -30,6 +30,7 @@ class JsonSchemaView(BrowserView):
     def get_schema(self):
         form = self.context
         self.set_json_base_schema()
+        self.prepare_objects(form)  # traverse all objects and set parent_dependencies
 
         children = form.getFolderContents()
         for child in children:
@@ -44,6 +45,25 @@ class JsonSchemaView(BrowserView):
         self.jsonschema["dependentRequired"] = {}
         self.jsonschema["allOf"] = []
         self.ids = set()
+
+    def prepare_objects(self, obj, parent_dependencies=None):
+        """
+        Prepare objects before creating the schema.
+        Traverse all objects and set parent_dependencies as a flat list of dependencies collected from all ancestor objects.
+        Skip Option and OptionList.
+        """
+        if parent_dependencies is None:
+            parent_dependencies = []
+
+        if obj.portal_type != "Form":
+            obj.parent_dependencies = copy.copy(parent_dependencies)
+            parent_dependencies = parent_dependencies + obj.dependencies
+
+        if hasattr(obj, "getFolderContents"):
+            for child in obj.getFolderContents():
+                child = child.getObject()
+                if child.portal_type not in ["Option", "OptionList"]:
+                    self.prepare_objects(child, parent_dependencies)
 
     def add_child_to_schema(self, child_object, schema):
         """
@@ -246,7 +266,13 @@ class JsonSchemaView(BrowserView):
         return complex_schema
 
     def add_dependent_required(self, schema, child_object, child_id):
-        dependencies = child_object.dependencies
+        """
+        schema: dict - schema where dependentRequired and/or allOf should be added
+        child_object: object - object which is dependently required (or its ancestors have dependencies)
+        child_id: str - id of the child_object
+        """
+        dependencies = copy.copy(child_object.dependencies)
+        dependencies.extend(getattr(child_object, "parent_dependencies", []))
 
         # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
         schema_allof_copy = copy.deepcopy(schema["allOf"])
@@ -258,22 +284,52 @@ class JsonSchemaView(BrowserView):
                 if dep.portal_type == "Option":
                     dep_id = self.get_option_name(dep)
                     selection_parent = dep.aq_parent
-                    if_then = {
-                        "if": {
-                            "properties": {
-                                create_id(selection_parent): {"const": dep_id}
-                            }
-                        },
-                        "then": {"required": [child_id]},
-                    }
 
-                    if self.is_extended_schema:
-                        if_then["else"] = create_else_statement(child_object)
-                    # if 'allOf' in schema:
-                    #     schema['allOf'].append(if_then)
-                    # else:
-                    #     schema['allOf'] = [if_then]
-                    schema["allOf"].append(if_then)
+                    if_then_added = False
+                    if (
+                        not self.is_extended_schema
+                    ):  # then it also needs an else statement (see below)
+                        # add child to existing if-then statement if applicable
+                        for if_then_dict in schema["allOf"]:
+                            if (
+                                "if" in if_then_dict
+                                and create_id(selection_parent)
+                                in if_then_dict["if"]["properties"]
+                            ):
+                                if (
+                                    if_then_dict["if"]["properties"][
+                                        create_id(selection_parent)
+                                    ]["const"]
+                                    == dep_id
+                                ):
+                                    if "required" in if_then_dict["then"]:
+                                        if (
+                                            child_id
+                                            not in if_then_dict["then"]["required"]
+                                        ):
+                                            if_then_dict["then"]["required"].append(
+                                                child_id
+                                            )
+                                        if_then_added = True
+                                    else:
+                                        if_then_dict["then"]["required"] = [child_id]
+                                        if_then_added = True
+                                    break
+
+                    # add new if-then statement if not already added
+                    if not if_then_added:
+                        if_then = {
+                            "if": {
+                                "properties": {
+                                    create_id(selection_parent): {"const": dep_id}
+                                }
+                            },
+                            "then": {"required": [child_id]},
+                        }
+                        if self.is_extended_schema:
+                            if_then["else"] = create_else_statement(child_object)
+                        schema["allOf"].append(if_then)
+
                 else:
                     dep_id = create_id(dep)
                     if dep_id in schema["dependentRequired"]:
@@ -481,6 +537,7 @@ class JsonSchemaView(BrowserView):
 
         return schema
 
+
 def get_option_name(option):
     parent_selectionfield = option.aq_parent
     if parent_selectionfield.use_id_in_schema:
@@ -488,8 +545,14 @@ def get_option_name(option):
     else:
         return option.title
 
+
 def check_for_dependencies(child_object):
     if child_object.dependencies is not None and child_object.dependencies != []:
+        return True
+    elif (
+        hasattr(child_object, "parent_dependencies")
+        and child_object.parent_dependencies
+    ):
         return True
     else:
         return False
