@@ -37,6 +37,9 @@ class JsonSchemaView(BrowserView):
         for child in children:
             self.add_child_to_schema(child.getObject(), self.jsonschema)
 
+        if len(self.jsonschema["allOf"]) == 0:
+            del self.jsonschema["allOf"]
+
         return self.jsonschema
 
     def set_json_base_schema(self):
@@ -263,6 +266,9 @@ class JsonSchemaView(BrowserView):
         for child in children:
             child_object = child.getObject()
             self.add_child_to_schema(child_object, complex_schema)
+
+        if len(complex_schema["allOf"]) == 0:
+            del complex_schema["allOf"]
 
         return complex_schema
 
