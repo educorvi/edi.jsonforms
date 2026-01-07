@@ -31,6 +31,7 @@ class JsonSchemaView(BrowserView):
     def get_schema(self):
         form = self.context
         self.set_json_base_schema()
+        self.prepare_objects(form)  # traverse all objects and set parent_dependencies
 
         children = form.getFolderContents()
         for child in children:
@@ -45,6 +46,25 @@ class JsonSchemaView(BrowserView):
         self.jsonschema["dependentRequired"] = {}
         self.jsonschema["allOf"] = []
         self.ids = set()
+
+    def prepare_objects(self, obj, parent_dependencies=None):
+        """
+        Prepare objects before creating the schema.
+        Traverse all objects and set parent_dependencies as a flat list of dependencies collected from all ancestor objects.
+        Skip Option and OptionList.
+        """
+        if parent_dependencies is None:
+            parent_dependencies = []
+
+        if obj.portal_type != "Form":
+            obj.parent_dependencies = copy.copy(parent_dependencies)
+            parent_dependencies = parent_dependencies + obj.dependencies
+
+        if hasattr(obj, "getFolderContents"):
+            for child in obj.getFolderContents():
+                child = child.getObject()
+                if child.portal_type not in ["Option", "OptionList"]:
+                    self.prepare_objects(child, parent_dependencies)
 
     def add_child_to_schema(self, child_object, schema):
         """
@@ -76,7 +96,7 @@ class JsonSchemaView(BrowserView):
             and child_object.required_choice == "required"
         ):
             if self.check_for_dependencies(child_object):
-                schema = self.add_dependent_required(schema, child_object, child_id)
+                self.add_dependent_required(schema, child_object)
             elif "required" in schema:
                 schema["required"].append(child_id)
             else:
@@ -246,8 +266,14 @@ class JsonSchemaView(BrowserView):
 
         return complex_schema
 
-    def add_dependent_required(self, schema, child_object, child_id):
-        dependencies = child_object.dependencies
+    def add_dependent_required(self, parent_schema, child_object):
+        """
+        schema: dict - schema where dependentRequired and/or allOf should be added
+        child_object: object - object which is dependently required (or its ancestors have dependencies)
+        """
+        schema = self.jsonschema  # TODO make this dependent on schema parameter? (if present take schema, change calls accordingly) (at the end of this function the current schema is needed as backup in case all dependencies are invalid)
+        dependencies = copy.copy(child_object.dependencies)
+        dependencies.extend(getattr(child_object, "parent_dependencies", []))
 
         # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
         schema_allof_copy = copy.deepcopy(schema["allOf"])
@@ -256,43 +282,63 @@ class JsonSchemaView(BrowserView):
         for dep in dependencies:
             try:
                 dep = dep.to_object
-                if dep.portal_type == "Option":
-                    dep_id = self.get_option_name(dep)
-                    selection_parent = dep.aq_parent
-                    if_then = {
-                        "if": {
-                            "properties": {
-                                create_id(selection_parent): {"const": dep_id}
-                            }
-                        },
-                        "then": {"required": [child_id]},
-                    }
-
-                    if self.is_extended_schema:
-                        if_then["else"] = create_else_statement(child_object)
-                    # if 'allOf' in schema:
-                    #     schema['allOf'].append(if_then)
-                    # else:
-                    #     schema['allOf'] = [if_then]
-                    schema["allOf"].append(if_then)
-                else:
-                    dep_id = create_id(dep)
-                    if dep_id in schema["dependentRequired"]:
-                        schema["dependentRequired"][dep_id].append(child_id)
-                    else:
-                        schema["dependentRequired"][dep_id] = [child_id]
             except:
                 # dependency got deleted, plone error, ignore this dependency
                 continue
 
+            if dep.portal_type == "Option":
+                dep_path = self.get_path(dep.aq_parent)
+            else:
+                dep_path = self.get_path(dep)
+
+            def create_statement(obj, obj_path) -> dict:
+                """
+                creates hiearchy of path as a statement (use in if or then)
+                if portal_type of obj is not Option and only one 'properties' in path, no 'properties' key is created
+                """
+                props = obj_path.split("/")
+                if props.count("properties") == 1 and obj.portal_type != "Option":
+                    statement = {"required": [props[-1]]}
+                else:
+                    statement = {}
+                    cur_statement = statement
+
+                    for i, p in enumerate(props):
+                        if p == "properties" and (
+                            i < len(props) - 2
+                            and obj.portal_type != "Option"
+                            or i < len(props) - 1
+                            and obj.portal_type == "Option"
+                        ):
+                            cur_statement[p] = {}
+                            cur_statement["required"] = [props[i + 1]]
+                            cur_statement = cur_statement[p]
+                        elif i < len(props) - 2:
+                            cur_statement[p] = {}
+                            cur_statement = cur_statement[p]
+                        else:  # last element
+                            if obj.portal_type == "Option":
+                                cur_statement[p] = {"const": get_option_name(obj)}
+                            else:
+                                cur_statement["required"] = [props[-1]]
+                return statement
+
+            if_statement = {"if": create_statement(dep, dep_path)}
+            then_statement = {
+                "then": create_statement(child_object, self.get_path(child_object))
+            }
+            if self.is_extended_schema:
+                if_statement["else"] = create_else_statement(child_object)
+            if_then = {**if_statement, **then_statement}
+            schema["allOf"].append(if_then)
         # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
         # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
         if (
             schema_allof_copy == schema["allOf"]
             and schema_dependentrequired_copy == schema["dependentRequired"]
         ):
-            schema["required"].append(child_id)
-        return schema
+            parent_schema["required"].append(create_id(child_object))
+        return
 
     def get_dependent_options(self, parent_object):
         if self.is_single_view:
@@ -442,6 +488,18 @@ class JsonSchemaView(BrowserView):
     def get_option_name(self, option):
         return get_option_name(option)
 
+    def get_path(self, obj, without_root=False):
+        """
+        get the path of an object in the json schema (leaves out fieldsets)
+        e.g. properties/object1/properties/selectionfield1/properties/option1
+        """
+        path = create_id(obj)
+        while obj.aq_parent.portal_type != "Form":
+            obj = obj.aq_parent
+            if obj.portal_type != "Fieldset":
+                path = create_id(obj) + "/properties/" + path
+        return "properties/" + path
+
     def _get_option_order_map(self, selectionfield):
         order_map = {}
         index = 0
@@ -489,9 +547,13 @@ class JsonSchemaView(BrowserView):
             return False
         elif child_object.dependencies is not None and child_object.dependencies != []:
             return True
+        elif (
+            hasattr(child_object, "parent_dependencies")
+            and child_object.parent_dependencies
+        ):
+            return True
         else:
             return False
-
 
 def get_option_name(option):
     parent_selectionfield = option.aq_parent
