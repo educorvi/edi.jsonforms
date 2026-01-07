@@ -96,7 +96,7 @@ class JsonSchemaView(BrowserView):
             and child_object.required_choice == "required"
         ):
             if self.check_for_dependencies(child_object):
-                schema = self.add_dependent_required(schema, child_object, child_id)
+                self.add_dependent_required(schema, child_object)
             elif "required" in schema:
                 schema["required"].append(child_id)
             else:
