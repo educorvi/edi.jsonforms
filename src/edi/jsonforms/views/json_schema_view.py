@@ -267,7 +267,7 @@ class JsonSchemaView(BrowserView):
             child_object = child.getObject()
             self.add_child_to_schema(child_object, complex_schema)
 
-        if len(complex_schema["allOf"]) == 0:
+        if "allOf" in complex_schema and len(complex_schema["allOf"]) == 0:
             del complex_schema["allOf"]
 
         return complex_schema
