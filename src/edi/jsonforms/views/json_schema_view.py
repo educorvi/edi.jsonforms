@@ -14,6 +14,7 @@ from edi.jsonforms.content.option_list import get_keys_and_values_for_options_li
 class JsonSchemaView(BrowserView):
     is_extended_schema = False  # True if schema is generated for an api call and not for the usual form view
     content_types_without_schema = ["Helptext", "Button Handler"]
+    is_single_view = False
 
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -94,8 +95,8 @@ class JsonSchemaView(BrowserView):
             child_object.portal_type in possibly_required_types
             and child_object.required_choice == "required"
         ):
-            if check_for_dependencies(child_object):
-                schema = self.add_dependent_required(schema, child_object)
+            if self.check_for_dependencies(child_object):
+                schema = self.add_dependent_required(schema, child_object, child_id)
             elif "required" in schema:
                 schema["required"].append(child_id)
             else:
@@ -185,7 +186,7 @@ class JsonSchemaView(BrowserView):
         for o in options:
             if o.portal_type == "Option":
                 o = o.getObject()
-                if not check_for_dependencies(o):
+                if not self.check_for_dependencies(o):
                     options_list.append(self.get_option_name(o))
                 # dependencies of options are handled in add_child_to_schema
             elif o.portal_type == "OptionList":
@@ -340,6 +341,8 @@ class JsonSchemaView(BrowserView):
         return
 
     def get_dependent_options(self, parent_object):
+        if self.is_single_view:
+            return []
         dependency_option_order = {}
         """
         parent_object: SelectionField
@@ -385,7 +388,7 @@ class JsonSchemaView(BrowserView):
         for option in options:
             if option.portal_type == "Option":
                 option = option.getObject()
-                if check_for_dependencies(option):
+                if self.check_for_dependencies(option):
                     dependencies = option.dependencies
                     for dep in dependencies:
                         try:
@@ -539,6 +542,18 @@ class JsonSchemaView(BrowserView):
 
         return schema
 
+    def check_for_dependencies(self, child_object):
+        if self.is_single_view:  # if form-element-view, ignore all dependencies
+            return False
+        elif child_object.dependencies is not None and child_object.dependencies != []:
+            return True
+        elif (
+            hasattr(child_object, "parent_dependencies")
+            and child_object.parent_dependencies
+        ):
+            return True
+        else:
+            return False
 
 def get_option_name(option):
     parent_selectionfield = option.aq_parent
@@ -546,18 +561,6 @@ def get_option_name(option):
         return create_id(option)
     else:
         return option.title
-
-
-def check_for_dependencies(child_object):
-    if child_object.dependencies is not None and child_object.dependencies != []:
-        return True
-    elif (
-        hasattr(child_object, "parent_dependencies")
-        and child_object.parent_dependencies
-    ):
-        return True
-    else:
-        return False
 
 
 def add_interninformation(schema, child):
