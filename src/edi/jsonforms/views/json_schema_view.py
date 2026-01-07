@@ -37,7 +37,7 @@ class JsonSchemaView(BrowserView):
         for child in children:
             self.add_child_to_schema(child.getObject(), self.jsonschema)
 
-        if len(self.jsonschema["allOf"]) == 0:
+        if "allOf" in self.jsonschema and len(self.jsonschema["allOf"]) == 0:
             del self.jsonschema["allOf"]
 
         return self.jsonschema
