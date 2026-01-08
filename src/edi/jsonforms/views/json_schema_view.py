@@ -558,7 +558,7 @@ class JsonSchemaView(BrowserView):
             return True
         elif (
             safe_hasattr(child_object, "parent_dependencies")
-            and child_object.parent_dependencies is not None and child_object.parent_dependencies != []
+            and child_object.parent_dependencies
             and child_object.portal_type not in ["Option", "OptionList"]
         ):
             return True
