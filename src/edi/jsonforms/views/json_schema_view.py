@@ -63,7 +63,7 @@ class JsonSchemaView(BrowserView):
 
         if obj.portal_type != "Form":
             obj.parent_dependencies = copy.copy(parent_dependencies)
-            if safe_hasattr(obj, "dependencies") and obj.dependencies is not None and obj.dependencies != []:
+            if safe_hasattr(obj, "dependencies") and obj.dependencies:
                 parent_dependencies = parent_dependencies + obj.dependencies
 
         if hasattr(obj, "getFolderContents"):
