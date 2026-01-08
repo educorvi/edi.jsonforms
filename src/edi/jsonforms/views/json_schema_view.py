@@ -554,7 +554,7 @@ class JsonSchemaView(BrowserView):
     def check_for_dependencies(self, child_object):
         if self.is_single_view:  # if form-element-view, ignore all dependencies
             return False
-        elif safe_hasattr(child_object, "dependencies") and child_object.dependencies is not None and child_object.dependencies != []:
+        elif safe_hasattr(child_object, "dependencies") and child_object.dependencies:
             return True
         elif (
             safe_hasattr(child_object, "parent_dependencies")
