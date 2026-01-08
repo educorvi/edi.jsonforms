@@ -461,8 +461,8 @@ class JsonSchemaView(BrowserView):
                             key=lambda value: order_map.get(value, len(order_map))
                         )
                     if_dict["properties"][selectionfield_id_clean] = {
-                        # "const": const_values
-                        "contains": {"enum": const_values}
+                        "const": const_values
+                        # "contains": {"enum": const_values}
                     }
                     for o in sublist[1]:
                         then_enum.extend(dependency_dict[selectionfield_id][o])
