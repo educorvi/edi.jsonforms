@@ -10,6 +10,8 @@ from edi.jsonforms.views.common import *
 
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 
+from plone.base.utils import safe_hasattr
+
 
 class JsonSchemaView(BrowserView):
     is_extended_schema = False  # True if schema is generated for an api call and not for the usual form view
@@ -61,7 +63,8 @@ class JsonSchemaView(BrowserView):
 
         if obj.portal_type != "Form":
             obj.parent_dependencies = copy.copy(parent_dependencies)
-            parent_dependencies = parent_dependencies + obj.dependencies
+            if safe_hasattr(obj, "dependencies") and obj.dependencies:
+                parent_dependencies = parent_dependencies + obj.dependencies
 
         if hasattr(obj, "getFolderContents"):
             for child in obj.getFolderContents():
@@ -458,8 +461,8 @@ class JsonSchemaView(BrowserView):
                             key=lambda value: order_map.get(value, len(order_map))
                         )
                     if_dict["properties"][selectionfield_id_clean] = {
-                        # "const": const_values
-                        "contains": {"enum": const_values}
+                        "const": const_values
+                        # "contains": {"enum": const_values}
                     }
                     for o in sublist[1]:
                         then_enum.extend(dependency_dict[selectionfield_id][o])
@@ -551,11 +554,12 @@ class JsonSchemaView(BrowserView):
     def check_for_dependencies(self, child_object):
         if self.is_single_view:  # if form-element-view, ignore all dependencies
             return False
-        elif child_object.dependencies is not None and child_object.dependencies != []:
+        elif safe_hasattr(child_object, "dependencies") and child_object.dependencies:
             return True
         elif (
-            hasattr(child_object, "parent_dependencies")
+            safe_hasattr(child_object, "parent_dependencies")
             and child_object.parent_dependencies
+            and child_object.portal_type not in ["Option", "OptionList"]
         ):
             return True
         else:
