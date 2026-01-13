@@ -192,7 +192,13 @@ class JsonSchemaView(BrowserView):
         for o in options:
             if o.portal_type == "Option":
                 o = o.getObject()
-                if not self.check_for_dependencies(o):
+                show = True
+                if safe_hasattr(o, "show_condition"):
+                    negate_condition = getattr(o, "negate_condition", False)
+                    show = check_show_condition_in_request(
+                        self.request, o.show_condition, negate_condition
+                    )
+                if show and not self.check_for_dependencies(o):
                     options_list.append(self.get_option_name(o))
                 # dependencies of options are handled in add_child_to_schema
             elif o.portal_type == "OptionList":
