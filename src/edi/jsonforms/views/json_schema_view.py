@@ -193,9 +193,10 @@ class JsonSchemaView(BrowserView):
             if o.portal_type == "Option":
                 o = o.getObject()
                 show = True
-                if safe_hasattr(o, "show_condition") and safe_hasattr(o, "negate_condition"):
+                if safe_hasattr(o, "show_condition"):
+                    negate_condition = getattr(o, "negate_condition", False)
                     show = check_show_condition_in_request(
-                        self.request, o.show_condition, o.negate_condition
+                        self.request, o.show_condition, negate_condition
                     )
                 if not self.check_for_dependencies(o) and show:
                     options_list.append(self.get_option_name(o))
