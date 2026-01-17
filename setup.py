@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="edi.jsonforms",
-    version="0.9",
+    version="0.10.dev0",
     description="Webforms based on JSON-Schema and UI-Schema for Plone",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
