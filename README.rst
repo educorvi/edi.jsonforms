@@ -98,6 +98,29 @@ Contribute
 - Documentation: https://docs.plone.org/foo/bar
 
 
+Testing
+-------
+
+This package includes a comprehensive test suite covering all major components:
+
+- Content types (Form, Field, SelectionField, UploadField, Array, Complex, Fieldset, etc.)
+- Views (JSON schema, UI schema, form views)
+- API services (@json-schema, @ui-schema, @schemata)
+- Event handlers and utilities
+- Integration tests for nested structures and dependencies
+- Edge case and boundary condition tests
+
+To run the tests::
+
+    $ tox
+
+For specific Python/Plone versions::
+
+    $ tox -e py39-Plone60
+
+For more details on the test suite, see `TEST_COVERAGE.md <TEST_COVERAGE.md>`_.
+
+
 Support
 -------
 
