@@ -7,6 +7,11 @@ from plone.app.testing import TEST_USER_ID
 import json
 import unittest
 
+# Test constants
+MAX_TITLE_LENGTH = 1000
+PERFORMANCE_TEST_FIELD_COUNT = 50
+MAX_NESTING_DEPTH = 5
+
 
 class EdgeCasesTest(unittest.TestCase):
     """Test edge cases and boundary conditions"""
@@ -75,7 +80,7 @@ class EdgeCasesTest(unittest.TestCase):
 
     def test_field_with_very_long_title(self):
         """Test field with very long title"""
-        long_title = 'A' * 1000  # 1000 character title
+        long_title = 'A' * MAX_TITLE_LENGTH
         field = api.content.create(
             container=self.form,
             type='Field',
@@ -241,8 +246,8 @@ class EdgeCasesTest(unittest.TestCase):
 
     def test_many_fields_performance(self):
         """Test form with many fields (50+)"""
-        # Create 50 fields
-        for i in range(50):
+        # Create multiple fields to test performance
+        for i in range(PERFORMANCE_TEST_FIELD_COUNT):
             field = api.content.create(
                 container=self.form,
                 type='Field',
@@ -258,14 +263,14 @@ class EdgeCasesTest(unittest.TestCase):
         )
         schema = json.loads(view())
         
-        # Should have all 50 fields
-        self.assertEqual(len(schema['properties']), 50)
+        # Should have all fields
+        self.assertEqual(len(schema['properties']), PERFORMANCE_TEST_FIELD_COUNT)
 
     def test_deeply_nested_structure_limit(self):
         """Test very deeply nested structure"""
-        # Create deeply nested structure (5 levels)
+        # Create deeply nested structure
         parent = self.form
-        for i in range(5):
+        for i in range(MAX_NESTING_DEPTH):
             if i % 2 == 0:
                 parent = api.content.create(
                     container=parent,
