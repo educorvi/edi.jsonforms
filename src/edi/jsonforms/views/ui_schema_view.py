@@ -18,6 +18,7 @@ from edi.jsonforms.views.json_schema_view import get_option_name
 class UiSchemaView(BrowserView):
     tools_on = False
     rita_dependent_options = {}
+    is_single_view = False
 
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -201,7 +202,7 @@ class UiSchemaView(BrowserView):
         for option in options:
             o = option.getObject()
             if safe_hasattr(o, "ritarules"):
-                if o.ritarules is not "" and o.ritarules is not None:
+                if o.ritarules != "" and o.ritarules is not None:
                     try:
                         formatted_rita_rule = json.loads(o.ritarules)
                         option_filters[get_option_name(o)] = formatted_rita_rule
@@ -584,6 +585,8 @@ class UiSchemaView(BrowserView):
         return child_schema
 
     def add_dependencies_to_schema(self, child_schema, child_object):
+        if self.is_single_view:
+            return child_schema
         # add showOn dependencies
         if child_object.dependencies:
             showOn = create_showon_properties(child_object, self.lookup_scopes)
