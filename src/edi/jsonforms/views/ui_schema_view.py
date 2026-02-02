@@ -208,9 +208,9 @@ class UiSchemaView(BrowserView):
                     except (json.JSONDecodeError, TypeError, ValueError):
                         print(f"Invalid rita rule for option {get_option_name(o)}")
                         pass
-        if len(option_filters)>0:
+        if len(option_filters) > 0:
             selectionfield_schema["options"]["optionFilters"] = option_filters
-            self.rita_dependent_options[scope+selectionfield.id] = option_filters
+            self.rita_dependent_options[scope + selectionfield.id] = option_filters
 
         if selectionfield_schema["options"] == {}:
             del selectionfield_schema["options"]
@@ -299,7 +299,8 @@ class UiSchemaView(BrowserView):
         text = ""
         if self.tools_on:
             text += f"{self.get_tools_html(helptext)}\n"
-        text += str(helptext.helptext.output)
+        if safe_hasattr(helptext.helptext, "output"):
+            text += str(helptext.helptext.output)
 
         helptext_schema = self.helptext_schema(text)
         helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
@@ -360,9 +361,9 @@ class UiSchemaView(BrowserView):
                     request_url
                 )
                 if safe_hasattr(button, "page_after_success"):
-                    button_schema["options"]["submitOptions"]["request"]["onSuccessRedirect"] = (
-                        button.page_after_success
-                    )
+                    button_schema["options"]["submitOptions"]["request"][
+                        "onSuccessRedirect"
+                    ] = button.page_after_success
 
                 button_schema["options"]["variant"] = button.button_variant
 
@@ -402,9 +403,9 @@ class UiSchemaView(BrowserView):
                 button_schema["options"]["submitOptions"]["request"]["url"] = (
                     request_url
                 )
-                button_schema["options"]["submitOptions"]["request"]["onSuccessRedirect"] = (
-                    button.page_after_success
-                )
+                button_schema["options"]["submitOptions"]["request"][
+                    "onSuccessRedirect"
+                ] = button.page_after_success
 
                 button_schema["options"]["variant"] = button.button_variant
 
