@@ -40,6 +40,7 @@ class IFormElementView(Interface):
 class FormElementUiSchema(UiSchemaView):
     def __init__(self, context, request):
         super().__init__(context, request)
+        self.is_single_view = True
 
     def __call__(self):
         uischema = self.ui_schema_without_showon()
@@ -49,20 +50,20 @@ class FormElementUiSchema(UiSchemaView):
         self.set_ui_base_schema()
 
         object = self.context
+        option = None
+        if object.portal_type in ["Option", "OptionList"]:
+            option = object
+            object = object.aq_parent
         self.add_child_to_schema(object, self.uischema)
 
-        # TODO refactor in the same way as in FormElementJsonSchema (use is_single_view=True to ignore all dependencies instead of removing showOn)
-        def remove_showon(dictionary):
-            if isinstance(dictionary, dict):
-                if "showOn" in dictionary:
-                    del dictionary["showOn"]
-                for key, value in dictionary.items():
-                    remove_showon(value)
-            elif isinstance(dictionary, list):
-                for item in dictionary:
-                    remove_showon(item)
-
-        remove_showon(self.uischema)
+        if option:
+            if "layout" in self.uischema:
+                if "elements" in self.uischema["layout"]:
+                    if len(self.uischema["layout"]["elements"]) > 0:
+                        if "options" in self.uischema["layout"]["elements"][0]:
+                            self.uischema["layout"]["elements"][0]["options"][
+                                "label"
+                            ] = False
 
         return self.uischema
 
@@ -81,5 +82,18 @@ class FormElementJsonSchema(JsonSchemaView):
         self.set_json_base_schema()
 
         object = self.context
+        option = None
+        if object.portal_type in ["Option", "OptionList"]:
+            option = object
+            object = object.aq_parent
         self.add_child_to_schema(object, self.jsonschema)
+
+        if option:
+            if "properties" in self.jsonschema:
+                id = self.create_and_check_id(object)
+                if id in self.jsonschema["properties"]:
+                    if "enum" in self.jsonschema["properties"][id]:
+                        self.jsonschema["properties"][id]["enum"] = (
+                            self.get_values_for_selectionfield(object, option, True)
+                        )
         return self.jsonschema

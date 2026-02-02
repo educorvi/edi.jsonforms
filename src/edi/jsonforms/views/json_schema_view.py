@@ -183,6 +183,42 @@ class JsonSchemaView(BrowserView):
                 field_schema["maximum"] = field.maximum
         return field_schema
 
+    def get_values_for_selectionfield(
+        self, selectionfield, option_optionlist, ignore_conditions=False
+    ):
+        """
+        selectionfield: SelectionField, is used to check use_id_in_schema
+        option_optionlist: Option or OptionList
+        returns the option or optionlist depending on show_condition and dependencies
+        if ignore_conditions is True, show_condition and dependencies are ignored
+        """
+        o = option_optionlist
+        if safe_hasattr(o, "getObject"):
+            o = o.getObject()
+        options_list = []
+        if o.portal_type == "Option":
+            if ignore_conditions:
+                options_list.append(self.get_option_name(o))
+                return options_list
+
+            show = True
+            if safe_hasattr(o, "show_condition"):
+                negate_condition = getattr(o, "negate_condition", False)
+                show = check_show_condition_in_request(
+                    self.request, o.show_condition, negate_condition
+                )
+            if show and not self.check_for_dependencies(o):
+                options_list.append(self.get_option_name(o))
+            # dependencies of options are handled in add_child_to_schema
+        elif o.portal_type == "OptionList":
+            keys, vals = get_keys_and_values_for_options_list(o)
+            if selectionfield.use_id_in_schema:
+                local_options_list = keys
+            else:
+                local_options_list = vals
+            options_list.extend(local_options_list)
+        return options_list
+
     def get_schema_for_selectionfield(self, selectionfield):
         selectionfield_schema = self.create_base_schema__field({}, selectionfield)
         answer_type = selectionfield.answer_type
@@ -190,24 +226,11 @@ class JsonSchemaView(BrowserView):
 
         options_list = []
         for o in options:
-            if o.portal_type == "Option":
-                o = o.getObject()
-                show = True
-                if safe_hasattr(o, "show_condition"):
-                    negate_condition = getattr(o, "negate_condition", False)
-                    show = check_show_condition_in_request(
-                        self.request, o.show_condition, negate_condition
-                    )
-                if show and not self.check_for_dependencies(o):
-                    options_list.append(self.get_option_name(o))
-                # dependencies of options are handled in add_child_to_schema
-            elif o.portal_type == "OptionList":
-                keys, vals = get_keys_and_values_for_options_list(o.getObject())
-                if selectionfield.use_id_in_schema:
-                    local_options_list = keys
-                else:
-                    local_options_list = vals
-                options_list.extend(local_options_list)
+            options_list.extend(
+                self.get_values_for_selectionfield(
+                    selectionfield, o, self.is_single_view
+                )
+            )
 
         if answer_type == "radio" or answer_type == "select":
             selectionfield_schema["type"] = "string"
@@ -570,6 +593,7 @@ class JsonSchemaView(BrowserView):
             return True
         else:
             return False
+
 
 def get_option_name(option):
     parent_selectionfield = option.aq_parent
