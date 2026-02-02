@@ -37,8 +37,18 @@ class ConvertOptionListView(BrowserView):
         parent_selectionfield = optionlist.aq_parent
         options = get_keys_and_values_for_options_list(optionlist)
         for key, value in zip(options[0], options[1]):
-            api.content.create(
-                container=parent_selectionfield, type="Option", id=key, title=value
-            )
+            try:
+                api.content.create(
+                    container=parent_selectionfield, type="Option", id=key, title=value
+                )
+            except Exception as e:
+                logger.error(
+                    f"Error creating Option with id '{key}' and title '{value}': {e}. Trying without id."
+                )
+                api.content.create(
+                    container=parent_selectionfield,
+                    type="Option",
+                    title=value,
+                )
         api.content.delete(optionlist)
         self.request.response.redirect(self.context.aq_parent.absolute_url())
