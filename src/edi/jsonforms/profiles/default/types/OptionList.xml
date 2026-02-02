@@ -55,6 +55,7 @@
   <property name="immediate_view">form-element-view</property>
   <property name="view_methods">
     <element value="form-element-view"/>
+    <element value="convert-optionlist-view"/>
   </property>
 
   <!-- Method aliases -->

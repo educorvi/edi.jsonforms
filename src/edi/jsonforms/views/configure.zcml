@@ -103,4 +103,23 @@
     permission="zope2.View"
     />
 
+  <browser:page
+    name="convert-optionlist-view"
+    for="edi.jsonforms.content.option_list.IOptionList"
+    class=".optionlist_view.OptionListView"
+    template="optionlist_view.pt"
+    permission="zope2.View"
+    title="Convert Option List"
+    menu="plone_displayviews"
+    i18n:domain="edi.jsonforms"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    for="edi.jsonforms.content.option_list.IOptionList"
+    name="convert_optionlist_to_options"
+    class=".optionlist_view.ConvertOptionListView"
+    permission="zope2.View"
+    />
+
 </configure>
