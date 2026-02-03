@@ -5,10 +5,13 @@ from Products.Five.browser import BrowserView
 import copy
 import itertools
 import json
+import logging
 
 from edi.jsonforms.views.common import *
 
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+
+logger = logging.getLogger("edi.jsonforms")
 
 from plone.base.utils import safe_hasattr
 
@@ -195,6 +198,7 @@ class JsonSchemaView(BrowserView):
         o = option_optionlist
         if safe_hasattr(o, "getObject"):
             o = o.getObject()
+
         options_list = []
         if o.portal_type == "Option":
             if ignore_conditions:

@@ -193,8 +193,8 @@ class UiSchemaView(BrowserView):
                     keys, vals = get_keys_and_values_for_options_list(
                         option.getObject()
                     )
-                    selectionfield_schema["options"]["enumTitles"] = dict(
-                        zip(keys, vals)
+                    selectionfield_schema["options"]["enumTitles"].update(
+                        dict(zip(keys, vals))
                     )
 
         option_filters = {}
