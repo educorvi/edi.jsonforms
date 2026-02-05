@@ -1,4 +1,5 @@
 import re
+from edi.jsonforms.content.common import IFormElement
 
 possibly_required_types = ["Field", "SelectionField", "UploadField", "Array"]
 
@@ -150,3 +151,16 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
             return False
         else:
             return True
+
+
+def get_path(obj: IFormElement, without_root=False):
+    """
+    get the path of an object in the json schema (leaves out fieldsets)
+    e.g. properties/object1/properties/selectionfield1/properties/option1
+    """
+    path = create_id(obj)
+    while obj.aq_parent.portal_type != "Form":
+        obj = obj.aq_parent
+        if obj.portal_type != "Fieldset":
+            path = create_id(obj) + "/properties/" + path
+    return "properties/" + path
