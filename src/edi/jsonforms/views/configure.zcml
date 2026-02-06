@@ -8,6 +8,14 @@
   -*- extra stuff goes here -*-
 
   <browser:page
+    name="convert-all-optionlists"
+    for="*"
+    class=".convert_all_optionlists.ConvertAllOptionlists"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
     name="version-view"
     for="edi.jsonforms.content.form.IForm"
     class=".version_view.VersionView"
