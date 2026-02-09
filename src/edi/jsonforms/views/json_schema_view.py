@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from Products.Five.browser import BrowserView
-
-import copy
-import itertools
 import json
 import logging
 
-from edi.jsonforms.views.common import *
-
-from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
 
 logger = logging.getLogger("edi.jsonforms")
-
-from edi.jsonforms.views.pydantic_models.schema_generator import (
-    FormModel,
-    JsonSchemaGenerator,
-)
-from plone.base.utils import safe_hasattr
 
 
 class JsonSchemaView(BrowserView):
@@ -39,16 +29,15 @@ class JsonSchemaView(BrowserView):
 
     def get_schema(self):
         form = self.context
-        self.set_json_base_schema()
+        # self.set_json_base_schema()
         # self.prepare_objects(form)  # traverse all objects and set parent_dependencies
 
-        form_model = FormModel(form)
-        json_schema_generator = JsonSchemaGenerator(
-            form_model, self.request, self.is_single_view, self.is_extended_schema
+        form_model = ObjectModel(form, None, self.request)
+        generatorArguments = GeneratorArguments(
+            self.request, self.is_single_view, self.is_extended_schema
         )
-        form_model.set_children(json_schema_generator)
-        json_schema_generator.generate_json_schema()
-
+        form_model.set_children(generatorArguments)
+        self.json_schema = form_model.get_json_schema()
         # children = form.getFolderContents()
         # for child in children:
         #     self.add_child_to_schema(child.getObject(), self.jsonschema)

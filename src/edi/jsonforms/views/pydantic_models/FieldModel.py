@@ -1,5 +1,7 @@
 import logging
 from typing import Optional
+from ZPublisher.HTTPRequest import WSGIRequest
+
 from edi.jsonforms.content.field import IField
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
@@ -16,8 +18,13 @@ class FieldModel(BaseFormElementModel):
     minimum: Optional[float]
     maximum: Optional[float]
 
-    def __init__(self, form_element: IField, parent_model: BaseFormElementModel):
-        super().__init__(form_element, parent_model)
+    def __init__(
+        self,
+        form_element: IField,
+        parent_model: BaseFormElementModel,
+        request: WSGIRequest,
+    ):
+        super().__init__(form_element, parent_model, request)
         answer_type = form_element.answer_type
         if answer_type in ["text", "textarea", "password"]:
             self.type = "string"

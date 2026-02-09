@@ -1,43 +1,50 @@
 import copy
 import itertools
+from typing import Any, Dict, List
 from edi.jsonforms.content.selection_field import ISelectionField
+from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.views.common import create_id, get_path, string_type_fields
-from edi.jsonforms.views.pydantic_models.FormModel import FormModel
-from edi.jsonforms.views.pydantic_models.SelectionFieldModel import get_option_name
-from plone.base.utils import safe_hasattr
+from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
+    BaseFormElementModel,
+)
+from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
+from edi.jsonforms.views.common import get_option_name
+# from plone.base.utils import safe_hasattr
 
 
-# call this method in check_dependencies() methods of models
-def check_for_dependencies(
-    model: "BaseFormElementModel | OptionModel", is_single_view: bool
-) -> bool:
-    """
-    returns True if the given model has dependencies that should be checked (if not in single view) and False otherwise
-    """
-    if is_single_view:  # if form-element-view, ignore all dependencies
-        return False
-    # elif safe_hasattr(model, "dependencies") and model.dependencies:
-    if model.dependencies:
-        return True
-    # elif (
-    #     safe_hasattr(model, "parent_dependencies")
-    #     and model.parent_dependencies
-    #     and model.portal_type not in ["Option", "OptionList"]
-    # ):
-    #     return True
-    else:
-        return False
+# # call this method in check_dependencies() methods of models
+# def check_for_dependencies(
+#     model: "BaseFormElementModel | OptionModel", is_single_view: bool
+# ) -> bool:
+#     """
+#     returns True if the given model has dependencies that should be checked (if not in single view) and False otherwise
+#     """
+#     if is_single_view:  # if form-element-view, ignore all dependencies
+#         return False
+#     # elif safe_hasattr(model, "dependencies") and model.dependencies:
+#     if model.dependencies:
+#         return True
+#     # elif (
+#     #     safe_hasattr(model, "parent_dependencies")
+#     #     and model.parent_dependencies
+#     #     and model.portal_type not in ["Option", "OptionList"]
+#     # ):
+#     #     return True
+#     else:
+#         return False
 
 
 # def add_dependent_required(parent: BaseFormElementModel, child: BaseFormElementModel):
 def add_dependent_required(
-    parent: FormModel, child: "BaseFormElementModel", is_extended_schema: bool = False
+    formProperties: FormProperties,
+    child: BaseFormElementModel,
+    is_extended_schema: bool = False,
 ):
     """
     this method changes dependentRequired or/and allOf of the parent based on the dependencies of the child model
     dependentRequired is changed if the child's dependency is not an Option inside a SelectionField
     allOf is changed if the child's dependency is an Option inside a SelectionField
-    :param parent: the model to which the child model belongs and which is adapted # outdated. currently only the outer formmodel's schema is adapted. so the parent input should be this Model
+    :param formProperties: the properties that will be set to the form at the end of generation.
     :param child: the model which is required and dependent on other models
     """
     # schema = self.jsonschema  # TODO make this dependent on schema parameter? (if present take schema, change calls accordingly) (at the end of this function the current schema is needed as backup in case all dependencies are invalid)
@@ -45,8 +52,8 @@ def add_dependent_required(
     # dependencies.extend(getattr(child_object, "parent_dependencies", []))
 
     # copy 'allOf' and 'dependentRequired' to check that at least one of them changed
-    allof_copy = copy.deepcopy(parent.allOf)
-    dependentrequired_copy = copy.deepcopy(parent.dependentRequired)
+    allof_copy = copy.deepcopy(formProperties.allOf)
+    dependentrequired_copy = copy.deepcopy(formProperties.dependentRequired)
 
     for dep in child.get_dependencies():
         try:
@@ -99,14 +106,14 @@ def add_dependent_required(
         if is_extended_schema:
             if_statement["else"] = create_else_statement(child.form_element)
         if_then = {**if_statement, **then_statement}
-        parent.allOf.append(if_then)
+        formProperties.update_allOf([if_then])
     # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
     # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
     if (
-        allof_copy == parent.allOf
-        and dependentrequired_copy == parent.dependentRequired
+        allof_copy == formProperties.allOf
+        and dependentrequired_copy == formProperties.dependentRequired
     ):
-        parent.required.append(child.get_id())
+        formProperties.update_required([child.get_id()])
     return
 
 
@@ -137,14 +144,16 @@ def _order_values(values, order_map):
     return [value for value, _ in deduped]
 
 
-def create_else_statement(child_object):
+def create_else_statement(child_object: IFormElement) -> dict:
     if child_object.portal_type == "Field":
         if child_object.answer_type in string_type_fields:
             return {"properties": {create_id(child_object): {"maxLength": 0}}}
 
 
 def add_dependent_options(
-    selectionfield: ISelectionField, is_single_view: bool, form: FormModel
+    selectionfield: ISelectionField,
+    is_single_view: bool,
+    formProperties: FormProperties,
 ):
     """
     this method computes the allOf statement for dependent options of a selectionfield and adds it to the form
@@ -152,10 +161,12 @@ def add_dependent_options(
     if is_single_view:
         return
 
-    form.allOf.extend(get_dependent_options(selectionfield, is_single_view))
+    formProperties.update_allOf(get_dependent_options(selectionfield, is_single_view))
 
 
-def get_dependent_options(selectionfield: ISelectionField, is_single_view: bool):
+def get_dependent_options(
+    selectionfield: ISelectionField, is_single_view: bool
+) -> List[Dict[str, Any]]:
     dependency_option_order = {}
 
     def add_to_dict(option, dependency, dict):

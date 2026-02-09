@@ -2,56 +2,91 @@ import abc
 import copy
 import logging
 
-from edi.jsonforms.views.pydantic_models.dependency_handler import (
-    check_for_dependencies,
-)
 from plone.base.utils import safe_hasattr
 from typing import Optional, List
+from ZPublisher.HTTPRequest import WSGIRequest
 
 from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.form import IForm
 
 from edi.jsonforms.views.common import (
     get_title,
     get_description,
     create_id,
 )
-from edi.jsonforms.views.pydantic_models.schema_generator import (
-    JsonSchemaGenerator,
-)
+from pydantic import BaseModel
+# from edi.jsonforms.views.pydantic_models.schema_generator import (
+#     JsonSchemaGenerator,
+# )
 
 logger = logging.getLogger(__name__)
 
 
-class BaseFormElementModel(abc.ABC):
+class BaseFormElementModel(BaseModel, abc.ABC):
     form_element: IFormElement
     id: str
     title: str
     description: Optional[str]
     comment: Optional[str]
     type: Optional[str]
-    parent: "BaseFormElementModel"  # actually it can only be an ObjectModel or a model that extends this (Form)
-    required: Optional[bool] = False
+    parent: Optional[
+        "BaseFormElementModel"
+    ]  # actually it can only be an ObjectModel or a model that extends this (Form)
+    required_choice: Optional[bool] = False
     dependencies: Optional[List[IFormElement]] = []
 
+    class Config:
+        arbitrary_types_allowed = True
+
     def __init__(
-        self, form_element: IFormElement, parent_model: "BaseFormElementModel"
+        self,
+        form_element: IFormElement | IForm,
+        parent_model: Optional[
+            "BaseFormElementModel"
+        ],  # only None if form_element is the outer form
+        request: WSGIRequest,
     ):
-        self.id = create_id(form_element)
-        self.form_element = form_element
-        self.title = get_title(form_element)
-        self.description = get_description(form_element)
-        self.comment = (
-            form_element.intern_information
-            if safe_hasattr(form_element, "intern_information")
-            else None
+        super().__init__(
+            form_element=form_element,
+            id=create_id(form_element),
+            title=get_title(form_element, request),
+            description=get_description(form_element, request),
+            comment=(
+                form_element.intern_information
+                if safe_hasattr(form_element, "intern_information")
+                else None
+            ),
+            parent=parent_model,
+            required_choice=(
+                form_element.required_choice
+                if safe_hasattr(form_element, "required_choice")
+                else False
+            ),
+            dependencies=copy.copy(form_element.dependencies)
+            if safe_hasattr(form_element, "dependencies")
+            else [],
         )
-        self.parent = parent_model
-        self.required = (
-            form_element.required_choice
-            if safe_hasattr(form_element, "required_choice")
-            else False
-        )
-        self.dependencies = copy.copy(form_element.dependencies)
+        # self.id = create_id(form_element)
+        # self.form_element = form_element
+        # self.title = get_title(form_element, request)
+        # self.description = get_description(form_element, request)
+        # self.comment = (
+        #     form_element.intern_information
+        #     if safe_hasattr(form_element, "intern_information")
+        #     else None
+        # )
+        # self.parent = parent_model
+        # self.required = (
+        #     form_element.required_choice
+        #     if safe_hasattr(form_element, "required_choice")
+        #     else False
+        # )
+        # if safe_hasattr(form_element, "dependencies"):
+        #     self.dependencies = copy.copy(form_element.dependencies)
+
+    @property
+    def is_required(self) -> bool:
+        return self.required_choice
 
     def get_id(self) -> str:
         return self.id
@@ -63,7 +98,15 @@ class BaseFormElementModel(abc.ABC):
         self.dependencies.extend(dependencies)
 
     def check_dependencies(self, is_single_view: bool) -> bool:
-        check_for_dependencies(self, is_single_view)
+        # check_for_dependencies(self, is_single_view)
+        if is_single_view:  # if form-element-view, ignore all dependencies
+            return False
+        if self.dependencies:
+            return True
+        else:
+            return False
 
-    def set_children(self, json_schema_generator: JsonSchemaGenerator):
-        pass  # only implemented in ObjectModel, ArrayModel, SelectionFieldModel
+    # def set_children(
+    #     self, json_schema_generator: JsonSchemaGenerator, form: ObjectModel
+    # ):
+    #     pass  # only implemented in ObjectModel, ArrayModel, SelectionFieldModel

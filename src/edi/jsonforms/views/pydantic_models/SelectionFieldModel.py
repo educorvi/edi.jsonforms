@@ -1,8 +1,8 @@
 import logging
+from ZPublisher.HTTPRequest import WSGIRequest
 
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_options,
-    check_for_dependencies,
 )
 from plone.base.utils import safe_hasattr
 from pydantic import BaseModel
@@ -22,16 +22,9 @@ from edi.jsonforms.views.common import (
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
-from edi.jsonforms.views.pydantic_models.schema_generator import JsonSchemaGenerator
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 
 logger = logging.getLogger(__name__)
-
-
-def get_option_name(option: IOption) -> str:
-    if option.aq_parent.use_id_in_schema:
-        return option.id
-    else:
-        return option.title
 
 
 class OptionModel(BaseModel):
@@ -39,6 +32,9 @@ class OptionModel(BaseModel):
     title: str
     parent: ISelectionField
     dependencies: Optional[List[IOption]] = []
+
+    class Config:
+        arbitrary_types_allowed = True
 
     def __init__(self, id: str, title: str, parent: ISelectionField):
         self.id = id
@@ -65,7 +61,13 @@ class OptionModel(BaseModel):
             return self.title
 
     def check_dependencies(self, is_single_view: bool) -> bool:
-        return check_for_dependencies(self, is_single_view)
+        # return check_for_dependencies(self, is_single_view)
+        if is_single_view:  # if form-element-view, ignore all dependencies
+            return False
+        if self.dependencies:
+            return True
+        else:
+            return False
 
 
 class OptionListModel(BaseModel):
@@ -89,9 +91,12 @@ class SelectionFieldModel(BaseFormElementModel):
     items: Optional[Dict[str, List[str] | str]]
 
     def __init__(
-        self, form_element: ISelectionField, parent_model: BaseFormElementModel
+        self,
+        form_element: ISelectionField,
+        parent_model: BaseFormElementModel,
+        request: WSGIRequest,
     ):
-        super().__init__(form_element, parent_model)
+        super().__init__(form_element, parent_model, request)
 
         answer_type = form_element.answer_type
 
@@ -102,7 +107,7 @@ class SelectionFieldModel(BaseFormElementModel):
             self.type = "array"
             # self.items = {"enum": options_list, "type": "string"}
 
-    def get_options(self, json_schema_generator: JsonSchemaGenerator):
+    def get_options(self, generatorArguments: GeneratorArguments):
         """
         sets options to self.form_element.getFolderContents()
 
@@ -114,7 +119,7 @@ class SelectionFieldModel(BaseFormElementModel):
         for o in options:
             o.getObject()
             if o.portal_type == "Option":
-                if json_schema_generator.ignore_conditions:
+                if generatorArguments.ignore_conditions:
                     option_model = OptionModel.from_option(o)
                     options_list.append(option_model.get_option_name())
                 else:
@@ -122,13 +127,13 @@ class SelectionFieldModel(BaseFormElementModel):
                     if safe_hasattr(o, "show_condition") and o.show_condition:
                         negate_condition = getattr(o, "negate_condition", False)
                         show = check_show_condition_in_request(
-                            json_schema_generator.request,
+                            generatorArguments.request,
                             o.show_condition,
                             negate_condition,
                         )
                     option_model = OptionModel.from_option(o)
                     if show and not option_model.check_dependencies(
-                        json_schema_generator.is_single_view
+                        generatorArguments.is_single_view
                     ):
                         options_list.append(option_model.get_option_name())
             elif o.portal_type == "OptionList":
@@ -139,8 +144,8 @@ class SelectionFieldModel(BaseFormElementModel):
                     options_list.extend(vals)
         return options_list
 
-    def set_children(self, json_schema_generator: JsonSchemaGenerator):
-        options_list = self.get_options(json_schema_generator)
+    def set_children(self, generatorArguments: GeneratorArguments):
+        options_list = self.get_options(generatorArguments)
 
         if self.type == "string":
             self.enum = options_list
@@ -150,7 +155,7 @@ class SelectionFieldModel(BaseFormElementModel):
         # adds the allOf of the dependent options to the form
         add_dependent_options(
             self.form_element,
-            json_schema_generator.is_single_view,
-            json_schema_generator.form,
+            generatorArguments.is_single_view,
+            generatorArguments.formProperties,
         )
         # schema["allOf"].extend(self.get_dependent_options(child_object))

@@ -1,15 +1,18 @@
 import copy
 import logging
+from ZPublisher.HTTPRequest import WSGIRequest
 
-from edi.jsonforms.views.pydantic_models import FieldsetModel
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_required,
 )
-from edi.jsonforms.views.pydantic_models.schema_generator import JsonSchemaGenerator
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from plone.base.utils import safe_hasattr
 from typing import Optional, List, Dict, Any
 
 from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.complex import IComplex
+from edi.jsonforms.content.array import IArray
+from edi.jsonforms.content.form import IForm
 
 from edi.jsonforms.views.common import check_show_condition_in_request
 from edi.jsonforms.views.pydantic_models.FieldModel import FieldModel
@@ -18,9 +21,9 @@ from edi.jsonforms.views.pydantic_models.SelectionFieldModel import (
 )
 from edi.jsonforms.views.pydantic_models.UploadFieldModel import UploadFieldModel
 from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel
-from edi.jsonforms.views.pydantic_models.ArrayModel import ArrayModel
-from edi.jsonforms.content.complex import IComplex
-from edi.jsonforms.content.array import IArray
+
+# from edi.jsonforms.views.pydantic_models.ArrayModel import ArrayModel
+# from edi.jsonforms.views.pydantic_models.FieldsetModel import FieldsetModel
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
@@ -32,7 +35,7 @@ logger = logging.getLogger(__name__)
 def create_model_recursivly(
     form_element: IFormElement,
     parent_model: BaseFormElementModel,
-    json_schema_generator: JsonSchemaGenerator,
+    generatorArguments: GeneratorArguments,
 ) -> BaseFormElementModel:
     """
     returns an object of the model class based on the portal_type of the input content object
@@ -40,23 +43,25 @@ def create_model_recursivly(
     it also adds the required fields to the required list of the parent model and handles dependencies by
     """
     if form_element.portal_type == "Field":
-        model = FieldModel(form_element, parent_model)
+        model = FieldModel(form_element, parent_model, generatorArguments.request)
     elif form_element.portal_type == "SelectionField":
-        model = SelectionFieldModel(form_element, parent_model)
-        model.set_children(json_schema_generator)
+        model = SelectionFieldModel(
+            form_element, parent_model, generatorArguments.request
+        )
+        model.set_children(generatorArguments)
     elif form_element.portal_type == "UploadField":
-        model = UploadFieldModel(form_element, parent_model)
+        model = UploadFieldModel(form_element, parent_model, generatorArguments.request)
     elif form_element.portal_type == "Reference":
-        model = ReferenceModel(form_element, parent_model)
+        model = ReferenceModel(form_element, parent_model, generatorArguments.request)
     elif form_element.portal_type == "Complex":
-        model = ObjectModel(form_element, parent_model)
-        model.set_children(json_schema_generator)
+        model = ObjectModel(form_element, parent_model, generatorArguments.request)
+        model.set_children(generatorArguments)
     elif form_element.portal_type == "Array":
-        model = ArrayModel(form_element, parent_model)
-        model.set_children(json_schema_generator)
+        model = ArrayModel(form_element, parent_model, generatorArguments.request)
+        model.set_children(generatorArguments)
     elif form_element.portal_type == "Fieldset":
-        model = FieldsetModel(form_element, parent_model)
-        model.set_children(json_schema_generator)
+        model = FieldsetModel(form_element, parent_model, generatorArguments.request)
+        model.set_children(generatorArguments)
         model = None  # Fieldset does not contribute to the json schema, the children are added to the parent model of the Fieldset, so we return None here to avoid adding the fieldset itself as a property to the parent model
     elif form_element.portal_type == "Helptext":
         # model = HelptextModel(form_element, parent_model)  # has no json schema
@@ -74,18 +79,22 @@ def create_model_recursivly(
 class ObjectModel(BaseFormElementModel):
     type: str = "object"
 
-    properties: Optional[Dict[str, BaseFormElementModel]]
-    allOf: Optional[List[Dict[str, Dict[str, Any]]]]
-    required: Optional[List[str]]
-    dependentRequired: Optional[Dict[str, List[str]]]
+    properties: Optional[Dict[str, BaseFormElementModel]] = None
+    allOf: Optional[List[Dict[str, Dict[str, Any]]]] = None
+    required: Optional[List[str]] = None
+    dependentRequired: Optional[Dict[str, List[str]]] = None
 
     def __init__(
         self,
         form_element: IComplex
-        | IArray,  # to create the intern object model for array items
-        parent_model: BaseFormElementModel,
+        | IArray
+        | IForm,  # to create the intern object model for array items
+        parent_model: Optional[
+            BaseFormElementModel
+        ],  # is None if form_element is the outer form or if in form-element-view
+        request: WSGIRequest,
     ):
-        super().__init__(form_element, parent_model)
+        super().__init__(form_element, parent_model, request)
         self.properties = {}
         self.allOf = []
         self.required = []
@@ -103,7 +112,7 @@ class ObjectModel(BaseFormElementModel):
     def update_required(self, required: List[str]):
         self.required.extend(required)
 
-    def set_children(self, json_schema_generator: JsonSchemaGenerator):
+    def set_children(self, generatorArguments: GeneratorArguments):
         """
         :param parent_model: the model whose children should be created and which is also adapted
 
@@ -117,13 +126,15 @@ class ObjectModel(BaseFormElementModel):
             for child in self.form_element.getFolderContents():
                 child = child.getObject()
                 self.create_and_add_model(
-                    child, json_schema_generator
+                    child, generatorArguments
                 )  # creates child model and adds it to self.properties, dependentRequired etc.
 
         return models
 
     def create_and_add_model(
-        self, form_element: IFormElement, json_schema_generator: JsonSchemaGenerator
+        self,
+        form_element: IFormElement,
+        generatorArguments: GeneratorArguments,
     ) -> Optional[BaseFormElementModel]:
         """
         creates a model for the given form_element based on its portal_type and returns it
@@ -149,14 +160,95 @@ class ObjectModel(BaseFormElementModel):
         if model:
             self.set_property(model.get_id(), model)
 
-        if model.required:
-            if model.check_dependencies(json_schema_generator.is_single_view):
+        if model.is_required:
+            if model.check_dependencies(generatorArguments.is_single_view):
                 add_dependent_required(
-                    json_schema_generator.form,
+                    generatorArguments.formProperties,
                     model,
-                    json_schema_generator.is_extended_schema,
+                    generatorArguments.is_extended_schema,
                 )  # adds child to dependentRequired or allOf of the outer form
             else:
                 self.required.append(model.get_id())
 
         return model
+
+    def get_json_schema(self) -> dict:
+        # return dict(self, exclude={"form_element", "parent", "dependencies", "id"})
+        return self.model_dump(exclude={"form_element", "parent", "dependencies", "id"})
+
+    # def get_pydantic_model(self):
+    #     return TODO
+
+
+###############################
+
+
+from edi.jsonforms.content.fieldset import IFieldset
+# from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
+# from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+
+
+class FieldsetModel(ObjectModel):
+    """
+    This class is different from the other BaseFormElementModel-classes. It does not store any information, but the init method creates the children and stores them in the parent_model
+    """
+
+    def __init__(
+        self, form_element: IFieldset, parent_model: ObjectModel, request: WSGIRequest
+    ):
+        super().__init__(form_element, parent_model, request)
+
+    def set_children(self, generatorArguments: GeneratorArguments):
+        super().set_children(generatorArguments)
+        self.parent.update_properties(self.properties)
+        self.parent.update_required(self.required)
+        self.parent.extend_dependencies(self.dependencies)
+        self.parent.update_dependentRequired(self.dependentRequired)
+
+    def get_json_schema(self) -> dict:
+        return {}  # Fieldset does not contribute to the json schema
+
+
+###################################
+
+# import logging
+
+# from typing import Optional
+
+from edi.jsonforms.content.array import IArray
+# from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
+#     BaseFormElementModel,
+# )
+# from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
+# from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+
+
+# logger = logging.getLogger(__name__)
+
+
+class ArrayModel(BaseFormElementModel):
+    items: ObjectModel = None
+    type: str = "array"
+    minItems: Optional[int]
+
+    def __init__(
+        self,
+        form_element: IArray,
+        parent_model: BaseFormElementModel,
+        request: WSGIRequest,
+    ):
+        super().__init__(form_element, parent_model, request)
+        if self.is_required:
+            self.minItems = 1
+
+    def set_children(self, generatorArguments: GeneratorArguments):
+        """
+        :param compute_children_method: creates instances of the children models and returns them as a dict (child_id: child_model)
+        """
+        object_model = ObjectModel(self.form_element, self.parent)
+        object_model.set_children(generatorArguments)
+        self.items = object_model
+
+    def get_json_schema(self) -> dict:
+        # remove title from object from schema inside items
+        return {}  # TODO
