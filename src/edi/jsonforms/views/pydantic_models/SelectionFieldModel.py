@@ -15,7 +15,6 @@ from edi.jsonforms.content.option_list import (
     get_keys_and_values_for_options_list,
 )
 from edi.jsonforms.views.common import (
-    get_title,
     create_id,
     check_show_condition_in_request,
 )
@@ -104,7 +103,8 @@ class SelectionFieldModel(BaseFormElementModel):
             self.enum = []
         elif answer_type == "checkbox" or answer_type == "selectmultiple":
             self.type = "array"
-            self.minItems = 1 if form_element.required_choice else None
+            if self.is_required:
+                self.minItems = 1
             self.items = {"enum": [], "type": "string"}
 
     def get_options(self, generatorArguments: GeneratorArguments) -> List[str]:

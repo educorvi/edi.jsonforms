@@ -4,6 +4,7 @@ from ZPublisher.HTTPRequest import WSGIRequest
 
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_required,
+    get_dependencies_of_closest_ancestor_with_dependencies,
 )
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from plone.base.utils import safe_hasattr
@@ -57,7 +58,7 @@ def create_model_recursivly(
         model = ReferenceModel(form_element, parent_model, generatorArguments)
         if recursively:
             model.set_children(generatorArguments)
-    elif form_element.portal_type == "Complex":
+    elif form_element.portal_type in ["Complex", "Form"]:  # handle form like an object
         model = ObjectModel(form_element, parent_model, generatorArguments.request)
         if recursively:
             model.set_children(generatorArguments)
@@ -173,17 +174,18 @@ class ObjectModel(BaseFormElementModel):
         if model is None:
             return None
 
-        # give the children the same dependencies as the parent plus their own
-        parent_dependencies = (
-            copy.copy(self.dependencies)
-            if safe_hasattr(self, "dependencies") and self.dependencies
-            else []
-        )
-        # TODO dependencies from ancestor with dependencies
+        # give the children the same dependencies as the closest ancestor with dependencies if they have none of their own
+        if model.get_dependencies() == []:
+            parent_dependencies = (
+                get_dependencies_of_closest_ancestor_with_dependencies(model)
+            )
+            model.extend_dependencies(parent_dependencies)
 
-        model.extend_dependencies(parent_dependencies)
+        # add child model to properties of self
         self.set_property(model.get_id(), model)
 
+        # if child is required, add it to the required list of self
+        # unless it has dependencies, then add to allOf or dependentRequired
         if model.is_required:
             if model.check_dependencies(generatorArguments.is_single_view):
                 add_dependent_required(

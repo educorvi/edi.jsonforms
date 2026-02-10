@@ -4,6 +4,10 @@
 import copy
 import json
 from Products.Five.browser import BrowserView
+from edi.jsonforms.views.pydantic_models.SelectionFieldModel import GeneratorArguments
+from edi.jsonforms.views.pydantic_models.ObjectModel import (
+    ObjectModel,
+)
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -44,29 +48,24 @@ buttons = {
             "type": "Button",
             "buttonType": "previousWizardPage",
             "text": "Vorherige Seite",
-            "options": {
-                "variant": "outline-primary"
-            }
+            "options": {"variant": "outline-primary"},
         },
         {
             "type": "Button",
             "buttonType": "nextWizardPage",
             "text": "Nächste Seite",
-            "options": {
-                "variant": "outline-primary"
-            }
-        }
-    ]
+            "options": {"variant": "outline-primary"},
+        },
+    ],
 }
 
 submit_button = {
     "type": "Button",
     "buttonType": "submit",
     "text": "Absenden",
-    "options": {
-        "variant": "primary"
-    }
+    "options": {"variant": "primary"},
 }
+
 
 class WizardUiSchemaView(UiSchemaView):
     def __init__(self, context, request):
@@ -92,7 +91,7 @@ class WizardUiSchemaView(UiSchemaView):
                     self.add_child_to_schema(
                         child.getObject(),
                         vertical_layout,
-                        f"/properties/{form_id}/properties/"
+                        f"/properties/{form_id}/properties/",
                     )
                 vertical_layout["layout"]["elements"].append(copy.deepcopy(buttons))
                 self.uischema["layout"]["elements"].append(vertical_layout["layout"])
@@ -100,9 +99,13 @@ class WizardUiSchemaView(UiSchemaView):
         if self.uischema["layout"]["elements"]:
             del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
         if len(self.uischema["layout"]["elements"]) == 1:
-            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = submit_button
-        elif len(self.uischema["layout"]["elements"]) >1:
-            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button
+            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = (
+                submit_button
+            )
+        elif len(self.uischema["layout"]["elements"]) > 1:
+            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = (
+                submit_button
+            )
 
         self.uischema["layout"]["pages"] = self.uischema["layout"].pop("elements")
         self.uischema["layout"]["options"] = {}
@@ -119,15 +122,22 @@ class WizardJsonSchemaView(JsonSchemaView):
         return json.dumps(jsonschema, ensure_ascii=False, indent=4)
 
     def combined_json_schema(self):
-        self.set_json_base_schema()
+        # self.set_json_base_schema()
 
         object = self.context
-        for child in object.listFolderContents():
-            if child.portal_type == "Form":
-                object_schema = self.get_schema_for_object(
-                    child
-                )  # create schema for form as if it were an object
-                child_id = self.create_and_check_id(child)
-                self.jsonschema["properties"][child_id] = object_schema
+
+        generatorArguments = GeneratorArguments(
+            self.request, self.is_single_view, self.is_extended_schema
+        )
+        wizard_model = ObjectModel(object, None, self.request)
+        wizard_model.set_children(generatorArguments)
+        self.jsonschema = wizard_model.get_json_schema()
+        # for child in object.listFolderContents():
+        #     if child.portal_type == "Form":
+        #         object_schema = self.get_schema_for_object(
+        #             child
+        #         )  # create schema for form as if it were an object
+        #         child_id = self.create_and_check_id(child)
+        #         self.jsonschema["properties"][child_id] = object_schema
 
         return self.jsonschema

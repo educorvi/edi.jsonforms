@@ -25,6 +25,20 @@ def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
         return False
 
 
+def get_dependencies_of_closest_ancestor_with_dependencies(
+    model: BaseFormElementModel,
+) -> List[IFormElement]:
+    """
+    returns a shallow copy of the dependencies of the closest ancestor with dependencies, if there is no ancestor with dependencies, an empty list is returned
+    """
+    parent = model.parent
+    while parent:
+        if safe_hasattr(parent, "dependencies") and parent.dependencies:
+            return copy.copy(parent.dependencies)
+        parent = parent.parent
+    return []
+
+
 # def add_dependent_required(parent: BaseFormElementModel, child: BaseFormElementModel):
 def add_dependent_required(
     formProperties: FormProperties,

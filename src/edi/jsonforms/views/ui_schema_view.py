@@ -12,7 +12,7 @@ from edi.jsonforms.content.option_list import get_keys_and_values_for_options_li
 
 from plone.base.utils import safe_hasattr
 
-from edi.jsonforms.views.json_schema_view import get_option_name
+from edi.jsonforms.views.common import get_option_name
 
 
 class UiSchemaView(BrowserView):

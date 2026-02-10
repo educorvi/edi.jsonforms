@@ -1,5 +1,6 @@
 import re
 from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.option import IOption
 
 possibly_required_types = ["Field", "SelectionField", "UploadField", "Array"]
 
@@ -27,6 +28,13 @@ def create_unique_id(object):
     id_str = str(object.id) + str(object.UID())
     escaped_id_str = id_str.replace(".", "").replace("/", "")
     return escaped_id_str
+
+
+def get_option_name(option: IOption) -> str:
+    if option.aq_parent.use_id_in_schema:
+        return option.id
+    else:
+        return option.title
 
 
 def get_view_url(object):
