@@ -242,6 +242,8 @@ class JsonSchemaView(BrowserView):
         elif answer_type == "checkbox" or answer_type == "selectmultiple":
             selectionfield_schema["type"] = "array"
             selectionfield_schema["items"] = {"enum": options_list, "type": "string"}
+            if selectionfield.required_choice == "required":
+                selectionfield_schema["minItems"] = 1
         return selectionfield_schema
 
     def get_schema_for_uploadfield(self, uploadfield):
