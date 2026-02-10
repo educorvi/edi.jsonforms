@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 class FieldModel(BaseFormElementModel):
-    minLength: Optional[int]
-    maxLength: Optional[int]
-    pattern: Optional[str]
-    format: Optional[str]
-    minimum: Optional[float]
-    maximum: Optional[float]
+    minLength: Optional[int] = None
+    maxLength: Optional[int] = None
+    pattern: Optional[str] = None
+    format: Optional[str] = None
+    minimum: Optional[float] = None
+    maximum: Optional[float] = None
 
     def __init__(
         self,
@@ -63,3 +63,6 @@ class FieldModel(BaseFormElementModel):
                 self.minimum = form_element.minimum
             if form_element.maximum:
                 self.maximum = form_element.maximum
+
+    def get_json_schema(self) -> dict:
+        return super().get_json_schema()

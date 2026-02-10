@@ -1,5 +1,6 @@
 import copy
 import itertools
+from plone.base.utils import safe_hasattr
 from typing import Any, Dict, List
 from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.content.common import IFormElement
@@ -12,26 +13,16 @@ from edi.jsonforms.views.common import get_option_name
 # from plone.base.utils import safe_hasattr
 
 
-# # call this method in check_dependencies() methods of models
-# def check_for_dependencies(
-#     model: "BaseFormElementModel | OptionModel", is_single_view: bool
-# ) -> bool:
-#     """
-#     returns True if the given model has dependencies that should be checked (if not in single view) and False otherwise
-#     """
-#     if is_single_view:  # if form-element-view, ignore all dependencies
-#         return False
-#     # elif safe_hasattr(model, "dependencies") and model.dependencies:
-#     if model.dependencies:
-#         return True
-#     # elif (
-#     #     safe_hasattr(model, "parent_dependencies")
-#     #     and model.parent_dependencies
-#     #     and model.portal_type not in ["Option", "OptionList"]
-#     # ):
-#     #     return True
-#     else:
-#         return False
+def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
+    """
+    returns True if the given model has dependencies that should be checked (if not in single view) and False otherwise
+    """
+    if is_single_view:  # if form-element-view, ignore all dependencies
+        return False
+    elif safe_hasattr(model, "dependencies") and model.dependencies:
+        return True
+    else:
+        return False
 
 
 # def add_dependent_required(parent: BaseFormElementModel, child: BaseFormElementModel):
@@ -208,7 +199,7 @@ def get_dependent_options(
     for option in options:
         if option.portal_type == "Option":
             option = option.getObject()
-            if option.check_dependencies(is_single_view):
+            if check_for_dependencies(option, is_single_view):
                 dependencies = option.dependencies
                 for dep in dependencies:
                     try:

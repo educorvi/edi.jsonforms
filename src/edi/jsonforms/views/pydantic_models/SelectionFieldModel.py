@@ -37,15 +37,13 @@ class OptionModel(BaseModel):
         arbitrary_types_allowed = True
 
     def __init__(self, id: str, title: str, parent: ISelectionField):
-        self.id = id
-        self.title = title
-        self.parent = parent
+        super().__init__(id=id, title=title, parent=parent)
 
     @classmethod
     def from_option(cls, option: IOption):
         return cls(
             id=create_id(option),
-            title=get_title(option),
+            title=option.title,
             parent=option.aq_parent,
         )
 
@@ -74,8 +72,8 @@ class OptionListModel(BaseModel):
     options: List[OptionModel]
 
     def __init__(self, option_list: OptionList):
+        super().__init__(options=[])
         o_keys, o_values = get_keys_and_values_for_options_list(option_list)
-        self.options = []
         for key, value in zip(o_keys, o_values):
             option_model = OptionModel.from_id_and_title(
                 key, value, option_list.aq_parent
@@ -87,8 +85,9 @@ class OptionListModel(BaseModel):
 
 
 class SelectionFieldModel(BaseFormElementModel):
-    enum: Optional[List[str]]
-    items: Optional[Dict[str, List[str] | str]]
+    enum: Optional[List[str]] = None
+    items: Optional[Dict[str, List[str] | str]] = None
+    minItems: Optional[int] = None
 
     def __init__(
         self,
@@ -102,24 +101,26 @@ class SelectionFieldModel(BaseFormElementModel):
 
         if answer_type == "radio" or answer_type == "select":
             self.type = "string"
-            # self.enum = options_list
+            self.enum = []
         elif answer_type == "checkbox" or answer_type == "selectmultiple":
             self.type = "array"
-            # self.items = {"enum": options_list, "type": "string"}
+            self.minItems = 1 if form_element.required_choice else None
+            self.items = {"enum": [], "type": "string"}
 
-    def get_options(self, generatorArguments: GeneratorArguments):
+    def get_options(self, generatorArguments: GeneratorArguments) -> List[str]:
         """
-        sets options to self.form_element.getFolderContents()
+        gets options as strings of self.form_element.getFolderContents()
+        includes dependencies in the computation
 
-        :param ignore_conditions: can be i.e. is_single_view, to get all options regardless of conditions and dependencies
+        :param generatorArguments: can be i.e. is_single_view, to get all options regardless of conditions and dependencies
         """
         options = self.form_element.getFolderContents()
 
         options_list = []
         for o in options:
-            o.getObject()
+            o = o.getObject()
             if o.portal_type == "Option":
-                if generatorArguments.ignore_conditions:
+                if generatorArguments.is_single_view:
                     option_model = OptionModel.from_option(o)
                     options_list.append(option_model.get_option_name())
                 else:
@@ -144,7 +145,40 @@ class SelectionFieldModel(BaseFormElementModel):
                     options_list.extend(vals)
         return options_list
 
+    def set_option(self, option_model: OptionModel | OptionListModel):
+        """
+        sets the option for the selectionfield
+        ignores dependencies of the options
+        :param option_model: OptionModel or OptionListModel to set
+        """
+        if isinstance(option_model, OptionModel):
+            option_name = option_model.get_option_name()
+
+            if self.type == "string":
+                self.enum.append(option_name)
+            elif self.type == "array":
+                if self.items and "enum" in self.items:
+                    self.items["enum"].append(option_name)
+        elif isinstance(option_model, OptionListModel):
+            for option in option_model.options:
+                self.set_option(option)
+
+    def unset_options(self):
+        """
+        removes all options from the selectionfield
+        """
+        if self.type == "string":
+            self.enum = []
+        elif self.type == "array":
+            if self.items and "enum" in self.items:
+                self.items["enum"] = []
+
     def set_children(self, generatorArguments: GeneratorArguments):
+        """
+        sets the options for the selectionfield and adds the allOf of the dependent options to the form
+
+        :param generatorArguments: needed to get is_single_view (ignore dependencies) and formProperties (to add dependent options to the formModel later)
+        """
         options_list = self.get_options(generatorArguments)
 
         if self.type == "string":
@@ -159,3 +193,6 @@ class SelectionFieldModel(BaseFormElementModel):
             generatorArguments.formProperties,
         )
         # schema["allOf"].extend(self.get_dependent_options(child_object))
+
+    def get_json_schema(self):
+        return super().get_json_schema()

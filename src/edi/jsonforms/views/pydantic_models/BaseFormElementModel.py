@@ -26,9 +26,9 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     form_element: IFormElement
     id: str
     title: str
-    description: Optional[str]
-    comment: Optional[str]
-    type: Optional[str]
+    description: Optional[str] = None
+    comment: Optional[str] = None
+    type: Optional[str] = None
     parent: Optional[
         "BaseFormElementModel"
     ]  # actually it can only be an ObjectModel or a model that extends this (Form)
@@ -46,25 +46,32 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         ],  # only None if form_element is the outer form
         request: WSGIRequest,
     ):
+        description = get_description(form_element, request)
+        comment = (
+            form_element.intern_information
+            if safe_hasattr(form_element, "intern_information")
+            else None
+        )
+        required_choice = (
+            True
+            if safe_hasattr(form_element, "required_choice")
+            and form_element.required_choice == "required"
+            else False
+        )
+        dependencies = (
+            copy.copy(form_element.dependencies)
+            if safe_hasattr(form_element, "dependencies")
+            else []
+        )
         super().__init__(
             form_element=form_element,
             id=create_id(form_element),
             title=get_title(form_element, request),
-            description=get_description(form_element, request),
-            comment=(
-                form_element.intern_information
-                if safe_hasattr(form_element, "intern_information")
-                else None
-            ),
+            description=description if description else None,
+            comment=comment,
             parent=parent_model,
-            required_choice=(
-                form_element.required_choice
-                if safe_hasattr(form_element, "required_choice")
-                else False
-            ),
-            dependencies=copy.copy(form_element.dependencies)
-            if safe_hasattr(form_element, "dependencies")
-            else [],
+            required_choice=required_choice,
+            dependencies=dependencies,
         )
         # self.id = create_id(form_element)
         # self.form_element = form_element
@@ -91,11 +98,17 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     def get_id(self) -> str:
         return self.id
 
+    def set_id(self, id: str):
+        self.id = id
+
     def get_dependencies(self) -> List[IFormElement]:
         return self.dependencies
 
     def extend_dependencies(self, dependencies: List[IFormElement]):
         self.dependencies.extend(dependencies)
+
+    def set_dependencies(self, dependencies: List[IFormElement]):
+        self.dependencies = dependencies
 
     def check_dependencies(self, is_single_view: bool) -> bool:
         # check_for_dependencies(self, is_single_view)
@@ -105,6 +118,14 @@ class BaseFormElementModel(BaseModel, abc.ABC):
             return True
         else:
             return False
+
+    def get_json_dump_exclude_list(self) -> dict:
+        return {"form_element", "parent", "dependencies", "id", "required_choice"}
+
+    def get_json_schema(self) -> dict:
+        return self.model_dump(
+            exclude=self.get_json_dump_exclude_list(), exclude_none=True
+        )
 
     # def set_children(
     #     self, json_schema_generator: JsonSchemaGenerator, form: ObjectModel

@@ -37,7 +37,7 @@ class JsonSchemaView(BrowserView):
             self.request, self.is_single_view, self.is_extended_schema
         )
         form_model.set_children(generatorArguments)
-        self.json_schema = form_model.get_json_schema()
+        self.jsonschema = form_model.get_json_schema()
         # children = form.getFolderContents()
         # for child in children:
         #     self.add_child_to_schema(child.getObject(), self.jsonschema)
