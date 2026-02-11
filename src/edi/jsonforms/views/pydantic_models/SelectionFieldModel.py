@@ -119,30 +119,34 @@ class SelectionFieldModel(BaseFormElementModel):
         options_list = []
         for o in options:
             o = o.getObject()
+
+            # compute if should be shown
+            if generatorArguments.is_single_view:
+                show = True
+            else:
+                show = True
+                if safe_hasattr(o, "show_condition") and o.show_condition:
+                    negate_condition = getattr(o, "negate_condition", False)
+                    show = check_show_condition_in_request(
+                        generatorArguments.request,
+                        o.show_condition,
+                        negate_condition,
+                    )
+
             if o.portal_type == "Option":
-                if generatorArguments.is_single_view:
+                if show:
                     option_model = OptionModel.from_option(o)
-                    options_list.append(option_model.get_option_name())
-                else:
-                    show = True
-                    if safe_hasattr(o, "show_condition") and o.show_condition:
-                        negate_condition = getattr(o, "negate_condition", False)
-                        show = check_show_condition_in_request(
-                            generatorArguments.request,
-                            o.show_condition,
-                            negate_condition,
-                        )
-                    option_model = OptionModel.from_option(o)
-                    if show and not option_model.check_dependencies(
+                    if not option_model.check_dependencies(
                         generatorArguments.is_single_view
                     ):
                         options_list.append(option_model.get_option_name())
             elif o.portal_type == "OptionList":
-                keys, vals = get_keys_and_values_for_options_list(o)
-                if self.form_element.use_id_in_schema:
-                    options_list.extend(keys)
-                else:
-                    options_list.extend(vals)
+                if show:
+                    keys, vals = get_keys_and_values_for_options_list(o)
+                    if self.form_element.use_id_in_schema:
+                        options_list.extend(keys)
+                    else:
+                        options_list.extend(vals)
         return options_list
 
     def set_option(self, option_model: OptionModel | OptionListModel):
