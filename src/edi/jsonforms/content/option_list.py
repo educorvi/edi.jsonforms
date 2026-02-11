@@ -9,14 +9,14 @@ from zope import schema
 
 from zope.interface import implementer
 from edi.jsonforms import _
-from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.common import IAdditionalInformation
 import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class IOptionList(IFormElement):
+class IOptionList(IAdditionalInformation):
     """Marker interface and Dexterity Python Schema for Option"""
 
     # do not use this field directly, use get_options() instead

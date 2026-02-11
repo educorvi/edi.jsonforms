@@ -49,7 +49,50 @@ class IFormElement(model.Schema):
     """
 
 
-class IDependent(IFormElement):
+class IAdditionalInformation(IFormElement):
+    """Marker interface for form elements that can have additional information"""
+
+    fieldset(
+        "additional-information",
+        label=_("Additional Information"),
+        fields=["intern_information", "show_condition", "negate_condition"],
+    )
+
+    # previously helptext
+    intern_information = schema.Text(
+        title=_("Unformatted intern information for the JSON-Schema"),
+        description=_(
+            "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
+        ),
+        required=False,
+    )
+
+    show_condition = schema.TextLine(
+        title=_("Condition for showing this field"),
+        description=_(
+            'This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If "condition" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter "fork" of the request URL. Multiple conditions can be separated by commas. Example: "condition1, condition2, condition3". If any of the conditions is met, the field will be displayed; otherwise it will not.'
+        ),
+        required=False,
+        default="",
+    )
+
+    negate_condition = schema.Bool(
+        title=_("Negate all show conditions"),
+        description=_(
+            "If this option is checked, all show conditions will be negated. This means that if any of the conditions is present in the request URL, the field will not be displayed."
+        ),
+        required=False,
+        default=False,
+    )
+
+    # # TODO no added to ui-schema yet (version 3.1)
+    # # TODO translate
+    # user_info = schema.Text(title=_('Helptext for the user'),
+    #                             description=_("Is displayed as a little i next to the title."),
+    #                             required=False)
+
+
+class IDependent(IAdditionalInformation):
     fieldset(
         "dependencies",
         label=_("Dependencies"),
@@ -130,45 +173,6 @@ class IDependent(IFormElement):
             "selectableTypes": ["Option", "Field"],
         },
     )
-
-    fieldset(
-        "additional-information",
-        label=_("Additional Information"),
-        fields=["intern_information", "show_condition", "negate_condition"],
-    )
-
-    # previously helptext
-    intern_information = schema.Text(
-        title=_("Unformatted intern information for the JSON-Schema"),
-        description=_(
-            "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
-        ),
-        required=False,
-    )
-
-    show_condition = schema.TextLine(
-        title=_("Condition for showing this field"),
-        description=_(
-            'This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If "condition" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter "fork" of the request URL. Multiple conditions can be separated by commas. Example: "condition1, condition2, condition3". If any of the conditions is met, the field will be displayed; otherwise it will not.'
-        ),
-        required=False,
-        default="",
-    )
-
-    negate_condition = schema.Bool(
-        title=_("Negate all show conditions"),
-        description=_(
-            "If this option is checked, all show conditions will be negated. This means that if any of the conditions is present in the request URL, the field will not be displayed."
-        ),
-        required=False,
-        default=False,
-    )
-
-    # # TODO no added to ui-schema yet (version 3.1)
-    # # TODO translate
-    # user_info = schema.Text(title=_('Helptext for the user'),
-    #                             description=_("Is displayed as a little i next to the title."),
-    #                             required=False)
 
 
 class IDependentElements(IDependent):
