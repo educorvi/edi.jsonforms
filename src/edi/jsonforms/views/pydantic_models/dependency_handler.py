@@ -63,6 +63,8 @@ def add_dependent_required(
     for dep in child.get_dependencies():
         try:
             dep = dep.to_object
+            if dep is None:
+                continue
         except:
             # dependency got deleted, plone error, ignore this dependency
             continue
