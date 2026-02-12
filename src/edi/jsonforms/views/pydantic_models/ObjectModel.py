@@ -198,6 +198,28 @@ class ObjectModel(BaseFormElementModel):
 
         return model
 
+    def create_and_add_model_without_dependencies(
+        self,
+        form_element: IFormElement,
+        generatorArguments: GeneratorArguments,
+    ) -> Optional[BaseFormElementModel]:
+        """
+        creates a model for the given form_element based on its portal_type and returns it
+        makes an entry inside the parent_models's required list if the field is required
+        does not make an entry inside the parent_models's dependentRequired and allOf lists
+        """
+
+        model = create_model_recursivly(form_element, self, generatorArguments)
+        if model is None:
+            return None
+
+        self.set_property(model.get_id(), model)
+
+        if model.is_required:
+            self.required.append(model.get_id())
+
+        return model
+
     def get_json_schema(self) -> dict:
         # return dict(self, exclude={"form_element", "parent", "dependencies", "id"})
         excluded_fields = self.get_json_dump_exclude_list().union({"properties"})

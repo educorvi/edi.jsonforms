@@ -18,7 +18,7 @@ class GeneratorArguments(BaseModel):
 
     def __init__(
         self,
-        request,
+        request: WSGIRequest,
         is_single_view: bool,
         is_extended_schema: bool = False,
     ):

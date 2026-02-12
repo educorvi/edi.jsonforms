@@ -102,7 +102,9 @@ class FormElementJsonSchema(JsonSchemaView):
             self.request, self.is_single_view, self.is_extended_schema
         )
         form_model = ObjectModel(parent, None, self.request)
-        model = create_model_recursivly(object, form_model, generatorArguments)
+        model = form_model.create_and_add_model_without_dependencies(
+            object, generatorArguments
+        )
 
         if model:
             if option:
@@ -114,7 +116,7 @@ class FormElementJsonSchema(JsonSchemaView):
                     ol = OptionListModel(option)
                     model.set_option(ol)
             # if object.portal_type != "Fieldset":
-            form_model.set_property(model.get_id(), model)
+
         self.jsonschema = form_model.get_json_schema()
 
         return self.jsonschema
