@@ -18,6 +18,7 @@ from edi.jsonforms.content.option_list import (
 from edi.jsonforms.views.common import (
     create_id,
     check_show_condition_in_request,
+    single_answer_types,
 )
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
@@ -31,7 +32,7 @@ class OptionModel(BaseModel):
     id: str
     title: str
     parent: ISelectionField
-    dependencies: Optional[List[IOption]] = []
+    dependencies: Optional[List[IOption]] = Field(default_factory=list)
 
     class Config:
         arbitrary_types_allowed = True
@@ -45,14 +46,14 @@ class OptionModel(BaseModel):
 
     @classmethod
     def from_option(cls, option: IOption):
-        option = cls(
+        option_model = cls(
             id=create_id(option),
             title=option.title,
             parent=option.aq_parent,
         )
         if safe_hasattr(option, "dependencies"):
-            option.dependencies = option.dependencies
-        return option
+            option_model.dependencies = option.dependencies
+        return option_model
 
     @classmethod
     def from_id_and_title(cls, id: str, title: str, parent: ISelectionField):
@@ -110,10 +111,11 @@ class SelectionFieldModel(BaseFormElementModel):
 
         answer_type = form_element.answer_type
 
-        if answer_type == "radio" or answer_type == "select":
+        if answer_type in single_answer_types:
             self.type = "string"
             self.enum = []
-        elif answer_type == "checkbox" or answer_type == "selectmultiple":
+        elif answer_type not in single_answer_types:
+            # elif answer_type == "checkbox" or answer_type == "selectmultiple":
             self.type = "array"
             if self.is_required:
                 self.minItems = 1
