@@ -14,7 +14,7 @@ from edi.jsonforms.views.common import (
     get_description,
     create_id,
 )
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 # from edi.jsonforms.views.pydantic_models.schema_generator import (
 #     JsonSchemaGenerator,
 # )
@@ -33,7 +33,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         "BaseFormElementModel"
     ]  # actually it can only be an ObjectModel or a model that extends this (Form)
     required_choice: Optional[bool] = False
-    dependencies: Optional[List[IFormElement]] = []
+    dependencies: Optional[List[IFormElement]] = Field(default_factory=list)
 
     class Config:
         arbitrary_types_allowed = True

@@ -57,7 +57,7 @@ setup(
         "z3c.jbot",
         "plone.api>=1.8.4",
         "plone.app.dexterity",
-        "pydantic",
+        "pydantic>=2",
     ],
     extras_require={
         "test": [

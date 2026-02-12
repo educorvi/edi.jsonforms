@@ -4,7 +4,7 @@
 import copy
 import json
 from Products.Five.browser import BrowserView
-from edi.jsonforms.views.pydantic_models.SelectionFieldModel import GeneratorArguments
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from edi.jsonforms.views.pydantic_models.ObjectModel import (
     ObjectModel,
 )

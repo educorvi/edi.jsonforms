@@ -12,6 +12,8 @@ from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
 from edi.jsonforms.views.common import get_option_name
 # from plone.base.utils import safe_hasattr
 
+logger = logging.getLogger(__name__)
+
 
 def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
     """
@@ -111,7 +113,9 @@ def add_dependent_required(
             "then": create_statement(child.form_element, get_path(child.form_element))
         }
         if is_extended_schema:
-            if_statement["else"] = create_else_statement(child.form_element)
+            else_statement = create_else_statement(child.form_element)
+            if else_statement:
+                if_statement["else"] = else_statement
         if_then = {**if_statement, **then_statement}
         formProperties.update_allOf([if_then])
     # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
@@ -155,6 +159,7 @@ def create_else_statement(child_object: IFormElement) -> dict:
     if child_object.portal_type == "Field":
         if child_object.answer_type in string_type_fields:
             return {"properties": {create_id(child_object): {"maxLength": 0}}}
+    return {}
 
 
 def add_dependent_options(
@@ -176,7 +181,7 @@ def get_dependent_options(
 ) -> List[Dict[str, Any]]:
     dependency_option_order = {}
 
-    def add_to_dict(option, dependency, dict):
+    def add_to_dict(option, dependency, target_dict):
         parent_key = "SHOWALWAYS"
         if dependency:
             parent_key = create_id(dependency.aq_parent)
@@ -195,16 +200,16 @@ def get_dependent_options(
                 dependency_option_order[parent_key] = _get_option_order_map(
                     dependency.aq_parent
                 )
-            if parent_key in dict:
-                if dependency_key in dict[parent_key]:
-                    dict[parent_key][dependency_key].append(option_value)
+            if parent_key in target_dict:
+                if dependency_key in target_dict[parent_key]:
+                    target_dict[parent_key][dependency_key].append(option_value)
                 else:
-                    dict[parent_key][dependency_key] = [option_value]
+                    target_dict[parent_key][dependency_key] = [option_value]
             else:
-                dict[parent_key] = {}
-                dict[parent_key][dependency_key] = [option_value]
+                target_dict[parent_key] = {}
+                target_dict[parent_key][dependency_key] = [option_value]
         else:
-            dict["SHOWALWAYS"].append(get_option_name(option))
+            target_dict["SHOWALWAYS"].append(get_option_name(option))
 
     allof_list = []
     options = selectionfield.getFolderContents()

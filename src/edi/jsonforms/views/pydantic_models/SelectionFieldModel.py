@@ -3,9 +3,10 @@ from ZPublisher.HTTPRequest import WSGIRequest
 
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_options,
+    check_for_dependencies,
 )
 from plone.base.utils import safe_hasattr
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
 from edi.jsonforms.content.selection_field import ISelectionField
@@ -36,18 +37,29 @@ class OptionModel(BaseModel):
         arbitrary_types_allowed = True
 
     def __init__(self, id: str, title: str, parent: ISelectionField):
+        """
+        constructor for OptionModel, sets id, title and parent of the option
+        dependencies stay empty
+        """
         super().__init__(id=id, title=title, parent=parent)
 
     @classmethod
     def from_option(cls, option: IOption):
-        return cls(
+        option = cls(
             id=create_id(option),
             title=option.title,
             parent=option.aq_parent,
         )
+        if safe_hasattr(option, "dependencies"):
+            option.dependencies = option.dependencies
+        return option
 
     @classmethod
     def from_id_and_title(cls, id: str, title: str, parent: ISelectionField):
+        """
+        constructor for OptionModel, sets id, title and parent of the option
+        dependencies stay empty
+        """
         return cls(id=id, title=title, parent=parent)
 
     # a get method for name (title or id)
@@ -58,13 +70,13 @@ class OptionModel(BaseModel):
             return self.title
 
     def check_dependencies(self, is_single_view: bool) -> bool:
-        # return check_for_dependencies(self, is_single_view)
-        if is_single_view:  # if form-element-view, ignore all dependencies
-            return False
-        if self.dependencies:
-            return True
-        else:
-            return False
+        return check_for_dependencies(self, is_single_view)
+        # if is_single_view:  # if form-element-view, ignore all dependencies
+        #     return False
+        # if self.dependencies:
+        #     return True
+        # else:
+        #     return False
 
 
 class OptionListModel(BaseModel):

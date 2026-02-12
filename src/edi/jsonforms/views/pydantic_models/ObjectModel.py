@@ -32,8 +32,8 @@ from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
 logger = logging.getLogger(__name__)
 
 
-# in this file to avoid circular imports, since ObjectModel is needed in the create_model_recursivly function but also used inside the ObjectModel to create child models for complex fields and arrays
-def create_model_recursivly(
+# in this file to avoid circular imports, since ObjectModel is needed in the create_model_recursively function but also used inside the ObjectModel to create child models for complex fields and arrays
+def create_model_recursively(
     form_element: IFormElement,
     parent_model: BaseFormElementModel,
     generatorArguments: GeneratorArguments,
@@ -170,7 +170,7 @@ class ObjectModel(BaseFormElementModel):
         ):
             return None
 
-        model = create_model_recursivly(form_element, self, generatorArguments)
+        model = create_model_recursively(form_element, self, generatorArguments)
         if model is None:
             return None
 
@@ -209,7 +209,7 @@ class ObjectModel(BaseFormElementModel):
         does not make an entry inside the parent_models's dependentRequired and allOf lists
         """
 
-        model = create_model_recursivly(form_element, self, generatorArguments)
+        model = create_model_recursively(form_element, self, generatorArguments)
         if model is None:
             return None
 
@@ -356,7 +356,7 @@ class ReferenceModel(BaseFormElementModel):
                 else False
             )
 
-            model = create_model_recursivly(
+            model = create_model_recursively(
                 reference_object, parent_model, generatorArguments, False
             )
 
