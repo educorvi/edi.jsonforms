@@ -323,7 +323,7 @@ class UiSchemaView(BrowserView):
                             "Accept": "application/json",
                             "Content-Type": "application/json",
                         },
-                        "onSuccessRedirect": None,
+                        "onSuccessRedirect": "",
                     },
                 },
             },
@@ -361,7 +361,10 @@ class UiSchemaView(BrowserView):
                 button_schema["options"]["submitOptions"]["request"]["url"] = (
                     request_url
                 )
-                if safe_hasattr(button, "page_after_success"):
+                if (
+                    safe_hasattr(button, "page_after_success")
+                    and button.page_after_success
+                ):
                     button_schema["options"]["submitOptions"]["request"][
                         "onSuccessRedirect"
                     ] = button.page_after_success
