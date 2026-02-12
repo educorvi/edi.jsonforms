@@ -5,7 +5,6 @@ import json
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from edi.jsonforms.views.pydantic_models.ObjectModel import (
     ObjectModel,
-    create_model_recursivly,
 )
 from edi.jsonforms.views.pydantic_models.SelectionFieldModel import (
     OptionListModel,
