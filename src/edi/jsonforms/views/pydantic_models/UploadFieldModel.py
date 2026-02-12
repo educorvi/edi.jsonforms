@@ -16,8 +16,8 @@ class UploadFieldModel(BaseFormElementModel):
     maxItems: Optional[int] = None
     format: Optional[str] = None
     items: Optional[dict] = None
-    maxSize: Optional[int] = None
-    allowedTypes: Optional[List[str]] = None
+    # maxSize: Optional[int] = None
+    # allowedTypes: Optional[List[str]] = None
 
     def __init__(
         self,
@@ -46,8 +46,8 @@ class UploadFieldModel(BaseFormElementModel):
                 "format": "uri",
             }
 
-        self.maxSize = form_element.max_file_size
-        self.allowedTypes = form_element.accepted_file_types
+        # self.maxSize = form_element.max_file_size
+        # self.allowedTypes = form_element.accepted_file_types
 
     def get_json_schema(self):
         return super().get_json_schema()

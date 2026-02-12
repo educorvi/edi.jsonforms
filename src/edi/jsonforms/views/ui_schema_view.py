@@ -493,11 +493,6 @@ class UiSchemaView(BrowserView):
             child_tmp_schema = self.get_schema_for_child(
                 child_object, base_scope, False
             )
-            if (
-                child_object.portal_type == "UploadField"
-                and child_object.display_as_array
-            ):
-                child_tmp_schema["scope"] += "/items"
 
             child_schema = {}
             if "options" in child_tmp_schema:
@@ -506,6 +501,35 @@ class UiSchemaView(BrowserView):
                 child_schema["showOn"] = child_tmp_schema["showOn"]
 
             if child_schema != {}:
+                if child_object.portal_type == "UploadField":
+                    if "options" in child_schema:
+                        descendantControlOverrides[
+                            child_tmp_schema["scope"] + "/items"
+                        ] = {"options": {}}
+                        if "acceptedFileType" in child_schema["options"]:
+                            descendantControlOverrides[
+                                child_tmp_schema["scope"] + "/items"
+                            ]["options"]["acceptedFileType"] = child_schema["options"][
+                                "acceptedFileType"
+                            ]
+                            del child_schema["options"]["acceptedFileType"]
+                        if "maxFileSize" in child_schema["options"]:
+                            if child_schema["options"]["maxFileSize"] is not None:
+                                descendantControlOverrides[
+                                    child_tmp_schema["scope"] + "/items"
+                                ]["options"]["maxFileSize"] = child_schema["options"][
+                                    "maxFileSize"
+                                ]
+                            del child_schema["options"]["maxFileSize"]
+                        if (
+                            descendantControlOverrides[
+                                child_tmp_schema["scope"] + "/items"
+                            ]
+                            == {}
+                        ):
+                            del descendantControlOverrides[
+                                child_tmp_schema["scope"] + "/items"
+                            ]
                 descendantControlOverrides[child_tmp_schema["scope"]] = child_schema
         else:  # ignore this type
             pass
