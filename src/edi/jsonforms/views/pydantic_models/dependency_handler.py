@@ -1,10 +1,16 @@
 import copy
 import itertools
+import logging
 from plone.base.utils import safe_hasattr
 from typing import Any, Dict, List
 from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.content.common import IFormElement
-from edi.jsonforms.views.common import create_id, get_path, string_type_fields
+from edi.jsonforms.views.common import (
+    create_id,
+    get_path,
+    string_type_fields,
+    single_answer_types,
+)
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )

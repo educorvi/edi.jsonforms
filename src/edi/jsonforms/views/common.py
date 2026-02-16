@@ -4,6 +4,7 @@ from edi.jsonforms.content.option import IOption
 
 possibly_required_types = ["Field", "SelectionField", "UploadField", "Array"]
 
+# for Field
 string_type_fields = [
     "text",
     "textarea",
@@ -15,6 +16,9 @@ string_type_fields = [
     "datetime-local",
     "time",
 ]
+
+# for SelectionField
+single_answer_types = ["radio", "select"]
 
 container_types = ["Array", "Fieldset", "Complex"]
 
