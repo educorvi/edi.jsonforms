@@ -7,8 +7,11 @@
   <object name="Field" meta_type="Dexterity FTI"/>
   <object name="SelectionField" meta_type="Dexterity FTI"/>
   <object name="Option" meta_type="Dexterity FTI"/>
+  <object name="OptionList" meta_type="Dexterity FTI"/>
   <object name="Array" meta_type="Dexterity FTI"/>
   <object name="Complex" meta_type="Dexterity FTI"/>
   <object name="UploadField" meta_type="Dexterity FTI"/>
   <object name="Helptext" meta_type="Dexterity FTI"/>
+  <object name="Reference" meta_type="Dexterity FTI"/>
+  <object name="Wizard" meta_type="Dexterity FTI"/>
 </object>

@@ -11,10 +11,10 @@ from zope.interface import implementer
 
 
 from edi.jsonforms import _
-from edi.jsonforms.content.common import Required_categories, IDependent
+from edi.jsonforms.content.common import Required_categories, IDependentElements
 
 
-class IComplex(IDependent):
+class IComplex(IDependentElements):
 #class IComplex(model.Schema):
     """ Marker interface and Dexterity Python Schema for Complex
     """

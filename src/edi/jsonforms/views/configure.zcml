@@ -2,9 +2,61 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="edi.jsonforms">
 
   -*- extra stuff goes here -*-
+
+  <browser:page
+    name="version-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".version_view.VersionView"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    name="wizard-view"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardView"
+    template="wizard_view.pt"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    name="wizard-tools-view"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardToolsView"
+    template="wizard_tools_view.pt"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    name="wizard-json-schema"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardJsonSchemaView"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    name="wizard-ui-schema"
+    for="edi.jsonforms.content.wizard.IWizard"
+    class=".wizard_view.WizardUiSchemaView"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    name="form-element-view"
+    for="edi.jsonforms.content.common.IFormElement"
+    class=".form_element_view.FormElementView"
+    template="form_element_view.pt"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
 
   <browser:page
     name="form-view"
@@ -12,6 +64,22 @@
     class=".form_view.FormView"
     template="form_view.pt"
     permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    title="Form View"
+    menu="plone_displayviews"
+    i18n:domain="edi.jsonforms"
+    />
+
+  <browser:page
+    name="form-tools-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".form_view.FormToolsView"
+    template="form_tools_view.pt"
+    permission="zope2.View"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    title="Form view with tools"
+    menu="plone_displayviews"
+    i18n:domain="edi.jsonforms"
     />
 
   <browser:page
@@ -22,11 +90,36 @@
     />
 
   <browser:page
+    name="ui-schema-tools-view"
+    for="edi.jsonforms.content.form.IForm"
+    class=".ui_schema_tools_view.UiSchemaToolsView"
+    permission="zope2.View"
+    />
+
+  <browser:page
     name="json-schema-view"
     for="edi.jsonforms.content.form.IForm"
     class=".json_schema_view.JsonSchemaView"
     permission="zope2.View"
     />
 
+  <browser:page
+    name="convert-optionlist-view"
+    for="edi.jsonforms.content.option_list.IOptionList"
+    class=".optionlist_view.OptionListView"
+    template="optionlist_view.pt"
+    permission="zope2.View"
+    title="Convert Option List"
+    menu="plone_displayviews"
+    i18n:domain="edi.jsonforms"
+    layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+    />
+
+  <browser:page
+    for="edi.jsonforms.content.option_list.IOptionList"
+    name="convert_optionlist_to_options"
+    class=".optionlist_view.ConvertOptionListView"
+    permission="zope2.View"
+    />
 
 </configure>

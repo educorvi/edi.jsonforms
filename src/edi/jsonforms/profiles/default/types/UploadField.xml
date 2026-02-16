@@ -14,7 +14,7 @@
 
   <property name="allow_discussion">False</property>
   <property name="factory">UploadField</property>
-  <property name="icon_expr">string:${portal_url}/document_icon.png</property>
+  <property name="icon_expr">string:upload</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
@@ -38,7 +38,7 @@
     <element value="plone.shortname"/>
     <!-- <element value="plone.ownership"/> -->
     <!-- <element value="plone.publication"/> -->
-    <!-- <element value="plone.categorization"/> -->
+    <element value="plone.categorization"/>
     <!-- <element value="plone.basic"/> -->
     <element value="plone.app.referenceablebehavior.referenceable.IReferenceable" />
     <!--<element value="plone.leadimage"/>-->
@@ -51,11 +51,11 @@
 
   <!-- View information -->
   <property name="add_view_expr">string:${folder_url}/++add++UploadField</property>
-  <property name="default_view">view</property>
+  <property name="default_view">form-element-view</property>
   <property name="default_view_fallback">False</property>
-  <property name="immediate_view">view</property>
+  <property name="immediate_view">form-element-view</property>
   <property name="view_methods">
-    <element value="view"/>
+    <element value="form-element-view"/>
   </property>
 
   <!-- Method aliases -->

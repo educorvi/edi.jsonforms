@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="edi.jsonforms",
-    version="1.0a1",
+    version="0.10.dev0",
     description="Webforms based on JSON-Schema and UI-Schema for Plone",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
@@ -53,10 +53,11 @@ setup(
     install_requires=[
         "setuptools",
         # -*- Extra requirements: -*-
-        'plone.app.dexterity',
+        "plone.app.dexterity",
         "z3c.jbot",
         "plone.api>=1.8.4",
         "plone.app.dexterity",
+        "pydantic>=2",
     ],
     extras_require={
         "test": [

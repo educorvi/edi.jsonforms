@@ -1,0 +1,20 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="edi.jsonforms"
+      metal:use-macro="context/main_template/macros/master">
+  <body>
+    <metal:block fill-slot="content-core">
+        <!-- <a href="@@convert_optionlist_to_options" class="btn btn-primary" i18n:translate="">Convert Option List to Options</a> -->
+
+        <form method="post" action="@@convert_optionlist_to_options">
+            <input type="hidden" name="_authenticator" tal:attributes="value request/_authenticator" />
+            <button type="submit" class="btn btn-primary" i18n:translate="">Convert Option List to Options</button>
+            <div class="alert alert-warning mt-3">
+                <p i18n:translate="">Warning: This action will convert the Option List into individual Options. This operation cannot be undone.</p>
+            </div>
+        </form>
+    </metal:block>
+  </body>
+</html>
