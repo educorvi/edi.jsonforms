@@ -173,6 +173,8 @@ def get_path(obj: IFormElement, without_root=False):
     path = create_id(obj)
     while obj.aq_parent.portal_type != "Form":
         obj = obj.aq_parent
-        if obj.portal_type != "Fieldset":
+        if obj.portal_type == "Array":
+            path = create_id(obj) + "/items/properties/" + path
+        elif obj.portal_type != "Fieldset":
             path = create_id(obj) + "/properties/" + path
     return "properties/" + path

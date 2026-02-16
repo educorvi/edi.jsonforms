@@ -88,30 +88,51 @@ def add_dependent_required(
             if portal_type of obj is not Option and only one 'properties' in path, no 'properties' key is created
             """
             props = obj_path.split("/")
-            if props.count("properties") == 1 and obj.portal_type != "Option":
-                statement = {"required": [props[-1]]}
-            else:
-                statement = {}
-                cur_statement = statement
-
-                for i, p in enumerate(props):
-                    if p == "properties" and (
-                        i < len(props) - 2
-                        and obj.portal_type != "Option"
-                        or i < len(props) - 1
-                        and obj.portal_type == "Option"
-                    ):
-                        cur_statement[p] = {}
-                        cur_statement["required"] = [props[i + 1]]
-                        cur_statement = cur_statement[p]
-                    elif i < len(props) - 2:
-                        cur_statement[p] = {}
-                        cur_statement = cur_statement[p]
-                    else:  # last element
-                        if obj.portal_type == "Option":
+            # if props.count("properties") == 1 and obj.portal_type != "Option":
+            #     statement = {"required": [props[-1]]}
+            # else:
+            statement = {}
+            cur_statement = statement
+            # properties/arrayyy/items/properties/pflichtfeld-in-array
+            for i, p in enumerate(props):
+                if p == "properties" and (
+                    i < len(props) - 2
+                    and obj.portal_type != "Option"
+                    or i < len(props) - 1
+                    and obj.portal_type == "Option"
+                ):
+                    cur_statement[p] = {}
+                    cur_statement["required"] = [props[i + 1]]
+                    cur_statement = cur_statement[p]
+                elif i < len(props) - 2:
+                    cur_statement[p] = {}
+                    cur_statement = cur_statement[p]
+                else:  # last element
+                    if obj.portal_type == "Option":
+                        if obj.aq_parent.answer_type in single_answer_types:
                             cur_statement[p] = {"const": get_option_name(obj)}
                         else:
+                            cur_statement[p] = {
+                                "contains": {"const": get_option_name(obj)}
+                            }
+                    elif obj.portal_type == "Field":
+                        if obj.answer_type == "boolean":
+                            cur_statement[p] = {props[-1]: {"const": True}}
+                        else:
+                            if obj.answer_type in string_type_fields:
+                                cur_statement[p] = {props[-1]: {"minLength": 1}}
                             cur_statement["required"] = [props[-1]]
+                    elif (
+                        obj.portal_type == "SelectionField"
+                        and obj.answer_type in single_answer_types
+                    ):
+                        cur_statement["required"] = [props[-1]]
+                    elif obj.portal_type in ["SelectionField", "Array"]:
+                        cur_statement["required"] = [props[-1]]
+                        cur_statement[p] = {props[-1]: {"minItems": 1}}
+                    else:
+                        cur_statement["required"] = [props[-1]]
+                    break
             return statement
 
         if_statement = {"if": create_statement(dep, dep_path)}
