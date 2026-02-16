@@ -12,19 +12,17 @@ import unittest
 
 
 class ViewsIntegrationTest(unittest.TestCase):
-
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
 
     def setUp(self):
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        api.content.create(self.portal, 'Folder', 'other-folder')
-        api.content.create(self.portal, 'Document', 'front-page')
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
+        api.content.create(self.portal, "Folder", "other-folder")
+        api.content.create(self.portal, "Document", "front-page")
 
     def test_version_view_is_registered(self):
         view = getMultiAdapter(
-            (self.portal['other-folder'], self.portal.REQUEST),
-            name='version-view'
+            (self.portal["other-folder"], self.portal.REQUEST), name="version-view"
         )
         self.assertTrue(IVersionView.providedBy(view))
 
@@ -32,8 +30,7 @@ class ViewsIntegrationTest(unittest.TestCase):
         view_found = True
         try:
             view = getMultiAdapter(
-                (self.portal['front-page'], self.portal.REQUEST),
-                name='version-view'
+                (self.portal["front-page"], self.portal.REQUEST), name="version-view"
             )
         except ComponentLookupError:
             view_found = False
@@ -43,9 +40,8 @@ class ViewsIntegrationTest(unittest.TestCase):
 
 
 class ViewsFunctionalTest(unittest.TestCase):
-
     layer = EDI_JSONFORMS_FUNCTIONAL_TESTING
 
     def setUp(self):
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])

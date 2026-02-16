@@ -16,30 +16,58 @@ content_type (string): of the children to add
 answer_types (list of strings): of the children
 base_scope (string): of the children
 """
-def create_and_test_children(self, ref_schema, elements, container, content_type, answer_types, base_scope):
+
+
+def create_and_test_children(
+    self, ref_schema, elements, container, content_type, answer_types, base_scope
+):
     has_buttons_element = container.portal_type == "Form"
     for t in answer_types:
         t = t.value
-        field = api.content.create(type=content_type, title=t + "_" + content_type, container=container)
+        field = api.content.create(
+            type=content_type, title=t + "_" + content_type, container=container
+        )
         field.answer_type = t
 
         scope = base_scope + create_id(field)
         child_schema = reference_schemata.get_child_ref_schema_ui(t, scope)
-        elements = reference_schemata.insert_into_elements(elements, child_schema, has_buttons_element)
+        elements = reference_schemata.insert_into_elements(
+            elements, child_schema, has_buttons_element
+        )
 
         # test schema
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
+
 
 def create_and_test_all_children(self, ref_schema, elements, container, base_scope):
     # test fields in fieldset
-        create_and_test_children(self, ref_schema, elements, container, "Field", Answer_types, base_scope)
+    create_and_test_children(
+        self, ref_schema, elements, container, "Field", Answer_types, base_scope
+    )
 
-        # test selectionfields in fieldset
-        create_and_test_children(self, ref_schema, elements, container, "SelectionField", Selection_answer_types, base_scope)
+    # test selectionfields in fieldset
+    create_and_test_children(
+        self,
+        ref_schema,
+        elements,
+        container,
+        "SelectionField",
+        Selection_answer_types,
+        base_scope,
+    )
 
-        # test uploadfields in fieldset
-        create_and_test_children(self, ref_schema, elements, container, "UploadField", Upload_answer_types, base_scope)
+    # test uploadfields in fieldset
+    create_and_test_children(
+        self,
+        ref_schema,
+        elements,
+        container,
+        "UploadField",
+        Upload_answer_types,
+        base_scope,
+    )
+
 
 """
 container: content_type Array or Complex
@@ -47,20 +75,35 @@ descendantControlOverrides needs the keys: "options":{"descendantControlOverride
 ref_schema: the full schema of the form
 descendantControlOverrides is part of the ref_schema
 """
-def create_and_test_children_descendantControlOverrides(self, ref_schema: dict, descendantControlOverrides: dict, container: type, content_type: type, answer_types: list, base_scope: str):
+
+
+def create_and_test_children_descendantControlOverrides(
+    self,
+    ref_schema: dict,
+    descendantControlOverrides: dict,
+    container: type,
+    content_type: type,
+    answer_types: list,
+    base_scope: str,
+):
     for t in answer_types:
         t = t.value
-        field = api.content.create(type=content_type, title=t + "_" + content_type, container=container)
+        field = api.content.create(
+            type=content_type, title=t + "_" + content_type, container=container
+        )
         field.answer_type = t
 
         scope = base_scope + create_id(field)
         child_schema = reference_schemata.get_child_ref_schema_ui(t, scope)
 
-        reference_schemata.insert_schema_into_descConOv(descendantControlOverrides, child_schema, scope)
+        reference_schemata.insert_schema_into_descConOv(
+            descendantControlOverrides, child_schema, scope
+        )
 
         # test schema
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
+
 
 """
 container: content_type Array or Complex
@@ -68,15 +111,47 @@ descendantControlOverrides needs the keys: "options":{"descendantControlOverride
 ref_schema: the full schema of the form
 descendantControlOverrides is part of the ref_schema
 """
-def create_and_test_all_children_descendantControlOverrides(self, ref_schema: dict, descendantControlOverrides: dict, container: type, base_scope: str):
+
+
+def create_and_test_all_children_descendantControlOverrides(
+    self,
+    ref_schema: dict,
+    descendantControlOverrides: dict,
+    container: type,
+    base_scope: str,
+):
     # test fields in fieldset
-    create_and_test_children(self, ref_schema, descendantControlOverrides, container, "Field", Answer_types, base_scope)
+    create_and_test_children(
+        self,
+        ref_schema,
+        descendantControlOverrides,
+        container,
+        "Field",
+        Answer_types,
+        base_scope,
+    )
 
     # test selectionfields in fieldset
-    create_and_test_children(self, ref_schema, descendantControlOverrides, container, "SelectionField", Selection_answer_types, base_scope)
+    create_and_test_children(
+        self,
+        ref_schema,
+        descendantControlOverrides,
+        container,
+        "SelectionField",
+        Selection_answer_types,
+        base_scope,
+    )
 
     # test uploadfields in fieldset
-    create_and_test_children(self, ref_schema, descendantControlOverrides, container, "UploadField", Upload_answer_types, base_scope)
+    create_and_test_children(
+        self,
+        ref_schema,
+        descendantControlOverrides,
+        container,
+        "UploadField",
+        Upload_answer_types,
+        base_scope,
+    )
 
 
 """
@@ -101,4 +176,3 @@ part_of_scope: "/properties/" for complex or "/properties/items/"
 #     # test filled complex in filled complex
 #     # insert children of self.complex into descendantControlOverrides of self.complex (is flattened) using base_scope
 #     create_content_ui.create_and_test_all_children_descendantControlOverrides(self, self.ref_schema, self.complex['options']['descendantControlOverrides'], self.complex, base_scope)
-
