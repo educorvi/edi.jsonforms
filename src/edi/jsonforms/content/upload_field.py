@@ -120,8 +120,7 @@ class IUploadField(IDependentExtended):
         title=_("Minimum number of files"),
         description=_("Minimum number of files that must be uploaded."),
         required=False,
-        min=1,
-        default=1,
+        min=0,
     )
 
     display_as_array = schema.Bool(

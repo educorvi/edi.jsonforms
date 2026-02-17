@@ -113,12 +113,6 @@ class IAdditionalInformation(IFormElement):
         default=False,
     )
 
-    # # TODO no added to ui-schema yet (version 3.1)
-    # # TODO translate
-    # user_info = schema.Text(title=_('Helptext for the user'),
-    #                             description=_("Is displayed as a little i next to the title."),
-    #                             required=False)
-
 
 class IDependent(IAdditionalInformation):
     fieldset(
