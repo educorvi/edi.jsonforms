@@ -1,7 +1,10 @@
 import re
+from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.option import IOption
 
 possibly_required_types = ["Field", "SelectionField", "UploadField", "Array"]
 
+# for Field
 string_type_fields = [
     "text",
     "textarea",
@@ -13,6 +16,9 @@ string_type_fields = [
     "datetime-local",
     "time",
 ]
+
+# for SelectionField
+single_answer_types = ["radio", "select"]
 
 container_types = ["Array", "Fieldset", "Complex"]
 
@@ -26,6 +32,13 @@ def create_unique_id(object):
     id_str = str(object.id) + str(object.UID())
     escaped_id_str = id_str.replace(".", "").replace("/", "")
     return escaped_id_str
+
+
+def get_option_name(option: IOption) -> str:
+    if option.aq_parent.use_id_in_schema:
+        return option.id
+    else:
+        return option.title
 
 
 def get_view_url(object):
@@ -150,3 +163,18 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
             return False
         else:
             return True
+
+
+def get_path(obj: IFormElement, without_root=False):
+    """
+    get the path of an object in the json schema (leaves out fieldsets)
+    e.g. properties/object1/properties/selectionfield1/properties/option1
+    """
+    path = create_id(obj)
+    while obj.aq_parent.portal_type != "Form":
+        obj = obj.aq_parent
+        if obj.portal_type == "Array":
+            path = create_id(obj) + "/items/properties/" + path
+        elif obj.portal_type != "Fieldset":
+            path = create_id(obj) + "/properties/" + path
+    return "properties/" + path

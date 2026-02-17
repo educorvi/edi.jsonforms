@@ -2,6 +2,14 @@
 
 from edi.jsonforms import _
 import json
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+from edi.jsonforms.views.pydantic_models.ObjectModel import (
+    ObjectModel,
+)
+from edi.jsonforms.views.pydantic_models.SelectionFieldModel import (
+    OptionListModel,
+    OptionModel,
+)
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -79,21 +87,35 @@ class FormElementJsonSchema(JsonSchemaView):
         return json.dumps(jsonschema, ensure_ascii=False, indent=4)
 
     def json_schema(self):
-        self.set_json_base_schema()
+        # self.set_json_base_schema()
 
         object = self.context
         option = None
+        parent = object.aq_parent
         if object.portal_type in ["Option", "OptionList"]:
             option = object
             object = object.aq_parent
-        self.add_child_to_schema(object, self.jsonschema)
+            parent = parent.aq_parent
 
-        if option:
-            if "properties" in self.jsonschema:
-                id = self.create_and_check_id(object)
-                if id in self.jsonschema["properties"]:
-                    if "enum" in self.jsonschema["properties"][id]:
-                        self.jsonschema["properties"][id]["enum"] = (
-                            self.get_values_for_selectionfield(object, option, True)
-                        )
+        generatorArguments = GeneratorArguments(
+            self.request, self.is_single_view, self.is_extended_schema
+        )
+        form_model = ObjectModel(parent, None, self.request)
+        model = form_model.create_and_add_model_without_dependencies(
+            object, generatorArguments
+        )
+
+        if model:
+            if option:
+                model.unset_options()
+                if option.portal_type == "Option":
+                    o = OptionModel.from_option(option)
+                    model.set_option(o)
+                elif option.portal_type == "OptionList":
+                    ol = OptionListModel(option)
+                    model.set_option(ol)
+            # if object.portal_type != "Fieldset":
+
+        self.jsonschema = form_model.get_json_schema()
+
         return self.jsonschema

@@ -12,7 +12,7 @@ from edi.jsonforms.content.option_list import get_keys_and_values_for_options_li
 
 from plone.base.utils import safe_hasattr
 
-from edi.jsonforms.views.json_schema_view import get_option_name
+from edi.jsonforms.views.common import get_option_name
 
 
 class UiSchemaView(BrowserView):
@@ -323,7 +323,7 @@ class UiSchemaView(BrowserView):
                             "Accept": "application/json",
                             "Content-Type": "application/json",
                         },
-                        "onSuccessRedirect": None,
+                        "onSuccessRedirect": "",
                     },
                 },
             },
@@ -361,7 +361,10 @@ class UiSchemaView(BrowserView):
                 button_schema["options"]["submitOptions"]["request"]["url"] = (
                     request_url
                 )
-                if safe_hasattr(button, "page_after_success"):
+                if (
+                    safe_hasattr(button, "page_after_success")
+                    and button.page_after_success
+                ):
                     button_schema["options"]["submitOptions"]["request"][
                         "onSuccessRedirect"
                     ] = button.page_after_success
@@ -498,6 +501,35 @@ class UiSchemaView(BrowserView):
                 child_schema["showOn"] = child_tmp_schema["showOn"]
 
             if child_schema != {}:
+                if child_object.portal_type == "UploadField":
+                    if "options" in child_schema:
+                        descendantControlOverrides[
+                            child_tmp_schema["scope"] + "/items"
+                        ] = {"options": {}}
+                        if "acceptedFileType" in child_schema["options"]:
+                            descendantControlOverrides[
+                                child_tmp_schema["scope"] + "/items"
+                            ]["options"]["acceptedFileType"] = child_schema["options"][
+                                "acceptedFileType"
+                            ]
+                            del child_schema["options"]["acceptedFileType"]
+                        if "maxFileSize" in child_schema["options"]:
+                            if child_schema["options"]["maxFileSize"] is not None:
+                                descendantControlOverrides[
+                                    child_tmp_schema["scope"] + "/items"
+                                ]["options"]["maxFileSize"] = child_schema["options"][
+                                    "maxFileSize"
+                                ]
+                            del child_schema["options"]["maxFileSize"]
+                        if (
+                            descendantControlOverrides[
+                                child_tmp_schema["scope"] + "/items"
+                            ]
+                            == {}
+                        ):
+                            del descendantControlOverrides[
+                                child_tmp_schema["scope"] + "/items"
+                            ]
                 descendantControlOverrides[child_tmp_schema["scope"]] = child_schema
         else:  # ignore this type
             pass
