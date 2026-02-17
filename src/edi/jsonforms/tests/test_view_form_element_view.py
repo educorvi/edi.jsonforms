@@ -17,20 +17,24 @@ class ViewsIntegrationTest(unittest.TestCase):
     def setUp(self):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        api.content.create(self.portal, "Folder", "other-folder")
-        api.content.create(self.portal, "Document", "front-page")
+        form = api.content.create(self.portal, "Form", "test-form")
+        api.content.create(form, "Field", "test-field")
 
     def test_form_element_view_is_registered(self):
         view = getMultiAdapter(
-            (self.portal["other-folder"], self.portal.REQUEST), name="form-element-view"
+            (self.portal["test-form"]["test-field"], self.portal.REQUEST),
+            name="form-element-view",
         )
-        self.assertTrue(IFormElementView.providedBy(view))
+        self.assertTrue(
+            IFormElementView.providedBy(view),
+            msg="ComponentLookUpError should not happen when trying to apply the form-element-view to a Field.",
+        )
 
     def test_form_element_view_not_matching_interface(self):
         view_found = True
         try:
             view = getMultiAdapter(
-                (self.portal["front-page"], self.portal.REQUEST),
+                (self.portal["test-form"], self.portal.REQUEST),
                 name="form-element-view",
             )
         except ComponentLookupError:

@@ -17,20 +17,24 @@ class ViewsIntegrationTest(unittest.TestCase):
     def setUp(self):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        api.content.create(self.portal, "Folder", "other-folder")
-        api.content.create(self.portal, "Document", "front-page")
+        api.content.create(self.portal, "Wizard", "test-wizard")
+        api.content.create(self.portal, "Form", "test-form")
 
     def test_wizard_view_is_registered(self):
         view = getMultiAdapter(
-            (self.portal["other-folder"], self.portal.REQUEST), name="wizard-view"
+            (self.portal["test-wizard"], self.portal.REQUEST), name="wizard-view"
         )
-        self.assertTrue(IWizardView.providedBy(view))
+        self.assertTrue(
+            IWizardView.providedBy(view),
+            msg="ComponentLookUpError should not happen when trying to apply the wizard-view to a Wizard.",
+        )
 
     def test_wizard_view_not_matching_interface(self):
         view_found = True
         try:
             view = getMultiAdapter(
-                (self.portal["front-page"], self.portal.REQUEST), name="wizard-view"
+                (self.portal["test-form"], self.portal.REQUEST),
+                name="wizard-view",
             )
         except ComponentLookupError:
             view_found = False

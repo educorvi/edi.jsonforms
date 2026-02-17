@@ -13,8 +13,8 @@ import json
 import unittest
 
 from edi.jsonforms.tests.utils._test_schema_views import (
-    test_json_schema_view_is_registered,
-    test_json_schema_view_not_matching_interface,
+    test_view_is_registered,
+    test_view_not_matching_interface,
     setUp_integration_test,
     setUp_ui_schema_test,
 )
@@ -24,7 +24,6 @@ from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
 from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
-from edi.jsonforms.content.field import IField
 
 
 class ViewsIntegrationTest(unittest.TestCase):
@@ -35,10 +34,10 @@ class ViewsIntegrationTest(unittest.TestCase):
         setUp_integration_test(self)
 
     def test_ui_schema_view_is_registered(self):
-        test_json_schema_view_is_registered(self, "ui-schema-view")
+        test_view_is_registered(self, "ui-schema-view")
 
     def test_ui_schema_view_not_matching_interface(self):
-        test_json_schema_view_not_matching_interface(self, "ui-schema-view")
+        test_view_not_matching_interface(self, "ui-schema-view")
 
 
 class ViewsUiSchemaPlainFormTest(unittest.TestCase):

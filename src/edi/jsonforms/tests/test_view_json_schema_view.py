@@ -31,8 +31,8 @@ from edi.jsonforms.tests.utils._test_required_choice import (
     test_object_children_required,
 )
 from edi.jsonforms.tests.utils._test_schema_views import (
-    test_json_schema_view_is_registered,
-    test_json_schema_view_not_matching_interface,
+    test_view_is_registered,
+    test_view_not_matching_interface,
     setUp_integration_test,
     setUp_json_schema_test,
 )
@@ -46,10 +46,10 @@ class ViewsIntegrationTest(unittest.TestCase):
         setUp_integration_test(self)
 
     def test_json_schema_view_is_registered(self):
-        test_json_schema_view_is_registered(self, "json-schema-view")
+        test_view_is_registered(self, "json-schema-view")
 
     def test_json_schema_view_not_matching_interface(self):
-        test_json_schema_view_not_matching_interface(self, "json-schema-view")
+        test_view_not_matching_interface(self, "json-schema-view")
 
 
 class ViewsJsonSchemaPlainFormTest(unittest.TestCase):

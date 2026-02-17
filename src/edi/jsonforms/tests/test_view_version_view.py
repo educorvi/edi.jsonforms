@@ -18,11 +18,11 @@ class ViewsIntegrationTest(unittest.TestCase):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         api.content.create(self.portal, "Folder", "other-folder")
-        api.content.create(self.portal, "Document", "front-page")
+        api.content.create(self.portal, "Form", "test-form")
 
     def test_version_view_is_registered(self):
         view = getMultiAdapter(
-            (self.portal["other-folder"], self.portal.REQUEST), name="version-view"
+            (self.portal["test-form"], self.portal.REQUEST), name="version-view"
         )
         self.assertTrue(IVersionView.providedBy(view))
 
@@ -30,7 +30,7 @@ class ViewsIntegrationTest(unittest.TestCase):
         view_found = True
         try:
             view = getMultiAdapter(
-                (self.portal["front-page"], self.portal.REQUEST), name="version-view"
+                (self.portal["other-folder"], self.portal.REQUEST), name="version-view"
             )
         except ComponentLookupError:
             view_found = False
