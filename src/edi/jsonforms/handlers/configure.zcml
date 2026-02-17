@@ -10,4 +10,10 @@
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
     handler=".schema_handler.schema_handler"
   />
+
+  <subscriber
+    for="edi.jsonforms.content.wizard.IWizard
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+    handler=".schema_handler.wizard_schema_handler"
+  />
 </configure>
