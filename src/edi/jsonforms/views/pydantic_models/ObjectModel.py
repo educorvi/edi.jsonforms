@@ -318,6 +318,12 @@ class ArrayModel(BaseFormElementModel):
             self.form_element, self.parent, generatorArguments.request
         )
         object_model.set_children(generatorArguments)
+
+        # remove fields of object_model that are not needed
+        object_model.description = None
+        object_model.comment = None
+        object_model.required_choice = False
+
         self.items = object_model
 
     def get_json_schema(self) -> dict:
