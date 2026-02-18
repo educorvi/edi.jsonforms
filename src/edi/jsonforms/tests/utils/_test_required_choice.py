@@ -10,6 +10,7 @@ import copy
 import json
 
 from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.pydantic_models.FieldModel import string_type_fields
 
 
 """
@@ -21,7 +22,11 @@ requirements:
 
 
 def _test_required(self, ref_required):
-    computed_schema = {"required": json.loads(self.view())["required"]}
+    computed_schema = json.loads(self.view())
+    if len(ref_required) == 0:
+        self.assertNotIn("required", computed_schema)
+        return
+    computed_schema = {"required": computed_schema["required"]}
     ref_schema = {"required": ref_required}
     self.assertEqual(dict(computed_schema), dict(ref_schema))
 
@@ -112,8 +117,43 @@ def test_object_not_required(context, id, parent_id=None, parent_type=None):
         computed_schema = computed_schema["properties"][parent_id]["items"]
     elif parent_id:
         computed_schema = computed_schema["properties"][parent_id]
+    if "required" not in computed_schema:
+        return
     required_list = computed_schema["required"]
     context.assertNotIn(id, required_list)
+
+
+def set_child_required(child, child_id, schema, parent_id):
+    """
+    schema is the schema of the parent of the child (with {parent_id: {...}})
+    helper function to set a child required and add the child to the required-list of the parent in the ref_schema
+    """
+    is_array = "items" in schema[parent_id]
+    if is_array and "required" not in schema[parent_id]["items"]:
+        schema[parent_id]["items"]["required"] = []
+    elif not is_array and "required" not in schema[parent_id]:
+        schema[parent_id]["required"] = []
+
+    child.required_choice = "required"
+    if is_array:
+        schema[parent_id]["items"]["required"].append(child_id)
+    else:
+        schema[parent_id]["required"].append(child_id)
+    if child.portal_type == "Array" or (
+        child.portal_type == "SelectionField" and child.answer_type == "checkbox"
+    ):
+        if is_array:
+            schema[parent_id]["items"]["properties"][child_id]["minItems"] = 1
+        else:
+            schema[parent_id]["properties"][child_id]["minItems"] = 1
+
+    if child.portal_type == "Field" and child.answer_type in string_type_fields:
+        if is_array:
+            schema[parent_id]["items"]["properties"][child_id]["minLength"] = 1
+        else:
+            schema[parent_id]["properties"][child_id]["minLength"] = 1
+
+    return schema
 
 
 """
@@ -150,16 +190,7 @@ def test_object_children_required(self, obj, ref_schema, test_schema_method):
         test_object_not_required(self, obj_id)
 
         # test that child is in the required-list of the object
-        child.required_choice = "required"
-        if is_array:
-            ref_schema_copy[obj_id]["items"]["required"].append(child_id)
-        else:
-            ref_schema_copy[obj_id]["required"].append(child_id)
-        if child.portal_type == "Array":
-            if is_array:
-                ref_schema_copy[obj_id]["items"]["properties"][child_id]["minItems"] = 1
-            else:
-                ref_schema_copy[obj_id]["properties"][child_id]["minItems"] = 1
+        set_child_required(child, child_id, ref_schema_copy, obj_id)
         test_schema_method(ref_schema_copy)
 
         # test that each child and the object are required
@@ -177,8 +208,20 @@ def test_object_children_required(self, obj, ref_schema, test_schema_method):
             del ref_schema_copy[obj_id]["minItems"]
         else:
             ref_schema_copy[obj_id]["required"] = []
-        if child.portal_type == "Array":
-            del ref_schema_copy[obj_id]["items"]["properties"][child_id]["minItems"]
+        if child.portal_type == "Array" or (
+            child.portal_type == "SelectionField" and child.answer_type == "checkbox"
+        ):
+            if is_array:
+                del ref_schema_copy[obj_id]["items"]["properties"][child_id]["minItems"]
+            else:
+                del ref_schema_copy[obj_id]["properties"][child_id]["minItems"]
+        if child.portal_type == "Field" and child.answer_type in string_type_fields:
+            if is_array:
+                del ref_schema_copy[obj_id]["items"]["properties"][child_id][
+                    "minLength"
+                ]
+            else:
+                del ref_schema_copy[obj_id]["properties"][child_id]["minLength"]
 
     # test that all children are required
     for child in obj.getFolderContents():
@@ -191,13 +234,7 @@ def test_object_children_required(self, obj, ref_schema, test_schema_method):
         test_object_not_required(self, obj_id)
 
         # test that child is in the required-list of the object
-        child.required_choice = "required"
-        if is_array:
-            ref_schema_copy[obj_id]["items"]["required"].append(child_id)
-        else:
-            ref_schema_copy[obj_id]["required"].append(child_id)
-        if child.portal_type == "Array":
-            ref_schema_copy[obj_id]["items"]["properties"][child_id]["minItems"] = 1
+        ref_schema_copy = set_child_required(child, child_id, ref_schema_copy, obj_id)
         test_schema_method(ref_schema_copy)
 
         # test that each child and the object are required

@@ -2,7 +2,6 @@ from plone import api
 
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
-from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
 
 import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
@@ -36,10 +35,14 @@ def create_child_in_object(ref_schema, type, answer_type, container):
             child_ref_schema["items"]["enum"] = ["yes", "no"]
 
     if container.portal_type == "Array":
+        if "properties" not in ref_schema[create_id(container)]["items"]:
+            ref_schema[create_id(container)]["items"]["properties"] = {}
         ref_schema[create_id(container)]["items"]["properties"][child_id] = (
             child_ref_schema
         )
     else:
+        if "properties" not in ref_schema[create_id(container)]:
+            ref_schema[create_id(container)]["properties"] = {}
         ref_schema[create_id(container)]["properties"][child_id] = child_ref_schema
     return ref_schema
 
@@ -82,19 +85,17 @@ def create_all_child_types_in_object(ref_schema, container):
 
     # Fields
     for type in Answer_types:
-        type = type.value
+        type = type.value if hasattr(type, "value") else type
         ref_schema = create_child_in_object(ref_schema, "Field", type, container)
 
     # SelectionFields
     for type in Selection_answer_types:
-        type = type.value
+        type = type.value if hasattr(type, "value") else type
         ref_schema = create_child_in_object(
             ref_schema, "SelectionField", type, container
         )
 
-    # UploadFields
-    for type in Upload_answer_types:
-        type = type.value
-        ref_schema = create_child_in_object(ref_schema, "UploadField", type, container)
+    # UploadField
+    ref_schema = create_child_in_object(ref_schema, "UploadField", "file", container)
 
     return ref_schema

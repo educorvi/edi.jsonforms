@@ -44,7 +44,7 @@ def setUp_integration_test(self):
     self.ids[feldgruppe.title] = feldgruppe.id
 
 
-def test_json_schema_view_is_registered(self, view_name):
+def test_view_is_registered(self, view_name):
     try:
         view = getMultiAdapter(
             (self.portal["Fragebogen"], self.portal.REQUEST), name=view_name
@@ -52,14 +52,14 @@ def test_json_schema_view_is_registered(self, view_name):
         self.assertTrue(view.__name__ == view_name)
     except ComponentLookupError:
         self.assertTrue(
-            1 == 0,
+            False,
             msg="ComponentLookUpError should not happen when trying to apply the "
             + str(view_name)
             + " to a Form.",
         )
 
 
-def test_json_schema_view_not_matching_interface(self, view_name):
+def test_view_not_matching_interface(self, view_name):
     with self.assertRaises(ComponentLookupError):
         getMultiAdapter(
             (self.portal["front-page"], self.portal.REQUEST), name=view_name

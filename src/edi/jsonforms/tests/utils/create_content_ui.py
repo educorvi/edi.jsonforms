@@ -6,7 +6,6 @@ from edi.jsonforms.views.common import create_id
 import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
-from edi.jsonforms.content.upload_field import Upload_answer_types
 
 """
 ref_schema (dict): whole ui-schema
@@ -21,9 +20,8 @@ base_scope (string): of the children
 def create_and_test_children(
     self, ref_schema, elements, container, content_type, answer_types, base_scope
 ):
-    has_buttons_element = container.portal_type == "Form"
     for t in answer_types:
-        t = t.value
+        t = t.value if hasattr(t, "value") else t
         field = api.content.create(
             type=content_type, title=t + "_" + content_type, container=container
         )
@@ -31,9 +29,7 @@ def create_and_test_children(
 
         scope = base_scope + create_id(field)
         child_schema = reference_schemata.get_child_ref_schema_ui(t, scope)
-        elements = reference_schemata.insert_into_elements(
-            elements, child_schema, has_buttons_element
-        )
+        elements = reference_schemata.insert_into_elements(elements, child_schema)
 
         # test schema
         computed_schema = json.loads(self.view())
@@ -64,7 +60,7 @@ def create_and_test_all_children(self, ref_schema, elements, container, base_sco
         elements,
         container,
         "UploadField",
-        Upload_answer_types,
+        ["file"],
         base_scope,
     )
 
@@ -87,7 +83,7 @@ def create_and_test_children_descendantControlOverrides(
     base_scope: str,
 ):
     for t in answer_types:
-        t = t.value
+        t = t.value if hasattr(t, "value") else t
         field = api.content.create(
             type=content_type, title=t + "_" + content_type, container=container
         )
@@ -149,7 +145,7 @@ def create_and_test_all_children_descendantControlOverrides(
         descendantControlOverrides,
         container,
         "UploadField",
-        Upload_answer_types,
+        ["file"],
         base_scope,
     )
 

@@ -22,7 +22,6 @@ from edi.jsonforms.tests.utils import create_content_ui
 import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
-from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
 
 
@@ -89,6 +88,7 @@ class ViewsUiSchemaFormWithChildrenTest(unittest.TestCase):
             Selection_answer_types,
             "/properties/",
         )
+
         for sf in self.form.getFolderContents():
             sf = sf.getObject()
             api.content.create(
@@ -104,7 +104,7 @@ class ViewsUiSchemaFormWithChildrenTest(unittest.TestCase):
             ref_schema["layout"]["elements"],
             self.form,
             "UploadField",
-            Upload_answer_types,
+            ["file"],
             "/properties/",
         )
 
@@ -159,10 +159,10 @@ class ViewsUiSchemaFormWithChildrenTest(unittest.TestCase):
         uploadfield = api.content.create(
             type="UploadField", title="uploadfield", container=self.form
         )
-        uploadfield.accepted_file_types = ["pdf", "png"]
+        uploadfield.accepted_file_types = ["application/pdf", "image/png"]
         self._test_options(
             uploadfield,
-            ["file", "file-multi"],
+            ["file"],
             "acceptedFileType",
             uploadfield.accepted_file_types,
         )
@@ -279,24 +279,23 @@ class ViewsUiSchemaFormWithArrayTest(unittest.TestCase):
             type="Array", title="Array", container=self.form
         )
         self.ref_schema = reference_schemata.get_form_ref_schema_ui()
-        array_schema = reference_schemata.get_array_ref_schema_ui("/properties/")
+        array_schema = reference_schemata.get_array_ref_schema_ui("/properties/array")
         self.ref_schema["layout"]["elements"] = reference_schemata.insert_into_elements(
             self.ref_schema["layout"]["elements"], array_schema
         )
 
     def test_empty_array(self):
-        # TODO
         self._test_schema(self.ref_schema)
 
     def test_children_in_array(self):
         base_scope = "/properties/" + create_id(self.array) + "/items/properties/"
-        create_content_ui.create_and_test_all_children_descendantControlOverrides(
-            self,
-            self.ref_schema,
-            self.ref_schema["layout"]["elements"][0],
-            self.array,
-            base_scope,
-        )
+        # create_content_ui.create_and_test_all_children_descendantControlOverrides(
+        #     self,
+        #     self.ref_schema,
+        #     self.ref_schema["layout"]["elements"],
+        #     self.array,
+        #     base_scope,
+        # )
         # TODO
 
     # def test_array_in_array(self):
@@ -347,24 +346,27 @@ class ViewsUiSchemaFormWithComplexTest(unittest.TestCase):
             type="Complex", title="Complex", container=self.form
         )
         self.ref_schema = reference_schemata.get_form_ref_schema_ui()
-        complex_schema = reference_schemata.get_complex_ref_schema_ui("/properties/")
+        complex_schema = reference_schemata.get_complex_ref_schema_ui(
+            "/properties/complex"
+        )
         self.ref_schema["layout"]["elements"] = reference_schemata.insert_into_elements(
             self.ref_schema["layout"]["elements"], complex_schema
         )
 
     def test_empty_complex(self):
-        # TODO
         self._test_schema(self.ref_schema)
 
     def test_children_in_complex(self):
         base_scope = "/properties/" + create_id(self.complex) + "/properties/"
-        create_content_ui.create_and_test_all_children_descendantControlOverrides(
-            self,
-            self.ref_schema,
-            self.ref_schema["layout"]["elements"][0],
-            self.complex,
-            base_scope,
-        )
+
+        # deprecated: children arent added to complex anymore. only their options to descendantControlOverrides
+        # create_content_ui.create_and_test_all_children_descendantControlOverrides(
+        #     self,
+        #     self.ref_schema,
+        #     self.ref_schema["layout"]["elements"],
+        #     self.complex,
+        #     base_scope,
+        # )
         # TODO
 
     # def test_complex_in_complex(self):

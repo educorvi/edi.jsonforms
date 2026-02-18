@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from edi.jsonforms.content.upload_field import IUploadField
 from edi.jsonforms.testing import EDI_JSONFORMS_FUNCTIONAL_TESTING
 from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
@@ -19,8 +20,8 @@ import unittest
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.field import IField
 from edi.jsonforms.content.selection_field import Selection_answer_types
-from edi.jsonforms.content.upload_field import Upload_answer_types
 from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import string_type_fields
 
 import edi.jsonforms.tests.utils.reference_schemata as reference_schemata
 import edi.jsonforms.tests.utils.create_content as test_content
@@ -29,6 +30,7 @@ from edi.jsonforms.tests.utils._test_required_choice import (
     test_object_required,
     test_object_not_required,
     test_object_children_required,
+    set_child_required,
 )
 from edi.jsonforms.tests.utils._test_schema_views import (
     test_view_is_registered,
@@ -245,7 +247,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     def test_multiple_fields(self):
         field_id = create_id(self.field)
-        ref_schema = reference_schemata.get_form_ref_schema("")
+        ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
         ref_schema["properties"][create_id(self.field)] = (
             reference_schemata.get_field_ref_schema(self.field.answer_type)
         )
@@ -552,22 +554,56 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
             type="UploadField", title="an uploadfield", container=self.form
         )
 
-    def test_file_uploadfield(self):
-        self.uploadfield.answer_type = "file"
+    def test_uploadfield(self):
         ref_schema = {
-            create_id(self.uploadfield): reference_schemata.get_uploadfield_ref_schema(
-                "file"
-            )
+            create_id(self.uploadfield): reference_schemata.get_uploadfield_ref_schema()
         }
         self._test_uploadfield_schema(ref_schema)
 
-    def test_filemulti_uploadfield(self):
-        self.uploadfield.answer_type = "file-multi"
+    def test_uploadfield_options(self):
+        field_id = create_id(self.uploadfield)
+
+        # test max number of files (schema not of type array)
+        self.uploadfield.max_number_of_files = 1
         ref_schema = {
-            create_id(self.uploadfield): reference_schemata.get_uploadfield_ref_schema(
-                "file-multi"
-            )
+            field_id: reference_schemata.get_uploadfield_ref_schema(max_files=1)
         }
+        self._test_uploadfield_schema(ref_schema)
+
+        # test invariant for min and max number of files
+        self.uploadfield.min_number_of_files = 5
+        try:
+            IUploadField.validateInvariants(self.uploadfield)
+            self.fail(
+                "Min_max_number_of_files_invariant didn't raise an Invalid a minimum bigger than the maximum."
+            )
+        except Invalid:
+            pass
+
+        # test min number of files, schema of type array now (because max_number_of_files != 1)
+        self.uploadfield.min_number_of_files = 1
+        self.uploadfield.max_number_of_files = None
+        ref_schema = {field_id: reference_schemata.get_uploadfield_ref_schema()}
+        ref_schema[field_id]["minItems"] = 1
+        self._test_uploadfield_schema(ref_schema)
+
+        # test min and max number of files
+        self.uploadfield.max_number_of_files = 5
+        ref_schema[field_id]["maxItems"] = 5
+        self._test_uploadfield_schema(ref_schema)
+
+        # test options that don't change the schema
+        self.uploadfield.accepted_file_types = ["image/png", "application/pdf"]
+        self._test_uploadfield_schema(
+            ref_schema
+        )  # doesn't change the schema, only ui schema
+
+        self.uploadfield.max_file_size = 5  # doesn't change the schema, only ui schema
+        self._test_uploadfield_schema(ref_schema)
+
+        self.uploadfield.display_as_array = (
+            True  # doesn't change the schema, only the ui schema
+        )
         self._test_uploadfield_schema(ref_schema)
 
     def test_additional_information(self):
@@ -575,25 +611,19 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
         self.uploadfield.user_helptext = "a tipp"
         field_id = create_id(self.uploadfield)
 
-        for type in Upload_answer_types:
-            type = type.value
-            self.uploadfield.answer_type = type
-            ref_schema = {field_id: reference_schemata.get_uploadfield_ref_schema(type)}
+        ref_schema = {field_id: reference_schemata.get_uploadfield_ref_schema()}
 
-            self.uploadfield.description = "a description"
-            ref_schema[field_id]["description"] = "a description"
-            self._test_uploadfield_schema(ref_schema)
+        self.uploadfield.description = "a description"
+        ref_schema[field_id]["description"] = "a description"
+        self._test_uploadfield_schema(ref_schema)
 
-            self.uploadfield.intern_information = "an extra info"
-            ref_schema[field_id]["comment"] = "an extra info"
-            self._test_uploadfield_schema(ref_schema)
+        self.uploadfield.intern_information = "an extra info"
+        ref_schema[field_id]["comment"] = "an extra info"
+        self._test_uploadfield_schema(ref_schema)
 
-            self.uploadfield.description = None
-            del ref_schema[field_id]["description"]
-            self._test_uploadfield_schema(ref_schema)
-
-            self.uploadfield.intern_information = None
-            del ref_schema[field_id]["comment"]
+        self.uploadfield.description = None
+        del ref_schema[field_id]["description"]
+        self._test_uploadfield_schema(ref_schema)
 
 
 class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
@@ -616,7 +646,7 @@ class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
 
     def test_schema(self):
         computed_schema = json.loads(self.view())
-        ref_schema = reference_schemata.get_form_ref_schema("")
+        ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
         for f in self.field:
             ref_schema["properties"][create_id(f)] = (
                 reference_schemata.get_field_ref_schema(f.answer_type, f.title)
@@ -650,7 +680,7 @@ class ViewsJsonSchemaSelectionfieldsRequiredTest(unittest.TestCase):
 
     def test_schema(self):
         computed_schema = json.loads(self.view())
-        ref_schema = reference_schemata.get_form_ref_schema("")
+        ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
         for f in self.field:
             ref_schema["properties"][create_id(f)] = (
                 reference_schemata.get_selectionfield_ref_schema(f.answer_type, f.title)
@@ -670,7 +700,6 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
 
     def setUp(self):
         setUp_json_schema_test(self)
-        upload_answer_type = ["file", "file-multi", "file-multi"]
         self.field = []
         for i in range(3):
             self.field.append(
@@ -680,14 +709,13 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
                     container=self.form,
                 )
             )
-            self.field[i].answer_type = upload_answer_type[i]
 
     def test_schema(self):
         computed_schema = json.loads(self.view())
-        ref_schema = reference_schemata.get_form_ref_schema("")
+        ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
         for f in self.field:
             ref_schema["properties"][create_id(f)] = (
-                reference_schemata.get_uploadfield_ref_schema(f.answer_type, f.title)
+                reference_schemata.get_uploadfield_ref_schema(f.title)
             )
 
         self.assertEqual(dict(computed_schema), dict(ref_schema))
@@ -709,7 +737,9 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
     def _test_array_with_children(self, type, answer_types, ref_schema={}):
         array_id = create_id(self.array)
         if ref_schema == {}:
-            ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
+            ref_schema = {
+                array_id: reference_schemata.get_array_ref_schema(properties=True)
+            }
 
         for at in answer_types:
             ref_schema = test_content.create_child_in_object(
@@ -759,12 +789,13 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
     def test_array_with_uploadfields(self):
-        uploadfield_answer_types = [t.value for t in Upload_answer_types]
-        self._test_array_with_children("UploadField", uploadfield_answer_types)
+        self._test_array_with_children("UploadField", ["file"])
 
     def test_array_with_children(self):
         array_id = create_id(self.array)
-        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
+        ref_schema = {
+            array_id: reference_schemata.get_array_ref_schema(properties=True)
+        }
 
         ref_schema = test_content.create_all_child_types_in_object(
             ref_schema, self.array
@@ -773,7 +804,9 @@ class ViewsJsonSchemaFormWithArrayTest(unittest.TestCase):
 
     def test_array_with_array(self):
         array_id = create_id(self.array)
-        ref_schema = {array_id: reference_schemata.get_array_ref_schema()}
+        ref_schema = {
+            array_id: reference_schemata.get_array_ref_schema(properties=True)
+        }
 
         # test array with empty array
         child_array = api.content.create(
@@ -842,7 +875,11 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
     def test_array_children_required(self):
-        ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
+        ref_schema = {
+            self.array_id: reference_schemata.get_array_ref_schema(
+                properties=True, required=True
+            )
+        }
         ref_schema = test_content.create_all_child_types_in_object(
             ref_schema, self.array
         )
@@ -852,7 +889,11 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         )
 
     def test_array_in_array_required(self):
-        ref_schema = {self.array_id: reference_schemata.get_array_ref_schema()}
+        ref_schema = {
+            self.array_id: reference_schemata.get_array_ref_schema(
+                properties=True, required=True
+            )
+        }
 
         # test empty array in array required
         child_array = api.content.create(
@@ -876,9 +917,6 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         self._test_array_schema(ref_schema)
 
         # test empty child_array in array required and other fields in array required
-        ref_schema = test_content.create_all_child_types_in_object(
-            ref_schema, self.array
-        )
         child_array.required_choice = "optional"
         ref_schema[self.array_id]["items"]["required"] = []
         del child_array_schema["minItems"]
@@ -895,11 +933,16 @@ class ViewsJsonSchemaArrayRequiredTest(unittest.TestCase):
         )[child_array_id]
         self._test_array_schema(ref_schema)
 
-        # test non-empty child_array in array required and other fields in array required and fields in child_array required
+        # test non-empty child_array in array required and other fields in array optional and fields in child_array required
         for child in child_array.getFolderContents():
             child = child.getObject()
             child.required_choice = "required"
-            child_array_schema["items"]["required"].append(create_id(child))
+            child_array_schema = set_child_required(
+                child,
+                create_id(child),
+                {child_array_id: child_array_schema},
+                child_array_id,
+            )[child_array_id]
         test_object_children_required(
             self, self.array, ref_schema, self._test_array_schema
         )
@@ -920,7 +963,7 @@ class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
         if ref_schema == {}:
             ref_schema = {
                 complex_id: reference_schemata.get_complex_ref_schema(
-                    self.complex.title
+                    self.complex.title, properties=True
                 )
             }
 
@@ -977,13 +1020,15 @@ class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
         self._test_complex_schema(ref_schema)
 
     def test_complex_with_uploadfields(self):
-        uploadfield_answer_types = [t.value for t in Upload_answer_types]
+        uploadfield_answer_types = ["file"]
         self._test_complex_with_children("UploadField", uploadfield_answer_types)
 
     def test_complex_with_children(self):
         complex_id = create_id(self.complex)
         ref_schema = {
-            complex_id: reference_schemata.get_complex_ref_schema(self.complex.title)
+            complex_id: reference_schemata.get_complex_ref_schema(
+                self.complex.title, properties=True
+            )
         }
 
         ref_schema = test_content.create_all_child_types_in_object(
@@ -994,7 +1039,9 @@ class ViewsJsonSchemaFormWithComplexTest(unittest.TestCase):
     def test_complex_with_complex(self):
         complex_id = create_id(self.complex)
         ref_schema = {
-            complex_id: reference_schemata.get_complex_ref_schema(self.complex.title)
+            complex_id: reference_schemata.get_complex_ref_schema(
+                self.complex.title, properties=True
+            )
         }
 
         # test complex with empty complex
@@ -1070,7 +1117,7 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
     def test_complex_children_required(self):
         ref_schema = {
             self.complex_id: reference_schemata.get_complex_ref_schema(
-                self.complex.title
+                self.complex.title, properties=True, required=True
             )
         }
         ref_schema = test_content.create_all_child_types_in_object(
@@ -1082,7 +1129,9 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
         )
 
     def test_complex_in_complex_required(self):
-        ref_schema = {self.complex_id: reference_schemata.get_complex_ref_schema()}
+        ref_schema = {
+            self.complex_id: reference_schemata.get_complex_ref_schema(properties=True)
+        }
 
         # create child complex
         child_complex = api.content.create(
@@ -1107,7 +1156,6 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
         ref_schema = test_content.create_all_child_types_in_object(
             ref_schema, self.complex
         )
-        # import pdb; pdb.set_trace()
         test_object_children_required(
             self, self.complex, ref_schema, self._test_complex_schema
         )
@@ -1122,7 +1170,12 @@ class ViewsJsonSchemaComplexRequiredTest(unittest.TestCase):
         for child in child_complex.getFolderContents():
             child = child.getObject()
             child.required_choice = "required"
-            child_complex_schema["required"].append(create_id(child))
+            child_complex_schema = set_child_required(
+                child,
+                create_id(child),
+                {child_complex_id: child_complex_schema},
+                child_complex_id,
+            )[child_complex_id]
         test_object_children_required(
             self, self.complex, ref_schema, self._test_complex_schema
         )
@@ -1153,7 +1206,9 @@ class ViewsJsonSchemaNestedTest(unittest.TestCase):
 
         # test empty complex in array
         ref_schema = {
-            array_id: reference_schemata.get_array_ref_schema(outer_array.title)
+            array_id: reference_schemata.get_array_ref_schema(
+                outer_array.title, properties=True
+            )
         }
         complex_schema = reference_schemata.get_complex_ref_schema(inner_complex.title)
         ref_schema[array_id]["items"]["properties"][complex_id] = complex_schema
@@ -1171,8 +1226,12 @@ class ViewsJsonSchemaNestedTest(unittest.TestCase):
     def create_array_and_complex(self, container, ref_schema):
         ref_props = {}
         if container.portal_type == "Array":
+            if "properties" not in ref_schema["items"]:
+                ref_schema["items"]["properties"] = {}
             ref_props = ref_schema["items"]["properties"]
         else:
+            if "properties" not in ref_schema:
+                ref_schema["properties"] = {}
             ref_props = ref_schema["properties"]
         array = api.content.create(type="Array", title="an array", container=container)
         complex = api.content.create(
@@ -1187,7 +1246,7 @@ class ViewsJsonSchemaNestedTest(unittest.TestCase):
 
     def test_nested_depth_3(self):
         # test depth 1
-        ref_schema = reference_schemata.get_form_ref_schema()
+        ref_schema = reference_schemata.get_form_ref_schema(properties=True)
         self.create_array_and_complex(self.form, ref_schema)
         self._test_schema(ref_schema["properties"])
 
@@ -1226,10 +1285,11 @@ class ViewsJsonSchemaFieldsetTest(unittest.TestCase):
 
     def setUp(self):
         setUp_json_schema_test(self)
-        self.ref_schema = reference_schemata.get_form_ref_schema("")
+        self.ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
 
     def test_empty_fieldset(self):
         api.content.create(type="Fieldset", title="a fieldset", container=self.form)
+        del self.ref_schema["properties"]
         self._test_fieldset_schema()
 
     def create_everything_in_fieldset(self, schema, container):
@@ -1258,19 +1318,16 @@ class ViewsJsonSchemaFieldsetTest(unittest.TestCase):
                 )
             )
 
-        for t in Upload_answer_types:
-            t = t.value
-            child = api.content.create(
-                type="UploadField", title="uploadfield_" + t, container=container
-            )
-            child.answer_type = t
-            schema["properties"][create_id(child)] = (
-                reference_schemata.get_uploadfield_ref_schema(t, child.title)
-            )
+        child = api.content.create(
+            type="UploadField", title="uploadfield", container=container
+        )
+        schema["properties"][create_id(child)] = (
+            reference_schemata.get_uploadfield_ref_schema(child.title)
+        )
 
         array = api.content.create(type="Array", title="an array", container=container)
         schema["properties"][create_id(array)] = (
-            reference_schemata.get_array_ref_schema(array.title)
+            reference_schemata.get_array_ref_schema(array.title, properties=True)
         )
 
         array_child = api.content.create(
@@ -1286,7 +1343,7 @@ class ViewsJsonSchemaFieldsetTest(unittest.TestCase):
             type="Complex", title="a complex", container=container
         )
         schema["properties"][create_id(complex)] = (
-            reference_schemata.get_complex_ref_schema(complex.title)
+            reference_schemata.get_complex_ref_schema(complex.title, properties=True)
         )
 
         complex_child = api.content.create(
@@ -1320,34 +1377,35 @@ class ViewsJsonSchemaFieldsetTest(unittest.TestCase):
 
         self._test_fieldset_schema()
 
-    def test_nested_fieldset(self):
-        array = api.content.create(type="Array", title="an array", container=self.form)
-        self.ref_schema["properties"][create_id(array)] = (
-            reference_schemata.get_array_ref_schema(array.title)
-        )
+    ### Fieldsets are not possible inside array or complex
+    # def test_nested_fieldset(self):
+    #     array = api.content.create(type="Array", title="an array", container=self.form)
+    #     self.ref_schema["properties"][create_id(array)] = (
+    #         reference_schemata.get_array_ref_schema(array.title)
+    #     )
 
-        fieldset1 = api.content.create(
-            type="Fieldset", title="a fieldset in an array", container=array
-        )
-        self.create_everything_in_fieldset(
-            self.ref_schema["properties"][create_id(array)]["items"], fieldset1
-        )
+    #     fieldset1 = api.content.create(
+    #         type="Fieldset", title="a fieldset in an array", container=array
+    #     )
+    #     self.create_everything_in_fieldset(
+    #         self.ref_schema["properties"][create_id(array)]["items"], fieldset1
+    #     )
 
-        complex = api.content.create(
-            type="Complex", title="a complex", container=self.form
-        )
-        self.ref_schema["properties"][create_id(complex)] = (
-            reference_schemata.get_complex_ref_schema(complex.title)
-        )
+    #     complex = api.content.create(
+    #         type="Complex", title="a complex", container=self.form
+    #     )
+    #     self.ref_schema["properties"][create_id(complex)] = (
+    #         reference_schemata.get_complex_ref_schema(complex.title)
+    #     )
 
-        fieldset2 = api.content.create(
-            type="Fieldset", title="a fieldset in a complex", container=complex
-        )
-        self.create_everything_in_fieldset(
-            self.ref_schema["properties"][create_id(complex)], fieldset2
-        )
+    #     fieldset2 = api.content.create(
+    #         type="Fieldset", title="a fieldset in a complex", container=complex
+    #     )
+    #     self.create_everything_in_fieldset(
+    #         self.ref_schema["properties"][create_id(complex)], fieldset2
+    #     )
 
-        self._test_fieldset_schema()
+    #     self._test_fieldset_schema()
 
     # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
 
@@ -1365,7 +1423,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
     def setUp(self):
         setUp_json_schema_test(self)
         self.intids = component.getUtility(IIntIds)
-        self.ref_schema = reference_schemata.get_form_ref_schema("")
+        self.ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
 
     def create_all_content_types(self, container):
         # create dependent field in form
@@ -1407,6 +1465,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         dependent_array = api.content.create(
             type="Array", title="dependent array", container=container
         )
+
         dependent_array_id = create_id(dependent_array)
         self.ref_schema["properties"][dependent_array_id] = (
             reference_schemata.get_array_ref_schema("dependent array")
@@ -1424,87 +1483,113 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         computed_schema = json.loads(self.view())
         self.assertEqual(dict(computed_schema), dict(ref_schema))
 
-    def test_dependent_from_field(self):
-        # create independent field in the form
-        independent_field = api.content.create(
-            type="Field", title="independent", container=self.form
-        )
-        independent_field_id = create_id(independent_field)
-        self.ref_schema["properties"][independent_field_id] = (
-            reference_schemata.get_field_ref_schema(
-                independent_field.answer_type, "independent"
-            )
-        )
+    # def test_dependent_from_field(self):
+    #     # create independent field in the form
+    #     independent_field = api.content.create(
+    #         type="Field", title="independent", container=self.form
+    #     )
+    #     independent_field_id = create_id(independent_field)
+    #     self.ref_schema["properties"][independent_field_id] = (
+    #         reference_schemata.get_field_ref_schema(
+    #             independent_field.answer_type, "independent"
+    #         )
+    #     )
 
-        # create dependent field/selectionfield/complex/array
-        dep_field, dep_sel_field, dep_complex, dep_array = (
-            self.create_all_content_types(self.form)
-        )
-        ids = [
-            create_id(dep_field),
-            create_id(dep_sel_field),
-            create_id(dep_complex),
-            create_id(dep_array),
-        ]
+    #     # create dependent field/selectionfield/complex/array
+    #     dep_field, dep_sel_field, dep_complex, dep_array = (
+    #         self.create_all_content_types(self.form)
+    #     )
+    #     ids = [
+    #         create_id(dep_field),
+    #         create_id(dep_sel_field),
+    #         create_id(dep_complex),
+    #         create_id(dep_array),
+    #     ]
 
-        # test dep_field (type field, selection_field, upload_field, complex or array) is dependent required from the independent field
-        def test_dep_req(dep_field, id):
-            # add dependency to the independent_field
-            dep_field.dependencies = [
-                RelationValue(self.intids.getId(independent_field))
-            ]
-            modified(dep_field)
-            # test schema, nothing should be changed
-            self._test_form_schema()
+    #     # test dep_field (type field, selection_field, upload_field, complex or array) is dependent required from the independent field
+    #     def test_dep_req(dep_field, id):
+    #         # add dependency to the independent_field
+    #         dep_field.dependencies = [
+    #             RelationValue(self.intids.getId(independent_field))
+    #         ]
+    #         modified(dep_field)
+    #         # test schema, nothing should be changed
+    #         self._test_form_schema()
 
-            # make independent field required
-            independent_field.required_choice = "required"
-            self.ref_schema["required"].append(independent_field_id)
-            # test schema, nothing should be changed (except for the required status)
-            self._test_form_schema()
+    #         # make independent field required
+    #         independent_field.required_choice = "required"
+    #         if "required" not in self.ref_schema:
+    #             self.ref_schema["required"] = []
+    #         self.ref_schema["required"].append(independent_field_id)
+    #         # test schema, nothing should be changed (except for the required status)
+    #         self._test_form_schema()
 
-            # make dependent one required
-            dep_field.required_choice = "required"
-            if dep_field.portal_type != "Complex":
-                if independent_field_id in self.ref_schema["dependentRequired"]:
-                    self.ref_schema["dependentRequired"][independent_field_id].append(
-                        [id]
-                    )
-                else:
-                    self.ref_schema["dependentRequired"][independent_field_id] = [id]
-                if dep_field.portal_type == "Array":
-                    self.ref_schema["properties"][id]["minItems"] = 1
-            # test schema, dependentrequired should be changed (unless it is a complex object)
-            self._test_form_schema()
+    #         # make dependent one required
+    #         dep_field.required_choice = "required"
+    #         if dep_field.portal_type != "Complex":
+    #             self.ref_schema["allOf"] = [
+    #                 {
+    #                     "if": {
+    #                         "properties": {
+    #                             independent_field_id: {"const": True}
+    #                         }
+    #                     },
+    #                     "then": {
+    #                         "required": [id]
+    #                     },
+    #                 }
+    #             ]
 
-            # make independent one optional again, dependentrequired should stay the same
-            independent_field.required_choice = "optional"
-            self.ref_schema["required"].remove(independent_field_id)
-            self._test_form_schema()
+    #             TODOOO
+    #             if independent_field_id in self.ref_schema["dependentRequired"]:
+    #                 self.ref_schema["dependentRequired"][independent_field_id].append(
+    #                     [id]
+    #                 )
+    #             else:
+    #                 self.ref_schema["dependentRequired"][independent_field_id] = [id]
+    #             if dep_field.portal_type == "Array":
+    #                 self.ref_schema["properties"][id]["minItems"] = 1
+    #             elif (
+    #                 dep_field.portal_type == "Field"
+    #                 and dep_field.answer_type in string_type_fields
+    #             ):
+    #                 self.ref_schema["properties"][id]["minLength"] = 1
+    #         # test schema, dependentrequired should be changed (unless it is a complex object)
+    #         self._test_form_schema()
 
-            # revert changes
-            dep_field.required_choice = "optional"
-            if dep_field.portal_type != "Complex":
-                self.ref_schema["dependentRequired"][independent_field_id].remove(id)
-                if self.ref_schema["dependentRequired"][independent_field_id] == []:
-                    del self.ref_schema["dependentRequired"][independent_field_id]
-                if dep_field.portal_type == "Array":
-                    del self.ref_schema["properties"][create_id(dep_field)]["minItems"]
-            dep_field.dependencies = []
+    #         # make independent one optional again, dependentrequired should stay the same
+    #         independent_field.required_choice = "optional"
+    #         self.ref_schema["required"].remove(independent_field_id)
+    #         self._test_form_schema()
 
-        answer_types = [a.value for a in Answer_types]
-        # test 'dependentRequired' for different answer types of undependent field
-        for at_independent in answer_types:
-            independent_field.answer_type = at_independent
-            self.ref_schema["properties"][independent_field_id] = (
-                reference_schemata.get_field_ref_schema(
-                    at_independent, independent_field.title
-                )
-            )
+    #         # revert changes
+    #         dep_field.required_choice = "optional"
+    #         if dep_field.portal_type != "Complex":
+    #             self.ref_schema["dependentRequired"][independent_field_id].remove(id)
+    #             if self.ref_schema["dependentRequired"][independent_field_id] == []:
+    #                 del self.ref_schema["dependentRequired"][independent_field_id]
+    #             if dep_field.portal_type == "Array":
+    #                 del self.ref_schema["properties"][create_id(dep_field)]["minItems"]
+    #             elif (
+    #                 dep_field.portal_type == "Field"
+    #                 and dep_field.answer_type in string_type_fields
+    #             ):
+    #                 del self.ref_schema["properties"][create_id(dep_field)]["minLength"]
+    #         dep_field.dependencies = []
 
-            self._test_dependencies(
-                [dep_field, dep_sel_field, dep_complex, dep_array], test_dep_req
-            )
+    #     answer_types = [a.value for a in Answer_types]
+    #     # test 'dependentRequired' for different answer types of undependent field
+    #     for at_independent in answer_types:
+    #         independent_field.answer_type = at_independent
+    #         self.ref_schema["properties"][independent_field_id] = (
+    #             reference_schemata.get_field_ref_schema(
+    #                 at_independent, independent_field.title
+    #             )
+    #         )
+
+    #         self._test_dependencies(
+    #             [dep_field, dep_sel_field, dep_complex, dep_array], test_dep_req
+    #         )
 
     """
     test_dep_req takes a field and its id as argument
@@ -1537,93 +1622,95 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
                 test_dep_req(d, ids[id])
             id += 1
 
-    def test_dependent_from_selectionfield(self):
-        # create independent selectionfield in the form with two options
-        independent_field = api.content.create(
-            type="SelectionField", title="independent", container=self.form
-        )
-        opt1 = api.content.create(
-            type="Option", title="yes", container=independent_field
-        )
-        opt2 = api.content.create(
-            type="Option", title="no", container=independent_field
-        )
-        options = [opt1.title, opt2.title]
+    # def test_dependent_from_selectionfield(self):
+    #     # create independent selectionfield in the form with two options
+    #     independent_field = api.content.create(
+    #         type="SelectionField", title="independent", container=self.form
+    #     )
+    #     opt1 = api.content.create(
+    #         type="Option", title="yes", container=independent_field
+    #     )
+    #     opt2 = api.content.create(
+    #         type="Option", title="no", container=independent_field
+    #     )
+    #     options = [opt1.title, opt2.title]
 
-        independent_field_id = create_id(independent_field)
-        self.ref_schema["properties"][independent_field_id] = (
-            reference_schemata.get_selectionfield_ref_schema(
-                independent_field.answer_type, "independent", options
-            )
-        )
+    #     independent_field_id = create_id(independent_field)
+    #     self.ref_schema["properties"][independent_field_id] = (
+    #         reference_schemata.get_selectionfield_ref_schema(
+    #             independent_field.answer_type, "independent", options
+    #         )
+    #     )
 
-        # create dependent field/selectionfield/complex/array
-        dep_field, dep_sel_field, dep_complex, dep_array = (
-            self.create_all_content_types(self.form)
-        )
-        ids = [
-            create_id(dep_field),
-            create_id(dep_sel_field),
-            create_id(dep_complex),
-            create_id(dep_array),
-        ]
+    #     # create dependent field/selectionfield/complex/array
+    #     dep_field, dep_sel_field, dep_complex, dep_array = (
+    #         self.create_all_content_types(self.form)
+    #     )
+    #     ids = [
+    #         create_id(dep_field),
+    #         create_id(dep_sel_field),
+    #         create_id(dep_complex),
+    #         create_id(dep_array),
+    #     ]
 
-        # test dep_field (type field, selection_field, upload_field, complex or array) is dependent required from the independent selectionfield
-        def test_dep_req(dep_field, id):
-            # add dependency to the option of the independent_field
-            dep_field.dependencies = [RelationValue(self.intids.getId(opt1))]
-            modified(dep_field)
-            # test schema, nothing should be changed
-            self._test_form_schema()
+    #     # test dep_field (type field, selection_field, upload_field, complex or array) is dependent required from the independent selectionfield
+    #     def test_dep_req(dep_field, id):
+    #         # add dependency to the option of the independent_field
+    #         dep_field.dependencies = [RelationValue(self.intids.getId(opt1))]
+    #         modified(dep_field)
+    #         # test schema, nothing should be changed
+    #         self._test_form_schema()
 
-            # make independent field required
-            independent_field.required_choice = "required"
-            self.ref_schema["required"].append(independent_field_id)
-            # test schema, nothing should be changed (except for the required status)
-            self._test_form_schema()
+    #         # make independent field required
+    #         independent_field.required_choice = "required"
+    #         if "required" not in self.ref_schema:
+    #             self.ref_schema["required"] = []
+    #         self.ref_schema["required"].append(independent_field_id)
+    #         # test schema, nothing should be changed (except for the required status)
+    #         self._test_form_schema()
 
-            # make dependent one required
-            dep_field.required_choice = "required"
-            if dep_field.portal_type != "Complex":
-                self.ref_schema["allOf"] = [
-                    {
-                        "if": {
-                            "properties": {independent_field_id: {"const": opt1.title}}
-                        },
-                        "then": {"required": id},
-                    }
-                ]
-                if dep_field.portal_type == "Array":
-                    self.ref_schema["properties"][id]["minItems"] = 1
-            # test schema, dependentrequired should be changed (unless it is a complex object)
-            self._test_form_schema()
+    #         # make dependent one required
+    #         dep_field.required_choice = "required"
+    #         if dep_field.portal_type != "Complex":
+    #             self.ref_schema["allOf"] = [
+    #                 {
+    #                     "if": {
+    #                         "properties": {independent_field_id: {"const": opt1.title}}
+    #                     },
+    #                     "then": {"required": id},
+    #                 }
+    #             ]
+    #             if dep_field.portal_type == "Array":
+    #                 self.ref_schema["properties"][id]["minItems"] = 1
+    #         # test schema, dependentrequired should be changed (unless it is a complex object)
+    #         self._test_form_schema()
 
-            # make independent one optional again, dependentrequired should stay the same
-            independent_field.required_choice = "optional"
-            self.ref_schema["required"].remove(independent_field_id)
-            self._test_form_schema()
+    #         # make independent one optional again, dependentrequired should stay the same
+    #         independent_field.required_choice = "optional"
+    #         self.ref_schema["required"].remove(independent_field_id)
+    #         self._test_form_schema()
 
-            # revert changes
-            dep_field.required_choice = "optional"
-            if dep_field.portal_type != "Complex":
-                self.ref_schema["allOf"] = []
-                if dep_field.portal_type == "Array":
-                    del self.ref_schema["properties"][create_id(dep_field)]["minItems"]
-            dep_field.dependencies = []
+    #         # revert changes
+    #         dep_field.required_choice = "optional"
+    #         if dep_field.portal_type != "Complex":
+    #             self.ref_schema["allOf"] = []
+    #             if dep_field.portal_type == "Array":
+    #                 del self.ref_schema["properties"][create_id(dep_field)]["minItems"]
+    #         dep_field.dependencies = []
 
-        selection_answer_types = [a.value for a in Selection_answer_types]
-        # test 'dependentRequired' for different answer types
-        for at_independent in selection_answer_types:
-            independent_field.answer_type = at_independent
-            self.ref_schema["properties"][independent_field_id] = (
-                reference_schemata.get_selectionfield_ref_schema(
-                    at_independent, independent_field.title, options
-                )
-            )
+    #     selection_answer_types = [a.value for a in Selection_answer_types]
+    #     # test 'dependentRequired' for different answer types
+    #     for at_independent in selection_answer_types:
+    #         independent_field.answer_type = at_independent
+    #         self.ref_schema["properties"][independent_field_id] = (
+    #             reference_schemata.get_selectionfield_ref_schema(
+    #                 at_independent, independent_field.title, options
+    #             )
+    #         )
 
-            self._test_dependencies(
-                [dep_field, dep_sel_field, dep_complex, dep_array], test_dep_req
-            )
+    #         self._test_dependencies(
+    #             [dep_field, dep_sel_field, dep_complex, dep_array], test_dep_req
+    #         )
 
     # TODO test additionally manually with JP after implementation
     def test_dependent_from_uploadfield(self):

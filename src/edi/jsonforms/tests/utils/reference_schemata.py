@@ -5,7 +5,7 @@ def get_child_ref_schema(type: str, title: str) -> dict:
     if type in ["radio", "checkbox", "select", "selectmultiple"]:
         return get_selectionfield_ref_schema(type, title)
     elif type in ["file", "file-multi"]:
-        return get_uploadfield_ref_schema(type, title)
+        return get_uploadfield_ref_schema(title)
     elif type == "Array":
         return get_array_ref_schema(title)
     elif type == "Complex":
@@ -14,23 +14,39 @@ def get_child_ref_schema(type: str, title: str) -> dict:
         return get_field_ref_schema(type, title)
 
 
-def get_form_ref_schema(title="a form") -> dict:
-    return get_object_ref_schema(title)
+def get_form_ref_schema(
+    title="a form", properties=False, required=False, allOf=False
+) -> dict:
+    return get_object_ref_schema(
+        title, properties=properties, required=required, allOf=allOf
+    )
 
 
-def get_complex_ref_schema(title="a complex object") -> dict:
-    return get_object_ref_schema(title)
+def get_complex_ref_schema(
+    title="a complex object", properties=False, required=False, allOf=False
+) -> dict:
+    return get_object_ref_schema(
+        title, properties=properties, required=required, allOf=allOf
+    )
 
 
-def get_object_ref_schema(title: str) -> dict:
+def get_object_ref_schema(
+    title: str, properties=False, required=False, allOf=False
+) -> dict:
     object_reference_schema = {
         "type": "object",
         "title": title,
-        "properties": {},
-        "required": [],
-        "dependentRequired": {},
-        "allOf": [],
+        # "properties": {},
+        # "required": [],
+        # "dependentRequired": {},
+        # "allOf": [],
     }
+    if properties:
+        object_reference_schema["properties"] = {}
+    if required:
+        object_reference_schema["required"] = []
+    if allOf:
+        object_reference_schema["allOf"] = []
     return object_reference_schema
 
 
@@ -42,7 +58,6 @@ def get_field_ref_schema(type: str, title="a field") -> dict:
         "tel": {
             "title": title,
             "type": "string",
-            "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$",
         },
         "url": {"title": title, "type": "string", "format": "hostname"},
         "email": {"title": title, "type": "string", "format": "email"},
@@ -87,30 +102,42 @@ def get_selectionfield_ref_schema(
     return selectionfield_reference_schemata
 
 
-def get_uploadfield_ref_schema(type: str, title="an uploadfield") -> dict:
-    uploadfield_reference_schemata = {
-        "file": {"title": title, "type": "string", "format": "uri"},
-        "file-multi": {
+def get_uploadfield_ref_schema(title="an uploadfield", max_files=None) -> dict:
+    if not max_files or max_files > 1:
+        uploadfield_reference_schemata = {
             "title": title,
             "type": "array",
             "items": {"type": "string", "format": "uri"},
-        },
-    }
-    return uploadfield_reference_schemata[type]
+        }
+    else:
+        uploadfield_reference_schemata = {
+            "title": title,
+            "type": "string",
+            "format": "uri",
+        }
+    return uploadfield_reference_schemata
 
 
-def get_array_ref_schema(title="an array") -> dict:
+def get_array_ref_schema(
+    title="an array", properties=False, required=False, allOf=False
+) -> dict:
     array_reference_schema = {
         "type": "array",
         "title": title,
         "items": {
             "type": "object",
-            "properties": {},
-            "required": [],
-            "dependentRequired": {},
-            "allOf": [],
+            # "properties": {},
+            # "required": [],
+            # "dependentRequired": {},
+            # "allOf": [],
         },
     }
+    if properties:
+        array_reference_schema["items"]["properties"] = {}
+    if required:
+        array_reference_schema["items"]["required"] = []
+    if allOf:
+        array_reference_schema["items"]["allOf"] = []
     return array_reference_schema
 
 
@@ -122,32 +149,14 @@ def get_form_ref_schema_ui():
         "version": "2.0",
         "layout": {
             "type": "VerticalLayout",
-            "elements": [
-                {
-                    "type": "Buttongroup",
-                    "buttons": [
-                        {
-                            "type": "Button",
-                            "buttonType": "submit",
-                            "text": "Submit",
-                            "options": {"variant": "primary"},
-                        },
-                        {
-                            "type": "Button",
-                            "buttonType": "reset",
-                            "text": "Reset this form",
-                            "options": {"variant": "danger"},
-                        },
-                    ],
-                }
-            ],
+            "elements": [],
         },
     }
     return schema
 
 
 def insert_into_elements(
-    elements: dict, child_schema: list, has_buttons_element=True
+    elements: dict, child_schema: list, has_buttons_element=False
 ) -> dict:
     # add child_schema to the elements before the buttons
     if has_buttons_element:
@@ -165,7 +174,7 @@ the title is only required if the type is "Fieldset"
 def get_child_ref_schema_ui(type: str, scope: str, title="") -> dict:
     if type in ["radio", "checkbox", "select", "selectmultiple"]:
         return get_selectionfield_ref_schema_ui(type, scope)
-    elif type in ["file", "file-multi"]:
+    elif type in ["file"]:
         return get_uploadfield_ref_schema_ui(type, scope)
     elif type == "Helptext":
         return get_helptext_ref_schema_ui(title)
@@ -189,7 +198,7 @@ def get_field_ref_schema_ui(type: str, scope: str) -> dict:
         "url": {"options": {"format": "url"}},
         "email": {"options": {"format": "email"}},
         "date": {"options": {"format": "date"}},
-        "datetime-local": {"options": {"format": "date-time"}},
+        "datetime-local": {"options": {"format": "datetime-local"}},
         "time": {"options": {"format": "time"}},
         "number": {},
         "integer": {},
@@ -218,9 +227,8 @@ def get_uploadfield_ref_schema_ui(type: str, scope: str) -> dict:
     schema = {"type": "Control", "scope": scope}
 
     uploadfield_reference_schemata = {
-        "file": {"options": {"acceptedFileType": "*"}},
-        "file-multi": {
-            "options": {"acceptedFileType": "*", "allowMultipleFiles": True}
+        "file": {
+            "options": {"acceptedFileType": "*", "displayAsSingleUploadField": True}
         },
     }
     schema.update(uploadfield_reference_schemata[type])
