@@ -678,7 +678,7 @@ class UiSchemaView(BrowserView):
             group_schema = self.add_option_to_schema(
                 group_schema, {"label": get_title(group, self.request)}
             )
-        if group.description is not None:
+        if group.description is not None and group.description != "":
             group_schema = self.add_option_to_schema(
                 group_schema, {"description": group.description}
             )
