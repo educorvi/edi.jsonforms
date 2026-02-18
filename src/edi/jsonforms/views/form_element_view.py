@@ -18,6 +18,11 @@ from edi.jsonforms.views.ui_schema_view import UiSchemaView
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
 
 
+class IFormElementView(Interface):
+    """Marker Interface for IFormElementView"""
+
+
+@implementer(IFormElementView)
 class FormElementView(FormView):
     def __call__(self):
         return self.index()
@@ -40,11 +45,6 @@ class FormElementView(FormView):
         return form_element_jsonschema
 
 
-class IFormElementView(Interface):
-    """Marker Interface for IFormElementView"""
-
-
-@implementer(IFormElementView)
 class FormElementUiSchema(UiSchemaView):
     def __init__(self, context, request):
         super().__init__(context, request)
@@ -76,7 +76,6 @@ class FormElementUiSchema(UiSchemaView):
         return self.uischema
 
 
-@implementer(IFormElementView)
 class FormElementJsonSchema(JsonSchemaView):
     def __init__(self, context, request):
         super().__init__(context, request)

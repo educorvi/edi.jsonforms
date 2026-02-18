@@ -1,6 +1,6 @@
 import copy
 import logging
-from ZPublisher.HTTPRequest import WSGIRequest
+from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_required,
@@ -100,7 +100,7 @@ class ObjectModel(BaseFormElementModel):
         parent_model: Optional[
             BaseFormElementModel
         ],  # is None if form_element is the outer form or if in form-element-view
-        request: WSGIRequest,
+        request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
         self.properties = {}
@@ -260,7 +260,10 @@ class FieldsetModel(ObjectModel):
     parent: Optional[ObjectModel]
 
     def __init__(
-        self, form_element: IFieldset, parent_model: ObjectModel, request: WSGIRequest
+        self,
+        form_element: IFieldset,
+        parent_model: ObjectModel,
+        request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
 
@@ -301,7 +304,7 @@ class ArrayModel(BaseFormElementModel):
         self,
         form_element: IArray,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest,
+        request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
         if self.is_required:
@@ -315,6 +318,12 @@ class ArrayModel(BaseFormElementModel):
             self.form_element, self.parent, generatorArguments.request
         )
         object_model.set_children(generatorArguments)
+
+        # remove fields of object_model that are not needed
+        object_model.description = None
+        object_model.comment = None
+        object_model.required_choice = False
+
         self.items = object_model
 
     def get_json_schema(self) -> dict:
