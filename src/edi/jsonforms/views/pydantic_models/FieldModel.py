@@ -35,8 +35,6 @@ class FieldModel(BaseFormElementModel):
                 self.maxLength = form_element.maximum
         elif answer_type == "tel":
             self.type = "string"
-            self.pattern = "^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}\)?)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$"
-            # or simply '^[\d+\-()\s]{1,25}$' (max 25 symbols, +, -, (, ), numbers and space are allowed
         elif answer_type == "url":
             self.type = "string"
             self.format = "hostname"
