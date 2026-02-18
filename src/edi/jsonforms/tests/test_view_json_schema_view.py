@@ -2,6 +2,7 @@
 from edi.jsonforms.content.upload_field import IUploadField
 from edi.jsonforms.testing import EDI_JSONFORMS_FUNCTIONAL_TESTING
 from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
+from edi.jsonforms.tests.utils.generate_allof import get_if_then_schema
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -1425,63 +1426,200 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         self.intids = component.getUtility(IIntIds)
         self.ref_schema = reference_schemata.get_form_ref_schema("", properties=True)
 
-    def create_all_content_types(self, container):
-        # create dependent field in form
-        dependent_field = api.content.create(
-            type="Field", title="dependent field", container=container
+    def create_content_types(self, container):
+        """
+        creates a field of type boolean, a field of type string, a selectionfield of type radio and a selectionfield of type checkbox in the container
+        the selectionfields contain two options each (option 1 and option 2 for the radio selectionfield, option 3 and option 4 for the checkbox selectionfield)
+        """
+        # field of type boolean
+        bool_field = api.content.create(
+            type="Field", title="bool field", container=container
         )
-        dependent_field_id = create_id(dependent_field)
-        self.ref_schema["properties"][dependent_field_id] = (
-            reference_schemata.get_field_ref_schema(
-                dependent_field.answer_type, "dependent field"
-            )
+        bool_field.answer_type = "boolean"
+
+        # field of type string
+        string_field = api.content.create(
+            type="Field", title="string field", container=container
+        )
+        string_field.answer_type = "text"
+
+        # selectionfield of type radio
+        radio_selectionfield = api.content.create(
+            type="SelectionField", title="radio selectionfield", container=container
+        )
+        radio_selectionfield.answer_type = "radio"
+        api.content.create(
+            type="Option", title="option 1", container=radio_selectionfield
+        )
+        api.content.create(
+            type="Option", title="option 2", container=radio_selectionfield
         )
 
-        # create dependent selectionfield in form
-        dependent_selectionfield = api.content.create(
-            type="SelectionField", title="dependent selectionfield", container=container
+        # selectionfield of type checkbox
+        checkbox_selectionfield = api.content.create(
+            type="SelectionField", title="checkbox selectionfield", container=container
         )
-        dependent_selectionfield_id = create_id(dependent_selectionfield)
-        self.ref_schema["properties"][dependent_selectionfield_id] = (
-            reference_schemata.get_selectionfield_ref_schema(
-                dependent_selectionfield.answer_type, "dependent selectionfield"
-            )
+        checkbox_selectionfield.answer_type = "checkbox"
+        api.content.create(
+            type="Option", title="option 3", container=checkbox_selectionfield
         )
-
-        dependent_field.dependencies.append(
-            RelationValue(self.intids.getId(dependent_selectionfield))
-        )
-
-        # create dependent complex in form
-        dependent_complex = api.content.create(
-            type="Complex", title="dependent complex", container=container
-        )
-        dependent_complex_id = create_id(dependent_complex)
-        self.ref_schema["properties"][dependent_complex_id] = (
-            reference_schemata.get_complex_ref_schema("dependent complex")
-        )
-
-        # create dependent array in form
-        dependent_array = api.content.create(
-            type="Array", title="dependent array", container=container
-        )
-
-        dependent_array_id = create_id(dependent_array)
-        self.ref_schema["properties"][dependent_array_id] = (
-            reference_schemata.get_array_ref_schema("dependent array")
+        api.content.create(
+            type="Option", title="option 4", container=checkbox_selectionfield
         )
 
         return (
-            dependent_field,
-            dependent_selectionfield,
-            dependent_complex,
-            dependent_array,
+            bool_field,
+            string_field,
+            radio_selectionfield,
+            checkbox_selectionfield,
         )
 
     def _test_form_schema(self, ref_schema=None):
         ref_schema = ref_schema if ref_schema is not None else self.ref_schema
+        ref_schema = ref_schema["allOf"] if "allOf" in ref_schema else []
+
         computed_schema = json.loads(self.view())
-        self.assertEqual(dict(computed_schema), dict(ref_schema))
+        computed_schema = computed_schema["allOf"] if "allOf" in computed_schema else []
+        self.assertEqual(computed_schema, ref_schema)
+
+    def test_field_depends_on_field(self):
+        """
+        tests an dependent string field that depends on a string field or a boolean field
+        """
+        # create fields to depend on
+        bool_field, string_field, radio_selectionfield, checkbox_selectionfield = (
+            self.create_content_types(self.form)
+        )
+
+        # create field that is dependent
+        dep_field = api.content.create(
+            type="Field", title="dependent field", container=self.form
+        )
+        dep_field.answer_type = "string"
+
+        for f in [
+            bool_field,
+            string_field,
+        ]:
+            # add dependency to the independent field
+            dep_field.dependencies = [RelationValue(self.intids.getId(f))]
+            modified(dep_field)
+
+            # test schema, nothing should be changed
+            self._test_form_schema()
+
+            # make field required and test (schema should have changed)
+            dep_field.required_choice = "required"
+            self.ref_schema["allOf"] = [get_if_then_schema(f, dep_field)]
+            self._test_form_schema()
+
+            dep_field.required_choice = "optional"
+            del self.ref_schema["allOf"]
+
+    def test_field_depends_on_selectionfield(self):
+        """
+        tests an dependent string field that depends on a string field or a boolean field
+        """
+        # create fields to depend on
+        bool_field, string_field, radio_selectionfield, checkbox_selectionfield = (
+            self.create_content_types(self.form)
+        )
+
+        # create field that is dependent
+        dep_field = api.content.create(
+            type="Field", title="dependent field", container=self.form
+        )
+        dep_field.answer_type = "string"
+
+        for f in [
+            radio_selectionfield,
+            checkbox_selectionfield,
+        ]:
+            # add dependency to the independent field
+            option = f.getFolderContents()[0].getObject()
+            dep_field.dependencies = [RelationValue(self.intids.getId(option))]
+            modified(dep_field)
+
+            # test schema, nothing should be changed
+            self._test_form_schema()
+
+            # make field required and test (schema should have changed)
+            dep_field.required_choice = "required"
+            self.ref_schema["allOf"] = [get_if_then_schema(f, dep_field, option)]
+            self._test_form_schema()
+
+            dep_field.required_choice = "optional"
+            del self.ref_schema["allOf"]
+
+    def test_field_depends_on_multiple_elements(self):
+        """
+        tests an dependent string field that depends on a string field or a boolean field
+        """
+        # create fields to depend on
+        bool_field, string_field, radio_selectionfield, checkbox_selectionfield = (
+            self.create_content_types(self.form)
+        )
+
+        # create field that is dependent
+        dep_field = api.content.create(
+            type="Field", title="dependent field", container=self.form
+        )
+        dep_field.answer_type = "string"
+
+        self.ref_schema["allOf"] = []
+        # test all dependencies at once
+        radio_option = radio_selectionfield.getFolderContents()[0].getObject()
+        checkbox_option = checkbox_selectionfield.getFolderContents()[0].getObject()
+        optionen = [None, None, radio_option, checkbox_option]
+        dep_field.dependencies = [
+            RelationValue(self.intids.getId(bool_field)),
+            RelationValue(self.intids.getId(string_field)),
+            RelationValue(self.intids.getId(radio_option)),
+            RelationValue(self.intids.getId(checkbox_option)),
+        ]
+        modified(dep_field)
+        self._test_form_schema()  # schema should not have changed
+        dep_field.required_choice = "required"
+        self.ref_schema["allOf"] = [
+            get_if_then_schema(
+                f,
+                dep_field,
+                optionen[i],
+            )
+            for i, f in enumerate(
+                [
+                    bool_field,
+                    string_field,
+                    radio_selectionfield,
+                    checkbox_selectionfield,
+                ]
+            )
+        ]
+        self._test_form_schema()
+
+    def test_boolean_field_depends_on_field(self):
+        pass
+
+    def test_radio_selectionfield_depends_on_field(self):
+        pass
+
+    def test_checkbox_selectionfield_depends_on_field(self):
+        pass
+
+    def test_field_in_array_depends_on_field(self):
+        pass
+
+    def test_field_in_complex_depends_on_field(self):
+        pass
+
+    def test_dependent_field_in_dependent_complex(self):
+        pass
+
+    def test_dependent_field_in_dependent_array(self):
+        pass
+
+    def test_dependent_field_in_dependent_fieldset(self):
+        pass
 
     # def test_dependent_from_field(self):
     #     # create independent field in the form
