@@ -4,7 +4,7 @@ import logging
 
 from plone.base.utils import safe_hasattr
 from typing import Optional, List
-from ZPublisher.HTTPRequest import WSGIRequest
+from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.form import IForm
@@ -44,7 +44,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         parent_model: Optional[
             "BaseFormElementModel"
         ],  # only None if form_element is the outer form
-        request: WSGIRequest,
+        request: WSGIRequest | HTTPRequest,
     ):
         description = get_description(form_element, request)
         comment = (

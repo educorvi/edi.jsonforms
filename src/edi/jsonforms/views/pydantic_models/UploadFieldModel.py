@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, List
-from ZPublisher.HTTPRequest import WSGIRequest
+from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
 from edi.jsonforms.content.upload_field import IUploadField
 
@@ -23,7 +23,7 @@ class UploadFieldModel(BaseFormElementModel):
         self,
         form_element: IUploadField,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest,
+        request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
         self.minItems = form_element.min_number_of_files

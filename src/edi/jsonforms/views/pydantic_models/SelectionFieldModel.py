@@ -1,5 +1,5 @@
 import logging
-from ZPublisher.HTTPRequest import WSGIRequest
+from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_options,
@@ -105,7 +105,7 @@ class SelectionFieldModel(BaseFormElementModel):
         self,
         form_element: ISelectionField,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest,
+        request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
 

@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from ZPublisher.HTTPRequest import WSGIRequest
+from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
 from edi.jsonforms.content.field import IField
 from edi.jsonforms.views.common import string_type_fields
@@ -23,7 +23,7 @@ class FieldModel(BaseFormElementModel):
         self,
         form_element: IField,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest,
+        request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
         answer_type = form_element.answer_type
