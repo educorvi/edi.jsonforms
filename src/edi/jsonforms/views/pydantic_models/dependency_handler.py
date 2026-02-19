@@ -121,7 +121,7 @@ def add_dependent_required(
                         else:
                             if obj.answer_type in string_type_fields:
                                 cur_statement[p] = {props[-1]: {"minLength": 1}}
-                            cur_statement["required"] = [props[-1]]
+                        cur_statement["required"] = [props[-1]]
                     elif (
                         obj.portal_type == "SelectionField"
                         and obj.answer_type in single_answer_types
