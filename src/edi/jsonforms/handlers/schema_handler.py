@@ -12,12 +12,17 @@ def schema_handler(context, event):
     @param event: Subclass of event.
     """
     request = getRequest()
-    schema_view = ploneapi.content.get_view(
-        name="json-schema-view", context=context, request=request
-    )
-    ui_schema_view = ploneapi.content.get_view(
-        name="ui-schema-view", context=context, request=request
-    )
+    try:
+        schema_view = ploneapi.content.get_view(
+            name="json-schema-view", context=context, request=request
+        )
+        ui_schema_view = ploneapi.content.get_view(
+            name="ui-schema-view", context=context, request=request
+        )
+    except ploneapi.exc.InvalidParameterError:
+        # Views are not available yet (e.g., during site creation before browser layer is active)
+        return
+
     if getattr(context, "REQUEST", None):
         changeNote = get_change_note(context.REQUEST, None)
         if changeNote:
@@ -34,12 +39,17 @@ def wizard_schema_handler(context, event):
     @param event: Subclass of event.
     """
     request = getRequest()
-    wizard_json_schema_view = ploneapi.content.get_view(
-        name="wizard-json-schema", context=context, request=request
-    )
-    wizard_ui_schema_view = ploneapi.content.get_view(
-        name="wizard-ui-schema", context=context, request=request
-    )
+    try:
+        wizard_json_schema_view = ploneapi.content.get_view(
+            name="wizard-json-schema", context=context, request=request
+        )
+        wizard_ui_schema_view = ploneapi.content.get_view(
+            name="wizard-ui-schema", context=context, request=request
+        )
+    except ploneapi.exc.InvalidParameterError:
+        # Views not available yet (e.g., during site creation before browser layer is active)
+        return
+
     if getattr(context, "REQUEST", None):
         changeNote = get_change_note(context.REQUEST, None)
         if changeNote:
