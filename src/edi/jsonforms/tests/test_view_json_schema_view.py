@@ -2,7 +2,10 @@
 from edi.jsonforms.content.upload_field import IUploadField
 from edi.jsonforms.testing import EDI_JSONFORMS_FUNCTIONAL_TESTING
 from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
-from edi.jsonforms.tests.utils.generate_allof import get_if_then_schema
+from edi.jsonforms.tests.utils.generate_allof import (
+    get_if_then_schema,
+    make_if_then_schema_nested,
+)
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -1411,7 +1414,7 @@ class ViewsJsonSchemaFieldsetTest(unittest.TestCase):
     # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
 
 
-class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
+class ViewsJsonSchemaDependencyTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     form = None
     view = None
@@ -1482,7 +1485,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         computed_schema = computed_schema["allOf"] if "allOf" in computed_schema else []
         self.assertEqual(computed_schema, ref_schema)
 
-    def test_field_depends_on_field(self):
+    def test_field_depends_on_fields(self):
         """
         tests an dependent string field that depends on a string field or a boolean field
         """
@@ -1495,7 +1498,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         dep_field = api.content.create(
             type="Field", title="dependent field", container=self.form
         )
-        dep_field.answer_type = "string"
+        dep_field.answer_type = "text"
 
         for f in [
             bool_field,
@@ -1516,7 +1519,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
             dep_field.required_choice = "optional"
             del self.ref_schema["allOf"]
 
-    def test_field_depends_on_selectionfield(self):
+    def test_field_depends_on_selectionfields(self):
         """
         tests an dependent string field that depends on a string field or a boolean field
         """
@@ -1529,7 +1532,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         dep_field = api.content.create(
             type="Field", title="dependent field", container=self.form
         )
-        dep_field.answer_type = "string"
+        dep_field.answer_type = "text"
 
         for f in [
             radio_selectionfield,
@@ -1564,7 +1567,7 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         dep_field = api.content.create(
             type="Field", title="dependent field", container=self.form
         )
-        dep_field.answer_type = "string"
+        dep_field.answer_type = "text"
 
         self.ref_schema["allOf"] = []
         # test all dependencies at once
@@ -1598,28 +1601,266 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
         self._test_form_schema()
 
     def test_boolean_field_depends_on_field(self):
-        pass
+        """
+        tests an dependent boolean field that depends on a text field
+        """
+        # create field to depend on
+        independent_field = api.content.create(
+            type="Field", title="independent field", container=self.form
+        )
+        independent_field.answer_type = "text"
+
+        # create field that is dependent
+        dep_field = api.content.create(
+            type="Field", title="dependent field", container=self.form
+        )
+        dep_field.answer_type = "boolean"
+
+        # add dependency to the independent field
+        dep_field.dependencies = [RelationValue(self.intids.getId(independent_field))]
+        modified(dep_field)
+
+        # test schema, nothing should be changed
+        self._test_form_schema()
+
+        # make field required and test (schema should have changed)
+        dep_field.required_choice = "required"
+        self.ref_schema["allOf"] = [get_if_then_schema(independent_field, dep_field)]
+        self._test_form_schema()
+
+    def _test_array_like_element_depends_on_field(self, element_type):
+                # create field to depend on
+        independent_field = api.content.create(
+            type="Field", title="independent field", container=self.form
+        )
+        independent_field.answer_type = "boolean"
+
+        # create field that is dependent
+        dep_field = api.content.create(
+            type=element_type, title="dependent " + element_type, container=self.form
+        )
+
+        # make element required and test
+        dep_field.required_choice = "required"
+        required_list = [create_id(dep_field)]
+
+        computed_schema = json.loads(self.view())
+        computed_required = (
+            computed_schema["required"] if "required" in computed_schema else []
+        )
+        self.assertEqual(computed_required, required_list)
+        self.assertIn("minItems", computed_schema["properties"][create_id(dep_field)])
+        self.assertEqual(
+            computed_schema["properties"][create_id(dep_field)]["minItems"], 1
+        )
+        self.assertNotIn("allOf", computed_schema)
+
+        # add dependency to the independent field
+        dep_field.dependencies = [RelationValue(self.intids.getId(independent_field))]
+        modified(dep_field)
+        self.ref_schema["allOf"] = [get_if_then_schema(independent_field, dep_field)]
+        self._test_form_schema()
+
+    def test_uploadfield_depends_on_field(self):
+        """
+        tests dependent uploadfield that depends on a field
+        """
+        self._test_array_like_element_depends_on_field("UploadField")
+
+    def test_array_depends_on_field(self):
+        """
+        tests dependent array that depends on a field
+        """
+        self._test_array_like_element_depends_on_field("Array")
+
+    def _test_selectionfield_depends_on_field(self, selectionfield_type):
+        # create field to depend on
+        independent_field = api.content.create(
+            type="Field", title="independent field", container=self.form
+        )
+        independent_field.answer_type = "text"
+
+        # create field that is dependent
+        dep_field = api.content.create(
+            type="SelectionField", title="dependent selectionfield", container=self.form
+        )
+        dep_field.answer_type = selectionfield_type
+        api.content.create(type="Option", title="option 1", container=dep_field)
+
+        # add dependency to the independent field
+        dep_field.dependencies = [RelationValue(self.intids.getId(independent_field))]
+        modified(dep_field)
+
+        # test schema, nothing should be changed
+        self._test_form_schema()
+
+        # make field required and test (schema should have changed)
+        dep_field.required_choice = "required"
+        self.ref_schema["allOf"] = [get_if_then_schema(independent_field, dep_field)]
+        self._test_form_schema()
 
     def test_radio_selectionfield_depends_on_field(self):
-        pass
+        """
+        tests an dependent radio selectionfield that depends on a text field
+        """
+        self._test_selectionfield_depends_on_field("radio")
 
     def test_checkbox_selectionfield_depends_on_field(self):
-        pass
+        """
+        tests an dependent checkbox selectionfield that depends on a text field
+        """
+        self._test_selectionfield_depends_on_field("checkbox")
 
     def test_field_in_array_depends_on_field(self):
-        pass
+        """
+        tests a required field inside an dependent array (dependent from a boolean field)
+        """
+        # create field to depend on
+        independent_field = api.content.create(
+            type="Field", title="independent field", container=self.form
+        )
+        independent_field.answer_type = "boolean"
 
-    def test_field_in_complex_depends_on_field(self):
-        pass
+        # create array
+        array = api.content.create(type="Array", title="an array", container=self.form)
+        array_id = create_id(array)
+        array.dependencies = [RelationValue(self.intids.getId(independent_field))]
+        modified(array)
 
-    def test_dependent_field_in_dependent_complex(self):
-        pass
+        # create field inside array that is dependent
+        dep_req_field = api.content.create(
+            type="Field", title="dependent field", container=array
+        )
+        dep_req_field.answer_type = "text"
 
-    def test_dependent_field_in_dependent_array(self):
-        pass
+        # test schema, nothing should be changed
+        self._test_form_schema()
 
-    def test_dependent_field_in_dependent_fieldset(self):
-        pass
+        # make field required and test (schema should have changed)
+        dep_req_field.required_choice = "required"
+        self.ref_schema["allOf"] = [
+            get_if_then_schema(independent_field, dep_req_field)
+        ]
+        make_if_then_schema_nested(self.ref_schema, array_id, is_array=True)
+        self._test_form_schema()
+
+    def test_selectionfield_in_complex_depends_on_selectionfield(self):
+        """
+        tests a required field inside an dependent complex (dependent from a selection field)
+        """
+        # create field to depend on
+        independent_field = api.content.create(
+            type="SelectionField",
+            title="independent selectionfield",
+            container=self.form,
+        )
+        independent_field.answer_type = "checkbox"
+        option = api.content.create(
+            type="Option", title="option 1", container=independent_field
+        )
+
+        # create complex
+        complex = api.content.create(
+            type="Complex", title="an object", container=self.form
+        )
+        complex_id = create_id(complex)
+        complex.dependencies = [RelationValue(self.intids.getId(option))]
+        modified(complex)
+
+        # create field inside complex that is dependent (because array is dependent)
+        dep_req_field = api.content.create(
+            type="SelectionField", title="dependent selectionfield", container=complex
+        )
+        dep_req_field.answer_type = "radio"
+
+        # test schema, nothing should be changed
+        self._test_form_schema()
+
+        # make field required and test (schema should have changed)
+        dep_req_field.required_choice = "required"
+        self.ref_schema["allOf"] = [
+            get_if_then_schema(
+                independent_field, dep_req_field, independent_option_value=option
+            )
+        ]
+        make_if_then_schema_nested(self.ref_schema, complex_id)
+        self._test_form_schema()
+
+    def test_field_in_complex_depends_on_field_in_complex(self):
+        """
+        tests a required field inside a complex. the field depends on another field inside the same complex
+        """
+        # create complex
+        complex = api.content.create(
+            type="Complex", title="an object", container=self.form
+        )
+        complex_id = create_id(complex)
+
+        # create independent text field inside complex
+        independent_field = api.content.create(
+            type="Field", title="independent field", container=complex
+        )
+        independent_field.answer_type = "text"
+
+        # create dependent boolean field inside complex
+        dep_req_field = api.content.create(
+            type="Field", title="dependent field", container=complex
+        )
+        dep_req_field.answer_type = "boolean"
+
+        # add dependency
+        dep_req_field.dependencies = [
+            RelationValue(self.intids.getId(independent_field))
+        ]
+        modified(dep_req_field)
+
+        # test schema, nothing should be changed
+        self._test_form_schema()
+
+        # make field required and test (schema should have changed)
+        dep_req_field.required_choice = "required"
+        self.ref_schema["allOf"] = [
+            get_if_then_schema(independent_field, dep_req_field)
+        ]
+        make_if_then_schema_nested(self.ref_schema, complex_id, if_schema_nested=True)
+        self._test_form_schema()
+
+    # def test_field_in_array_depends_on_field_in_array(self):
+    #     pass
+
+    def test_dependent_selectionfield_in_dependent_fieldset(self):
+        """
+        tests a required selectionfield checkbox inside a dependent fieldset (dependent from a boolean field)
+        """
+        # create field to depend on
+        independent_field = api.content.create(
+            type="Field", title="independent field", container=self.form
+        )
+        independent_field.answer_type = "boolean"
+
+        # create fieldset
+        fieldset = api.content.create(
+            type="Fieldset", title="a fieldset", container=self.form
+        )
+        fieldset.dependencies = [RelationValue(self.intids.getId(independent_field))]
+        modified(fieldset)
+
+        # create selectionfield inside fieldset that is dependent (because fieldset is dependent)
+        dep_req_field = api.content.create(
+            type="SelectionField", title="dependent selectionfield", container=fieldset
+        )
+        dep_req_field.answer_type = "checkbox"
+
+        # test schema, nothing should be changed
+        self._test_form_schema()
+
+        # make field required and test (schema should have changed)
+        dep_req_field.required_choice = "required"
+        self.ref_schema["allOf"] = [
+            get_if_then_schema(independent_field, dep_req_field)
+        ]
+        # do not make schema nested because fieldset isn't represented in the json-schema, only the ui-schema
+        self._test_form_schema()
 
     # def test_dependent_from_field(self):
     #     # create independent field in the form
