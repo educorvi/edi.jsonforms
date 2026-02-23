@@ -414,6 +414,22 @@ class UiSchemaView(BrowserView):
                 button_schema["options"]["variant"] = button.button_variant
 
                 buttons_schema["buttons"].append(button_schema)
+            elif button.portal_type == "Storage Handler":
+                button_schema = request_button_schema.copy()
+                button_schema["text"] = button.button_label
+                button_schema["options"]["variant"] = button.button_variant
+                request_url = self.context.absolute_url() + "/@store-as-annotation"
+                button_schema["options"]["submitOptions"]["request"]["url"] = (
+                    request_url
+                )
+                if (
+                    safe_hasattr(button, "page_after_success")
+                    and button.page_after_success
+                ):
+                    button_schema["options"]["submitOptions"]["request"][
+                        "onSuccessRedirect"
+                    ] = button.page_after_success
+                buttons_schema["buttons"].append(button_schema)
 
         return buttons_schema
 
