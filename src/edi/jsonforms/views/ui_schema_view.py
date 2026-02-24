@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
+from jinja2 import Environment, meta
 
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
@@ -405,7 +406,63 @@ class UiSchemaView(BrowserView):
                         request_url
                     )
                 elif button.portal_type == "File Storage Handler":
-                    request_url = self.context.absolute_url() + "/@store-as-object"
+                    request_url = self.context.absolute_url() + "/@store-as-file"
+                    try:
+                        folder_path = button.target_folder.to_object.absolute_url()
+                        # remove base url and name of plone site
+                        folder_path = "/" + "/".join(folder_path.split("/")[4:])
+                    except:
+                        folder_path = ""
+                        button_schema["options"]["disabled"] = True
+
+                    try:
+                        content_object_title = button.content_object_title
+
+                        parent_form = button.aq_parent.aq_parent
+                        if parent_form.portal_type != "Form":  # unspecified case
+                            raise Exception(
+                                "Parent of File Storage Handler Button is not a Form"
+                            )
+                        form_fields = parent_form.getFolderContents()
+                        form_field_ids = []
+
+                        def get_form_field_ids(form_fields):
+                            for f in form_fields:
+                                if f.portal_type in [
+                                    "Field",
+                                    "SelectionField",
+                                    "UploadField",
+                                ]:
+                                    form_field_ids.append(create_id(f))
+                                elif f.portal_type == "Fieldset":
+                                    child_fields = f.getFolderContents()
+                                    get_form_field_ids(child_fields)
+
+                        get_form_field_ids(form_fields)
+
+                        env = Environment()
+                        ast = env.parse(content_object_title)
+                        variables_in_title = meta.find_undeclared_variables(ast)
+                        for var in variables_in_title:
+                            if var not in form_field_ids:
+                                raise Exception(
+                                    f"Invalid field id in content object title: {var}"
+                                )
+
+                    except:
+                        content_object_title = ""
+                        button_schema["options"]["disabled"] = True
+
+                    query_params = {
+                        "folder_path": folder_path,
+                        "content_object_title": content_object_title,
+                    }
+
+                    # Encode the query parameters
+                    encoded_query = urlencode(query_params)
+
+                    # Combine the base URL with the encoded query parameters
+                    request_url = f"{request_url}?{encoded_query}"
                     button_schema["options"]["submitOptions"]["request"]["url"] = (
                         request_url
                     )
