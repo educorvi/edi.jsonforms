@@ -308,27 +308,6 @@ class UiSchemaView(BrowserView):
         return helptext_schema
 
     def get_schema_for_buttons(self, button_handler):
-        request_button_schema = {
-            "type": "Button",
-            "buttonType": "submit",
-            "text": "",  # FILL
-            "options": {
-                "variant": "primary",
-                "submitOptions": {
-                    "action": "request",
-                    "request": {
-                        "url": "",  # FILL
-                        "method": "POST",
-                        "headers": {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json",
-                        },
-                        "onSuccessRedirect": "",
-                    },
-                },
-            },
-        }
-
         buttons = button_handler.getFolderContents()
         if len(buttons) == 0:
             return {}
@@ -338,41 +317,7 @@ class UiSchemaView(BrowserView):
         for button in buttons:
             button = button.getObject()
 
-            if button.portal_type == "Email Handler":
-                request_url = self.context.absolute_url() + "/@send-email"
-
-                query_params = {"to_address": button.to_address}
-
-                if button.reply_to_address:
-                    query_params["reply_to_address"] = button.reply_to_address
-                if button.email_subject:
-                    query_params["subject"] = button.email_subject
-                if button.email_text:
-                    query_params["email_text"] = button.email_text
-
-                # Encode the query parameters
-                encoded_query = urlencode(query_params)
-
-                # Combine the base URL with the encoded query parameters
-                request_url = f"{request_url}?{encoded_query}"
-
-                button_schema = deepcopy(request_button_schema)
-                button_schema["text"] = button.button_label
-                button_schema["options"]["submitOptions"]["request"]["url"] = (
-                    request_url
-                )
-                if (
-                    safe_hasattr(button, "page_after_success")
-                    and button.page_after_success
-                ):
-                    button_schema["options"]["submitOptions"]["request"][
-                        "onSuccessRedirect"
-                    ] = button.page_after_success
-
-                button_schema["options"]["variant"] = button.button_variant
-
-                buttons_schema["buttons"].append(button_schema)
-            elif button.portal_type == "Reset Button":
+            if button.portal_type == "Reset Button":
                 button_schema = {
                     "type": "Button",
                     "buttonType": "reset",
@@ -381,47 +326,29 @@ class UiSchemaView(BrowserView):
                 }
                 button_schema["options"]["variant"] = button.button_variant
                 buttons_schema["buttons"].append(button_schema)
-            elif button.portal_type == "Webservice Handler":
-                request_url = self.context.absolute_url() + "/@webservice-request"
-                i = 1
-                query_params = {}
-                endpoints = button.getFolderContents()
-                for endpoint in endpoints:
-                    endpoint = endpoint.getObject()
-                    if endpoint.portal_type == "Endpoint":
-                        query_params[f"endpoint_{i}_url"] = endpoint.url
-                        if endpoint.api_key_header_name and endpoint.api_key:
-                            query_params[f"endpoint_{i}_api_key_header_name"] = (
-                                endpoint.api_key_header_name
-                            )
-                            query_params[f"endpoint_{i}_api_key"] = endpoint.api_key
-                    i += 1
-
-                if button.page_after_success:
-                    query_params["page_after_success"] = button.page_after_success
-                encoded_query = urlencode(query_params)
-                request_url = f"{request_url}?{encoded_query}"
-
-                button_schema = deepcopy(request_button_schema)
-                button_schema["text"] = button.button_label
-                button_schema["options"]["submitOptions"]["request"]["url"] = (
-                    request_url
-                )
-                button_schema["options"]["submitOptions"]["request"][
-                    "onSuccessRedirect"
-                ] = button.page_after_success
-
-                button_schema["options"]["variant"] = button.button_variant
-
-                buttons_schema["buttons"].append(button_schema)
-            elif button.portal_type == "Storage Handler":
-                button_schema = deepcopy(request_button_schema)
+            else:
+                button_schema = {
+                    "type": "Button",
+                    "buttonType": "submit",
+                    "text": "",  # FILL
+                    "options": {
+                        "variant": "primary",
+                        "submitOptions": {
+                            "action": "request",
+                            "request": {
+                                "url": "",  # FILL
+                                "method": "POST",
+                                "headers": {
+                                    "Accept": "application/json",
+                                    "Content-Type": "application/json",
+                                },
+                                "onSuccessRedirect": "",
+                            },
+                        },
+                    },
+                }
                 button_schema["text"] = button.button_label
                 button_schema["options"]["variant"] = button.button_variant
-                request_url = self.context.absolute_url() + "/@store-as-annotation"
-                button_schema["options"]["submitOptions"]["request"]["url"] = (
-                    request_url
-                )
                 if (
                     safe_hasattr(button, "page_after_success")
                     and button.page_after_success
@@ -429,6 +356,60 @@ class UiSchemaView(BrowserView):
                     button_schema["options"]["submitOptions"]["request"][
                         "onSuccessRedirect"
                     ] = button.page_after_success
+
+                if button.portal_type == "Email Handler":
+                    request_url = self.context.absolute_url() + "/@send-email"
+                    query_params = {"to_address": button.to_address}
+
+                    if button.reply_to_address:
+                        query_params["reply_to_address"] = button.reply_to_address
+                    if button.email_subject:
+                        query_params["subject"] = button.email_subject
+                    if button.email_text:
+                        query_params["email_text"] = button.email_text
+
+                    # Encode the query parameters
+                    encoded_query = urlencode(query_params)
+
+                    # Combine the base URL with the encoded query parameters
+                    request_url = f"{request_url}?{encoded_query}"
+
+                    button_schema["options"]["submitOptions"]["request"]["url"] = (
+                        request_url
+                    )
+                elif button.portal_type == "Webservice Handler":
+                    request_url = self.context.absolute_url() + "/@webservice-request"
+                    i = 1
+                    query_params = {}
+                    endpoints = button.getFolderContents()
+                    for endpoint in endpoints:
+                        endpoint = endpoint.getObject()
+                        if endpoint.portal_type == "Endpoint":
+                            query_params[f"endpoint_{i}_url"] = endpoint.url
+                            if endpoint.api_key_header_name and endpoint.api_key:
+                                query_params[f"endpoint_{i}_api_key_header_name"] = (
+                                    endpoint.api_key_header_name
+                                )
+                                query_params[f"endpoint_{i}_api_key"] = endpoint.api_key
+                        i += 1
+
+                    encoded_query = urlencode(query_params)
+                    request_url = f"{request_url}?{encoded_query}"
+
+                    button_schema["options"]["submitOptions"]["request"]["url"] = (
+                        request_url
+                    )
+                elif button.portal_type == "Storage Handler":
+                    request_url = self.context.absolute_url() + "/@store-as-annotation"
+                    button_schema["options"]["submitOptions"]["request"]["url"] = (
+                        request_url
+                    )
+                elif button.portal_type == "File Storage Handler":
+                    request_url = self.context.absolute_url() + "/@store-as-object"
+                    button_schema["options"]["submitOptions"]["request"]["url"] = (
+                        request_url
+                    )
+
                 buttons_schema["buttons"].append(button_schema)
 
         return buttons_schema
