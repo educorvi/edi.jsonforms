@@ -356,7 +356,7 @@ class UiSchemaView(BrowserView):
                 # Combine the base URL with the encoded query parameters
                 request_url = f"{request_url}?{encoded_query}"
 
-                button_schema = request_button_schema.copy()
+                button_schema = deepcopy(request_button_schema)
                 button_schema["text"] = button.button_label
                 button_schema["options"]["submitOptions"]["request"]["url"] = (
                     request_url
@@ -415,7 +415,7 @@ class UiSchemaView(BrowserView):
 
                 buttons_schema["buttons"].append(button_schema)
             elif button.portal_type == "Storage Handler":
-                button_schema = request_button_schema.copy()
+                button_schema = deepcopy(request_button_schema)
                 button_schema["text"] = button.button_label
                 button_schema["options"]["variant"] = button.button_variant
                 request_url = self.context.absolute_url() + "/@store-as-annotation"
