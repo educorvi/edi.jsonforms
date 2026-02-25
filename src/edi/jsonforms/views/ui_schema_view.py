@@ -5,7 +5,8 @@ from urllib.parse import urlencode
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
-from jinja2 import Environment, meta
+from jinja2 import meta
+from jinja2.sandbox import SandboxedEnvironment
 
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
@@ -353,6 +354,7 @@ class UiSchemaView(BrowserView):
                 if (
                     safe_hasattr(button, "page_after_success")
                     and button.page_after_success
+                    and button.page_after_success != ""
                 ):
                     button_schema["options"]["submitOptions"]["request"][
                         "onSuccessRedirect"
@@ -417,37 +419,53 @@ class UiSchemaView(BrowserView):
 
                     try:
                         content_object_title = button.content_object_title
+                        if not content_object_title or content_object_title.isspace():
+                            content_object_title = _("Form submission")
 
                         parent_form = button.aq_parent.aq_parent
                         if parent_form.portal_type != "Form":  # unspecified case
                             raise Exception(
-                                "Parent of File Storage Handler Button is not a Form"
+                                "Grandparent of File Storage Handler Button is not a Form"
                             )
-                        form_fields = parent_form.getFolderContents()
-                        form_field_ids = []
+                        # form_fields = parent_form.getFolderContents()
+                        # form_field_ids = ["user"]  # to allow using the username
 
-                        def get_form_field_ids(form_fields):
-                            for f in form_fields:
-                                if f.portal_type in [
-                                    "Field",
-                                    "SelectionField",
-                                    "UploadField",
-                                ]:
-                                    form_field_ids.append(create_id(f))
-                                elif f.portal_type == "Fieldset":
-                                    child_fields = f.getFolderContents()
-                                    get_form_field_ids(child_fields)
+                        # def get_form_field_ids(form_fields):
+                        #     for f in form_fields:
+                        #         f = f.getObject()
+                        #         if f.portal_type in [
+                        #             "Field",
+                        #             "SelectionField",
+                        #             "UploadField",
+                        #         ]:
+                        #             form_field_ids.append(create_id(f))
+                        #         elif f.portal_type == "Fieldset":
+                        #             child_fields = f.getFolderContents()
+                        #             get_form_field_ids(child_fields)
 
-                        get_form_field_ids(form_fields)
+                        # get_form_field_ids(form_fields)
 
-                        env = Environment()
+                        env = SandboxedEnvironment()
                         ast = env.parse(content_object_title)
                         variables_in_title = meta.find_undeclared_variables(ast)
-                        for var in variables_in_title:
-                            if var not in form_field_ids:
-                                raise Exception(
-                                    f"Invalid field id in content object title: {var}"
-                                )
+                        if any(
+                            var not in ["data", "user"] for var in variables_in_title
+                        ):
+                            raise Exception(
+                                "Invalid content object title: only 'user' or variables in the format {{data['field-id']}} are allowed"
+                            )
+                        # find all ids in data['some-id'] in content_object_title
+                        # data_id_pattern = r"data\[['\"]([^'\"]+)['\"]\]"
+                        # data_id_matches = re.findall(
+                        #     data_id_pattern, content_object_title
+                        # )
+                        # variables_in_title.update(data_id_matches)
+
+                        # for var in variables_in_title:
+                        #     if var not in form_field_ids:
+                        #         raise Exception(
+                        #             f"Invalid field id in content object title: {var}"
+                        #         )
 
                     except:
                         content_object_title = ""
@@ -460,6 +478,12 @@ class UiSchemaView(BrowserView):
 
                     # Encode the query parameters
                     encoded_query = urlencode(query_params)
+
+                    # replace page after success in case option is set to true
+                    if button.redirect_to_new_object:
+                        button_schema["options"]["submitOptions"]["request"][
+                            "onSuccessRedirect"
+                        ] = "redirect_to_new_object"
 
                     # Combine the base URL with the encoded query parameters
                     request_url = f"{request_url}?{encoded_query}"
