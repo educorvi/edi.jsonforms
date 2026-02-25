@@ -427,23 +427,6 @@ class UiSchemaView(BrowserView):
                             raise Exception(
                                 "Grandparent of File Storage Handler Button is not a Form"
                             )
-                        # form_fields = parent_form.getFolderContents()
-                        # form_field_ids = ["user"]  # to allow using the username
-
-                        # def get_form_field_ids(form_fields):
-                        #     for f in form_fields:
-                        #         f = f.getObject()
-                        #         if f.portal_type in [
-                        #             "Field",
-                        #             "SelectionField",
-                        #             "UploadField",
-                        #         ]:
-                        #             form_field_ids.append(create_id(f))
-                        #         elif f.portal_type == "Fieldset":
-                        #             child_fields = f.getFolderContents()
-                        #             get_form_field_ids(child_fields)
-
-                        # get_form_field_ids(form_fields)
 
                         env = SandboxedEnvironment()
                         ast = env.parse(content_object_title)
@@ -454,19 +437,6 @@ class UiSchemaView(BrowserView):
                             raise Exception(
                                 "Invalid content object title: only 'user' or variables in the format {{data['field-id']}} are allowed"
                             )
-                        # find all ids in data['some-id'] in content_object_title
-                        # data_id_pattern = r"data\[['\"]([^'\"]+)['\"]\]"
-                        # data_id_matches = re.findall(
-                        #     data_id_pattern, content_object_title
-                        # )
-                        # variables_in_title.update(data_id_matches)
-
-                        # for var in variables_in_title:
-                        #     if var not in form_field_ids:
-                        #         raise Exception(
-                        #             f"Invalid field id in content object title: {var}"
-                        #         )
-
                     except:
                         content_object_title = ""
                         button_schema["options"]["disabled"] = True
@@ -483,7 +453,7 @@ class UiSchemaView(BrowserView):
                     if button.redirect_to_new_object:
                         button_schema["options"]["submitOptions"]["request"][
                             "onSuccessRedirect"
-                        ] = "redirect_to_new_object"
+                        ] = button.target_folder.to_object.absolute_url()  # redirect to folder, where the created form submission data is stored
 
                     # Combine the base URL with the encoded query parameters
                     request_url = f"{request_url}?{encoded_query}"
