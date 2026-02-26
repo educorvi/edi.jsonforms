@@ -72,6 +72,7 @@
   <property name="view_methods">
     <element value="form-view"/>
     <element value="form-tools-view"/>
+    <element value="annotations-view"/>
   </property>
 
   <!-- Method aliases -->
