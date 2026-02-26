@@ -64,4 +64,9 @@
          Products.DCWorkflow.interfaces.IAfterTransitionEvent"
     handler=".subscribers.sync_children_workflow" />
 
+  <subscriber
+    for="edi.jsonforms.content.common.IFormElement
+         Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+    handler=".subscribers.sync_children_workflow" />
+
 </configure>
