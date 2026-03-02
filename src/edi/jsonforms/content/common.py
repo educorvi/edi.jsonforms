@@ -186,6 +186,7 @@ class IDependent(IAdditionalInformation):
     #     required=False
     # )
 
+    # TODO change to new widget when updating to plone >= 6.1
     directives.widget(
         "dependencies",
         RelatedItemsFieldWidget,
