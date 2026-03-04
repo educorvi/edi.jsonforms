@@ -26,4 +26,24 @@
      permission="zope2.View"
      />
 
+  <browser:viewlet
+     name="forks-viewlet"
+     for="edi.jsonforms.content.form.IForm"
+     manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
+     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+     class=".forks_viewlet.ForksViewlet"
+     template="forks_viewlet.pt"
+     permission="zope2.View"
+     />
+
+  <browser:viewlet
+     name="forks-viewlet"
+     for="edi.jsonforms.content.wizard.IWizard"
+     manager="plone.app.layout.viewlets.interfaces.IBelowContentBody"
+     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
+     class=".forks_viewlet.ForksViewlet"
+     template="forks_viewlet.pt"
+     permission="zope2.View"
+     />
+
 </configure>
