@@ -10,8 +10,9 @@
                 </h2>
                 <div id="collapseForks" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
                     <div class="accordion-body">
-                        <ul tal:define="forks python: view.get_available_forks()">
-                            <li tal:repeat="fork forks" tal:content="fork">
+                        <ul tal:define="forks python: view.create_available_fork_links()">
+                            <li tal:repeat="fork forks">
+                                <a tal:attributes="href python: fork['url']" tal:content="python: fork['title']"></a>
                             </li>
                         </ul>
                     </div>

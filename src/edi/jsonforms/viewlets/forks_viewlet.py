@@ -14,7 +14,7 @@ class ForksViewlet(ViewletBase):
             return super().render()
         return ""
 
-    def get_available_forks(self) -> list[str]:
+    def create_available_fork_links(self) -> list[str]:
         """
         gets all show_conditions of the current object and its children recursively
         deletes duplicates and returns the list
@@ -22,7 +22,14 @@ class ForksViewlet(ViewletBase):
         forks = self._get_available_forks(self.context)
         # delete duplicates
         forks = list(set(forks))
-        return forks
+
+        # create link for each fork
+        fork_links = []
+        for fork in forks:
+            fork_links.append(
+                {"url": f"{self.context.absolute_url()}?fork={fork}", "title": fork}
+            )
+        return fork_links
 
     def _get_available_forks(self, obj: IForm | IWizard | IFormElement) -> list[str]:
         """
