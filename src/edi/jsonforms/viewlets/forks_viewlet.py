@@ -5,16 +5,17 @@ from plone.base.utils import safe_hasattr
 from edi.jsonforms.content.form import IForm
 from edi.jsonforms.content.wizard import IWizard
 from edi.jsonforms.content.common import IFormElement
+from typing import List, Dict, Union
+from urllib.parse import quote_plus
 
 
 class ForksViewlet(ViewletBase):
     def render(self):
-        url = self.request.get("URL", "")
-        if url.endswith("form-tools-view") or url.endswith("wizard-tools-view"):
+        if self.view.__name__ in ["form-tools-view", "wizard-tools-view"]:
             return super().render()
         return ""
 
-    def create_available_fork_links(self) -> list[str]:
+    def create_available_fork_links(self) -> List[Dict]:
         """
         gets all show_conditions of the current object and its children recursively
         deletes duplicates and returns the list
@@ -22,16 +23,22 @@ class ForksViewlet(ViewletBase):
         forks = self._get_available_forks(self.context)
         # delete duplicates
         forks = list(set(forks))
+        # sort alphabetically
+        forks.sort()
 
         # create link for each fork
         fork_links = []
         for fork in forks:
+            # encode fork to be url safe
+            fork = quote_plus(fork)
             fork_links.append(
                 {"url": f"{self.context.absolute_url()}?fork={fork}", "title": fork}
             )
         return fork_links
 
-    def _get_available_forks(self, obj: IForm | IWizard | IFormElement) -> list[str]:
+    def _get_available_forks(
+        self, obj: Union[IForm, IWizard, IFormElement]
+    ) -> List[str]:
         """
         recursively traverses all children of obj and gets all show_conditions in a list
         duplicates are not removed

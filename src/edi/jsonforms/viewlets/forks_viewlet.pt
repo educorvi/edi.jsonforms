@@ -1,14 +1,14 @@
 <div class="p-3 mb-4 bg-body-tertiary rounded-3">
     <div class="container-fluid py-5">
         <h2 class="display-5 fw-bold" i18n:translate="">Information</h2>
-        <div class="accordion" id="accordionDeveloper">
+        <div class="accordion" id="accordionForks">
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForks" aria-expanded="true" aria-controls="collapseForks" i18n:translate="">
                   Available Forks
                     </button>
                 </h2>
-                <div id="collapseForks" class="accordion-collapse collapse" data-bs-parent="#accordionDeveloper">
+                <div id="collapseForks" class="accordion-collapse collapse" data-bs-parent="#accordionForks">
                     <div class="accordion-body">
                         <ul tal:define="forks python: view.create_available_fork_links()">
                             <li tal:repeat="fork forks">
@@ -21,9 +21,3 @@
         </div>
     </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    hljs.addPlugin(new CopyButtonPlugin());
-    hljs.highlightAll();
-  });
-</script>
