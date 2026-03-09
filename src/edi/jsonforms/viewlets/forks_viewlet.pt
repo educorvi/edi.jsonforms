@@ -1,4 +1,4 @@
-<div class="p-3 mb-4 bg-body-tertiary rounded-3">
+<div class="p-3 mb-4 bg-body-tertiary rounded-3" tal:condition="python: view.forks_available()">
     <div class="container-fluid py-5">
         <h2 class="display-5 fw-bold" i18n:translate="">Information</h2>
         <div class="accordion" id="accordionForks">

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 from plone.app.layout.viewlets import ViewletBase
@@ -17,6 +16,10 @@ class ForksViewlet(ViewletBase):
         if self.view.__name__ in ["form-tools-view", "wizard-tools-view"]:
             return super().render()
         return ""
+
+    def forks_available(self) -> bool:
+        forks = self._get_available_forks(self.context)
+        return bool(forks)
 
     def create_available_fork_links(self) -> List[Dict]:
         """
@@ -72,12 +75,13 @@ class ForksViewlet(ViewletBase):
         }
         """
         forks = {}
-        for child in obj.restrictedTraverse("@@contentlisting")():
+        for listing_object in obj.restrictedTraverse("@@contentlisting")():
+            child = listing_object.getObject()
             # test show_condition
             if safe_hasattr(child, "show_condition") and child.show_condition:
                 if child.show_condition not in forks:
                     forks[child.show_condition] = {}
-                child_path = get_path(child.getObject())
+                child_path = get_path(child)
                 if child_path not in forks[child.show_condition]:
                     forks[child.show_condition][child_path] = {}
                 forks[child.show_condition][child_path]["show_condition"] = (
@@ -99,13 +103,16 @@ class ForksViewlet(ViewletBase):
                         fork = get_override_fork(override_value)
                         if fork not in forks:
                             forks[fork] = {}
-                        child_path = get_path(child.getObject())
+                        child_path = get_path(child)
                         if child_path not in forks[fork]:
                             forks[fork][child_path] = {}
                         forks[fork][child_path][attr] = get_override_value(
                             override_value
                         )
 
-            if safe_hasattr(child, "is_folderish") and child.is_folderish:
-                forks.update(self._get_available_forks(child.getObject()))
+            if (
+                safe_hasattr(listing_object, "is_folderish")
+                and listing_object.is_folderish
+            ):
+                forks.update(self._get_available_forks(child))
         return forks
