@@ -2,6 +2,20 @@ import re
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.option import IOption
 
+try:
+    from edi.jsonforms_override.behaviors.interfaces import (
+        get_override_fork,
+        get_override_value,
+    )
+except:
+    # if the import fails, define dummy functions that return empty strings, so that the code doesn't break and the override fields just don't work
+    def get_override_fork(attribute: str):
+        return ""
+
+    def get_override_value(attribute: str):
+        return ""
+
+
 possibly_required_types = ["Field", "SelectionField", "UploadField", "Array"]
 
 # for Field
@@ -80,8 +94,8 @@ def get_value(overwritten_attribute, attribute, request):
     fork = get_fork(request)
     if fork and fork != "":
         for item in overwritten_attribute:
-            if item.startswith(fork + ":"):
-                new_attribute = item.split(":", 1)[1].strip()
+            if get_override_fork(item) == fork:
+                new_attribute = get_override_value(item)
 
     if new_attribute:
         return new_attribute
