@@ -30,7 +30,7 @@ class ForksViewlet(ViewletBase):
             {
                 "url": "http://example.com?fork=fork1",
                 "title": "fork1",
-                "fields": {...}
+                "data": [(path, attribute, value), (path, attribute2, value2), (path2, ...)]
             },
             ...
         ]
@@ -42,11 +42,19 @@ class ForksViewlet(ViewletBase):
         for fork in forks:
             # encode fork to be url safe
             fork = quote_plus(fork)
+
+            # transform data to use in table
+            table_data = []
+            for path in forks[fork].keys():
+                for attribute in forks[fork][path].keys():
+                    value = forks[fork][path][attribute]
+                    table_data.append((path, attribute, value))
+
             fork_links.append(
                 {
                     "url": f"{self.context.absolute_url()}?fork={fork}",
                     "title": fork,
-                    "fields": forks[fork],
+                    "data": table_data,
                 }
             )
         return fork_links

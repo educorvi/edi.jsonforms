@@ -18,7 +18,22 @@
                                 <div tal:attributes="id python: str(fork['title'])" class="accordion-collapse collapse" data-bs-parent="#accordionForksList">
                                     <div class="accordion-body">
                                         <a tal:attributes="href python: fork['url']" tal:content="python: fork['url']"></a>
-                                        <p tal:content="python: fork['fields']"></p>
+                                        <div class="table-responsive">
+                                            <table class="table" tal:define="table_data python: fork['data']">
+                                                <thead>
+                                                    <th scope="col" i18n:translate="">Path</th>
+                                                    <th scope="col" i18n:translate="">Attribute</th>
+                                                    <th scope="col" i18n:translate="">Value</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr tal:repeat="row table_data">
+                                                        <td tal:content="python: row[0]">
+                                                        <td tal:content="python: row[1]">
+                                                        <td tal:content="python: row[2]">
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
