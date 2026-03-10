@@ -27,23 +27,46 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-5" tal:define="versions view/get_versions" tal:condition="versions">
+        <div class="row mt-5" tal:define="versions python: view.get_versions()" tal:condition="versions">
             <div class="col-12">
                 <h3 i18n:translate="">Stable-Versions</h3>
-                <ul>
-                    <li tal:define="version python:versions[0]">
-                        <span tal:content="python: version[0]"/>
-                        <a tal:attributes="href python:version[2]">[JSON-Schema (Stable)]</a>
-                        <a tal:attributes="href python:version[3]">[UI-Schema]</a>
-                        <small tal:content="python: version[1]"/>
-                    </li>
-                    <li tal:repeat="version python:versions[1:]">
-                        <span tal:content="python: version[0]"/>
-                        <a tal:attributes="href python:version[2]">[JSON-Schema]</a>
-                        <a tal:attributes="href python:version[3]">[UI-Schema]</a>
-                        <small tal:content="python: version[1]"/>
-                    </li>
-                </ul>
+                <div tal:repeat="version python: versions" class="accordion" tal:attributes="id python: 'accordionVersion' + str(version['version_id'])">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" tal:attributes="data-bs-target python: '#collapseVersion' + str(version['version_id']); aria-controls python: 'collapseVersion' + str(version['version_id'])" aria-expanded="true" i18n:translate="">
+                                <div tal:content="python: str(version['version_id']) + ': ' + str(version['comment'])"/>
+                            </button>
+                        </h2>
+                        <div tal:attributes="id python: 'collapseVersion' + str(version['version_id']); data-bs-parent python: '#accordionVersion' + str(version['version_id'])" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>
+                                        <a tal:attributes="href python: version['json_schema_url']">[JSON-Schema]</a>
+                                    </li>
+                                    <li>
+                                        <a tal:attributes="href python: version['ui_schema_url']">[UI-Schema]</a>
+                                    </li>
+                                    <li tal:condition="python: version['forks']">
+                                        <span i18n:translate="">Forks</span>
+                                        <ul>
+                                            <li tal:repeat="fork python: version['forks']">
+                                                <span tal:content="python: fork['name']"/>
+                                                <ul>
+                                                    <li>
+                                                        <a tal:attributes="href python: fork['json_schema_url']">[JSON-Schema]</a>
+                                                    </li>
+                                                    <li>
+                                                        <a tal:attributes="href python: fork['ui_schema_url']">[UI-Schema]</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
