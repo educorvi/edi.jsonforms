@@ -182,7 +182,7 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
 def get_path(obj: IFormElement, without_root=False):
     """
     get the path of an object in the json schema (leaves out fieldsets)
-    e.g. properties/object1/properties/selectionfield1/properties/option1
+    e.g. /properties/object1/properties/selectionfield1/properties/option1
     """
     path = create_id(obj)
     while obj.aq_parent.portal_type != "Form":
@@ -191,4 +191,4 @@ def get_path(obj: IFormElement, without_root=False):
             path = create_id(obj) + "/items/properties/" + path
         elif obj.portal_type != "Fieldset":
             path = create_id(obj) + "/properties/" + path
-    return "properties/" + path
+    return "/properties/" + path

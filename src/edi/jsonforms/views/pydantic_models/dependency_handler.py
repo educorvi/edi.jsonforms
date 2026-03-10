@@ -87,7 +87,7 @@ def add_dependent_required(
             creates hiearchy of path as a statement (use in if or then)
             if portal_type of obj is not Option and only one 'properties' in path, no 'properties' key is created
             """
-            props = obj_path.split("/")
+            props = obj_path.split("/")[1:]  # split and remove first empty element
             # if props.count("properties") == 1 and obj.portal_type != "Option":
             #     statement = {"required": [props[-1]]}
             # else:
