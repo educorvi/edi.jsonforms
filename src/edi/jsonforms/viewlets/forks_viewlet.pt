@@ -48,7 +48,7 @@
                     </button>
                 </h2>
                 <div id="collapseForksJson" class="accordion-collapse collapse" data-bs-parent="#accordionForks">
-                    <div class="accordion-body" tal:define="forksJson python: view.get_available_forks()">
+                    <div class="accordion-body" tal:define="forksJson python: view.get_available_forks_string()">
                         <pre class="rounded"><code tal:content="python: forksJson" class="language-json theme-atom-one-dark"></code></pre>
                     </div>
                 </div>
