@@ -27,6 +27,7 @@ def _save_schemata(context, json_schema_view, ui_schema_view):
                 forked_ui_schemata[fork] = ui_schema_view.get_schema()
             context.forked_json_schema_rev = forked_json_schemata
             context.forked_ui_schema_rev = forked_ui_schemata
+            context.forks_rev = available_forks
 
 
 def schema_handler(context, event):

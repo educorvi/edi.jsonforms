@@ -40,6 +40,8 @@ class VersionView(BrowserView):
                 objschema = getattr(obj, "json_schema_rev", {})
             elif schema == "ui":
                 objschema = getattr(obj, "ui_schema_rev", {})
+            elif schema == "forks":
+                objschema = getattr(obj, "forks_rev", {})
 
         if objschema:
             return json.dumps(objschema, indent=4)

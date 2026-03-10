@@ -44,10 +44,11 @@ class DeveloperViewlet(ViewletBase):
                 "comment": "Initial release",
                 "json_schema_url": "http://example.com/form/@@version-view?version=1&schema=json",
                 "ui_schema_url": "http://example.com/form/@@version-view?version=1&schema=ui",
+                "forks_schema_url": "http://example.com/form/@@version-view?version=1&schema=forks", # the schema that only contains the differences of the forks
                 "forks": [
                     {
-                        "json_schema_url": "http://example.com/@@version-view?version=1&schema=json&fork=fork1",
-                        "ui_schema_url": "http://example.com/@@version-view?version=1&schema=ui&fork=fork1",
+                        "json_schema_url": "http://example.com/@@version-view?version=1&schema=json&fork=fork1", # full json schema of the fork
+                        "ui_schema_url": "http://example.com/@@version-view?version=1&schema=ui&fork=fork1", # full ui schema of the fork
                         "name": "fork1",
                     },
                     ...
@@ -71,6 +72,10 @@ class DeveloperViewlet(ViewletBase):
                 ui_schema_url = (
                     self.context.absolute_url()
                     + f"/@@version-view?version={version}&schema=ui"
+                )
+                forks_schema_url = (
+                    self.context.absolute_url()
+                    + f"/@@version-view?version={version}&schema=forks"
                 )
 
                 forked_json_schemata = getattr(obj, "forked_json_schema_rev", {}) or {}
@@ -104,6 +109,7 @@ class DeveloperViewlet(ViewletBase):
                         "comment": release.get("comments"),
                         "json_schema_url": json_schema_url,
                         "ui_schema_url": ui_schema_url,
+                        "forks_schema_url": forks_schema_url,
                         "forks": fork_urls,
                     }
                 )
