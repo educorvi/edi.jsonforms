@@ -463,6 +463,7 @@ class UiSchemaView(BrowserView):
 
                 buttons_schema["buttons"].append(button_schema)
 
+        self.add_tools_to_schema(buttons_schema, button_handler)
         return buttons_schema
 
     def get_schema_for_array(self, array, scope, recursive=True, overwrite_scope=None):
