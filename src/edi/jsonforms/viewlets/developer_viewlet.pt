@@ -34,7 +34,7 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" tal:attributes="data-bs-target python: '#collapseVersion' + str(version['version_id']); aria-controls python: 'collapseVersion' + str(version['version_id'])" aria-expanded="true" i18n:translate="">
-                                <div tal:content="python: str(version['version_id']) + ': ' + str(version['comment'])"/>
+                                <span tal:content="python: str(version['version_id']) + ': ' + str(version['comment'])"/>
                             </button>
                         </h2>
                         <div tal:attributes="id python: 'collapseVersion' + str(version['version_id']); data-bs-parent python: '#accordionVersion' + str(version['version_id'])" class="accordion-collapse collapse">

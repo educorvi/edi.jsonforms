@@ -10,12 +10,12 @@
                 </h2>
                 <div id="collapseForks" class="accordion-collapse collapse" data-bs-parent="#accordionForks">
                     <div class="accordion-body" tal:define="forks python: view.create_available_fork_links()">
-                        <div tal:repeat="fork forks" class="accordion" id="accordionForksList">
+                        <div tal:repeat="fork forks" class="accordion" tal:attributes="id python: 'accordionForksList' + str(fork['title'])">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" tal:content="python: fork['title']" data-bs-toggle="collapse" tal:attributes="data-bs-target python: '#' + str(fork['title'])" aria-expanded="true" aria-controls="collapseForksList" i18n:translate=""></button>
+                                    <button class="accordion-button collapsed" type="button" tal:content="python: fork['title']" data-bs-toggle="collapse" tal:attributes="data-bs-target python: '#' + str(fork['title']); aria-controls python: str(fork['title'])" aria-expanded="true" i18n:translate=""></button>
                                 </h2>
-                                <div tal:attributes="id python: str(fork['title'])" class="accordion-collapse collapse" data-bs-parent="#accordionForksList">
+                                <div tal:attributes="id python: str(fork['title']); data-bs-parent python: '#accordionForksList' + str(fork['title'])" class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                         <a tal:attributes="href python: fork['url']" tal:content="python: fork['url']"></a>
                                         <div class="table-responsive">
@@ -27,9 +27,9 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr tal:repeat="row table_data">
-                                                        <td tal:content="python: row[0]">
-                                                        <td tal:content="python: row[1]">
-                                                        <td tal:content="python: row[2]">
+                                                        <td tal:content="python: row[0]"/>
+                                                        <td tal:content="python: row[1]"/>
+                                                        <td tal:content="python: row[2]"/>
                                                     </tr>
                                                 </tbody>
                                             </table>

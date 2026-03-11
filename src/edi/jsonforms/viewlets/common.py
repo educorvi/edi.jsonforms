@@ -1,3 +1,4 @@
+from urllib.parse import quote_plus
 from plone.base.utils import safe_hasattr
 
 from edi.jsonforms.content.form import IForm
@@ -30,12 +31,13 @@ def get_available_forks(
         child = listing_object.getObject()
         # test show_condition
         if safe_hasattr(child, "show_condition") and child.show_condition:
-            if child.show_condition not in forks:
-                forks[child.show_condition] = {}
+            show_condition = quote_plus(child.show_condition)
+            if show_condition not in forks:
+                forks[show_condition] = {}
             child_path = get_path(child)
-            if child_path not in forks[child.show_condition]:
-                forks[child.show_condition][child_path] = {}
-            forks[child.show_condition][child_path]["show_condition"] = (
+            if child_path not in forks[show_condition]:
+                forks[show_condition][child_path] = {}
+            forks[show_condition][child_path]["show_condition"] = (
                 True if not child.negate_condition else False
             )
 

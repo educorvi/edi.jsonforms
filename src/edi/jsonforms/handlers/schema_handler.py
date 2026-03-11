@@ -17,6 +17,8 @@ def _save_schemata(context, json_schema_view, ui_schema_view):
             context.ui_schema_rev = ui_schema
 
             # update forked schemata
+            current_fork = json_schema_view.request.get("fork")
+
             available_forks = get_available_forks(context)
             forked_json_schemata = {}
             forked_ui_schemata = {}
@@ -28,6 +30,9 @@ def _save_schemata(context, json_schema_view, ui_schema_view):
             context.forked_json_schema_rev = forked_json_schemata
             context.forked_ui_schema_rev = forked_ui_schemata
             context.forks_rev = available_forks
+
+            json_schema_view.request.set("fork", current_fork)
+            ui_schema_view.request.set("fork", current_fork)
 
 
 def schema_handler(context, event):

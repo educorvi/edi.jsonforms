@@ -1,4 +1,5 @@
 import re
+from urllib.parse import quote_plus
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.option import IOption
 
@@ -7,7 +8,7 @@ try:
         get_override_fork,
         get_override_value,
     )
-except:
+except ModuleNotFoundError:
     # if the import fails, define dummy functions that return empty strings, so that the code doesn't break and the override fields just don't work
     def get_override_fork(attribute: str):
         return ""
@@ -155,10 +156,12 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
 
     # if show_condition only contains spaces or commas it is also considered as empty so show the field
     conditions = re.split(",\s*", show_condition)
+    conditions = [quote_plus(c) for c in conditions if c and c.strip() != ""]
     if len(conditions) == 0:
         return True
 
     fork = get_fork(request)
+
     # if no fork is set but a show_condition is set without negation, don't show the field
     if not fork and fork != "":
         if not negate_condition:

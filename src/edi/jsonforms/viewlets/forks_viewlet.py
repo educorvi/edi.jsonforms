@@ -36,9 +36,6 @@ class ForksViewlet(ViewletBase):
         # create link for each fork
         fork_links = []
         for fork in forks:
-            # encode fork to be url safe
-            fork = quote_plus(fork)
-
             # transform data to use in table
             table_data = []
             for path in forks[fork].keys():
@@ -48,7 +45,7 @@ class ForksViewlet(ViewletBase):
 
             fork_links.append(
                 {
-                    "url": f"{self.context.absolute_url()}?fork={fork}",
+                    "url": f"{self.context.absolute_url()}?fork={quote_plus(fork)}",
                     "title": fork,
                     "data": table_data,
                 }

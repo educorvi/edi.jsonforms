@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from typing import Dict, List
-
+from urllib.parse import quote_plus
 from plone.app.layout.viewlets import ViewletBase
 from plone.app.layout.viewlets.content import ContentHistoryView
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
@@ -89,11 +89,11 @@ class DeveloperViewlet(ViewletBase):
                 for fork in forks:
                     fork_json_schema_url = (
                         self.context.absolute_url()
-                        + f"/@@version-view?version={version}&schema=json&fork={fork}"
+                        + f"/@@version-view?version={version}&schema=json&fork={quote_plus(fork)}"
                     )
                     fork_ui_schema_url = (
                         self.context.absolute_url()
-                        + f"/@@version-view?version={version}&schema=ui&fork={fork}"
+                        + f"/@@version-view?version={version}&schema=ui&fork={quote_plus(fork)}"
                     )
                     fork_urls.append(
                         {
