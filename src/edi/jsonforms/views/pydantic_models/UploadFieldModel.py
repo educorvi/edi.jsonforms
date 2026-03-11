@@ -36,12 +36,21 @@ class UploadFieldModel(BaseFormElementModel):
         request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
-        self.minItems = form_element.min_number_of_files
+        if self.is_required:
+            self.minItems = 1
+        self.minItems = (
+            form_element.min_number_of_files
+            if form_element.min_number_of_files
+            else self.minItems
+        )
 
         upload = Upload()
         if form_element.max_number_of_files:
             if form_element.max_number_of_files == 1:
                 self.data = upload
+                self.minItems = (
+                    None  # remove minItems of array, since it's not an array anymore
+                )
             else:
                 self.type = "array"
                 self.items = upload
