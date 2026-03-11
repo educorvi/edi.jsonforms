@@ -22,6 +22,10 @@ class IFormElementView(Interface):
     """Marker Interface for IFormElementView"""
 
 
+class IFormElementToolsView(Interface):
+    """Marker Interface for IFormElementToolsView"""
+
+
 @implementer(IFormElementView)
 class FormElementView(FormView):
     def __call__(self):
@@ -118,3 +122,16 @@ class FormElementJsonSchema(JsonSchemaView):
         self.jsonschema = form_model.get_json_schema()
 
         return self.jsonschema
+
+
+@implementer(IFormElementToolsView)
+class FormElementToolsView(FormElementView):
+    def form_element_uischema(self) -> str:
+        form_element_uischema = ToolsFormElementUiSchema(self.context, self.request)()
+        return form_element_uischema
+
+
+class ToolsFormElementUiSchema(FormElementUiSchema):
+    def __init__(self, context, request):
+        super().__init__(context, request)
+        self.tools_on = True
