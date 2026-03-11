@@ -87,7 +87,9 @@ class IUploadField(IDependentExtended):
     #                             required=True)
 
     fieldset(
-        "advanced-options", label=_("Advanced Options"), fields=["accepted_file_types"]
+        "advanced-options",
+        label=_("Advanced Options"),
+        fields=["accepted_file_types", "data_format"],
     )
 
     accepted_file_types = schema.List(
@@ -128,6 +130,18 @@ class IUploadField(IDependentExtended):
         description=_("The user will be forced to upload files individually."),
         required=False,
         default=False,
+    )
+
+    data_format = schema.Choice(
+        title=_("Data format"),
+        description=_(
+            "The format in which the uploaded file(s) will be stored in the JSON data. "
+            "If 'URI' is selected, only the URI will be stored. "
+            "If 'Base64' is selected, the file content will be encoded in base64 and stored."
+        ),
+        values=["Base64", "URI"],
+        default="Base64",
+        required=True,
     )
 
     @invariant
