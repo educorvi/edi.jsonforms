@@ -18,6 +18,7 @@ class FieldModel(BaseFormElementModel):
     format: Optional[str] = None
     minimum: Optional[float] = None
     maximum: Optional[float] = None
+    multipleOf: Optional[float] = None
 
     def __init__(
         self,
@@ -33,6 +34,8 @@ class FieldModel(BaseFormElementModel):
                 self.minLength = form_element.minimum
             if form_element.maximum:
                 self.maxLength = form_element.maximum
+            if form_element.pattern and answer_type in ["text", "textarea"]:
+                self.pattern = form_element.pattern
         elif answer_type == "tel":
             self.type = "string"
         elif answer_type == "url":
@@ -52,6 +55,8 @@ class FieldModel(BaseFormElementModel):
             self.format = "time"
         elif answer_type == "number":
             self.type = "number"
+            if form_element.number_of_decimal_digits:
+                self.multipleOf = 1 / (10**form_element.number_of_decimal_digits)
         elif answer_type == "integer":
             self.type = "integer"
         elif answer_type == "boolean":
