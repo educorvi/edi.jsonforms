@@ -1,6 +1,21 @@
 import re
+from urllib.parse import quote_plus
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.option import IOption
+
+try:
+    from edi.jsonforms_override.behaviors.interfaces import (
+        get_override_fork,
+        get_override_value,
+    )
+except ModuleNotFoundError:
+    # if the import fails, define dummy functions that return empty strings, so that the code doesn't break and the override fields just don't work
+    def get_override_fork(attribute: str):
+        return ""
+
+    def get_override_value(attribute: str):
+        return ""
+
 
 possibly_required_types = ["Field", "SelectionField", "UploadField", "Array"]
 
@@ -80,8 +95,8 @@ def get_value(overwritten_attribute, attribute, request):
     fork = get_fork(request)
     if fork and fork != "":
         for item in overwritten_attribute:
-            if item.startswith(fork + ":"):
-                new_attribute = item.split(":", 1)[1].strip()
+            if get_override_fork(item) == fork:
+                new_attribute = get_override_value(item)
 
     if new_attribute:
         return new_attribute
@@ -141,10 +156,12 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
 
     # if show_condition only contains spaces or commas it is also considered as empty so show the field
     conditions = re.split(",\s*", show_condition)
+    conditions = [quote_plus(c) for c in conditions if c and c.strip() != ""]
     if len(conditions) == 0:
         return True
 
     fork = get_fork(request)
+
     # if no fork is set but a show_condition is set without negation, don't show the field
     if not fork and fork != "":
         if not negate_condition:
@@ -168,7 +185,7 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
 def get_path(obj: IFormElement, without_root=False):
     """
     get the path of an object in the json schema (leaves out fieldsets)
-    e.g. properties/object1/properties/selectionfield1/properties/option1
+    e.g. /properties/object1/properties/selectionfield1/properties/option1
     """
     path = create_id(obj)
     while obj.aq_parent.portal_type != "Form":
@@ -177,4 +194,4 @@ def get_path(obj: IFormElement, without_root=False):
             path = create_id(obj) + "/items/properties/" + path
         elif obj.portal_type != "Fieldset":
             path = create_id(obj) + "/properties/" + path
-    return "properties/" + path
+    return "/properties/" + path

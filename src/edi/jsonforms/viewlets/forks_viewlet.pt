@@ -1,20 +1,55 @@
-<div class="p-3 mb-4 bg-body-tertiary rounded-3">
+<div class="p-3 mb-4 bg-body-tertiary rounded-3" tal:condition="python: view.forks_available()">
     <div class="container-fluid py-5">
         <h2 class="display-5 fw-bold" i18n:translate="">Information</h2>
         <div class="accordion" id="accordionForks">
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForks" aria-expanded="true" aria-controls="collapseForks" i18n:translate="">
-                  Available Forks
+                Available Forks
                     </button>
                 </h2>
                 <div id="collapseForks" class="accordion-collapse collapse" data-bs-parent="#accordionForks">
-                    <div class="accordion-body">
-                        <ul tal:define="forks python: view.create_available_fork_links()">
-                            <li tal:repeat="fork forks">
-                                <a tal:attributes="href python: fork['url']" tal:content="python: fork['title']"></a>
-                            </li>
-                        </ul>
+                    <div class="accordion-body" tal:define="forks python: view.create_available_fork_links()">
+                        <div tal:repeat="fork forks" class="accordion" tal:attributes="id python: 'accordionForksList' + str(fork['title'])">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" tal:content="python: fork['title']" data-bs-toggle="collapse" tal:attributes="data-bs-target python: '#' + str(fork['title']); aria-controls python: str(fork['title'])" aria-expanded="true" i18n:translate=""></button>
+                                </h2>
+                                <div tal:attributes="id python: str(fork['title']); data-bs-parent python: '#accordionForksList' + str(fork['title'])" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <a tal:attributes="href python: fork['url']" tal:content="python: fork['url']"></a>
+                                        <div class="table-responsive">
+                                            <table class="table" tal:define="table_data python: fork['data']">
+                                                <thead>
+                                                    <th scope="col" i18n:translate="">Path</th>
+                                                    <th scope="col" i18n:translate="">Attribute</th>
+                                                    <th scope="col" i18n:translate="">Value</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr tal:repeat="row table_data">
+                                                        <td tal:content="python: row[0]"/>
+                                                        <td tal:content="python: row[1]"/>
+                                                        <td tal:content="python: row[2]"/>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForksJson" aria-expanded="true" aria-controls="collapseForksJson" i18n:translate="">
+                        forks.json
+                    </button>
+                </h2>
+                <div id="collapseForksJson" class="accordion-collapse collapse" data-bs-parent="#accordionForks">
+                    <div class="accordion-body" tal:define="forksJson python: view.get_available_forks_string()">
+                        <pre class="rounded"><code tal:content="python: forksJson" class="language-json theme-atom-one-dark"></code></pre>
                     </div>
                 </div>
             </div>

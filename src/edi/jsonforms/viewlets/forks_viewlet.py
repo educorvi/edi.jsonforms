@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from plone.app.layout.viewlets import ViewletBase
-from plone.base.utils import safe_hasattr
+import json
 
-from edi.jsonforms.content.form import IForm
-from edi.jsonforms.content.wizard import IWizard
-from edi.jsonforms.content.common import IFormElement
-from typing import List, Dict, Union
+from plone.app.layout.viewlets import ViewletBase
 from urllib.parse import quote_plus
+from typing import List, Dict
+
+from edi.jsonforms.viewlets.common import get_available_forks
 
 
 class ForksViewlet(ViewletBase):
@@ -15,38 +13,46 @@ class ForksViewlet(ViewletBase):
             return super().render()
         return ""
 
+    def forks_available(self) -> bool:
+        forks = get_available_forks(self.context)
+        return bool(forks)
+
     def create_available_fork_links(self) -> List[Dict]:
         """
-        gets all show_conditions of the current object and its children recursively
-        deletes duplicates and returns the list
+        calls get_available_forks from viewlets.common and adds the url for each fork
+
+        returns a list of dicts with the following structure:
+        [
+            {
+                "url": "http://example.com?fork=fork1",
+                "title": "fork1",
+                "data": [(path, attribute, value), (path, attribute2, value2), (path2, ...)]
+            },
+            ...
+        ]
         """
-        forks = self._get_available_forks(self.context)
-        # delete duplicates
-        forks = list(set(forks))
-        # sort alphabetically
-        forks.sort()
+        forks = get_available_forks(self.context)
 
         # create link for each fork
         fork_links = []
         for fork in forks:
-            # encode fork to be url safe
-            fork = quote_plus(fork)
+            # transform data to use in table
+            table_data = []
+            for path in forks[fork].keys():
+                for attribute in forks[fork][path].keys():
+                    value = forks[fork][path][attribute]
+                    table_data.append((path, attribute, value))
+
             fork_links.append(
-                {"url": f"{self.context.absolute_url()}?fork={fork}", "title": fork}
+                {
+                    "url": f"{self.context.absolute_url()}?fork={quote_plus(fork)}",
+                    "title": fork,
+                    "data": table_data,
+                }
             )
         return fork_links
 
-    def _get_available_forks(
-        self, obj: Union[IForm, IWizard, IFormElement]
-    ) -> List[str]:
-        """
-        recursively traverses all children of obj and gets all show_conditions in a list
-        duplicates are not removed
-        """
-        forks = []
-        for child in obj.restrictedTraverse("@@contentlisting")():
-            if safe_hasattr(child, "show_condition") and child.show_condition:
-                forks.append(child.show_condition)
-            if safe_hasattr(child, "is_folderish") and child.is_folderish:
-                forks.extend(self._get_available_forks(child.getObject()))
-        return forks
+    def get_available_forks_string(self) -> str:
+        return json.dumps(
+            get_available_forks(self.context), indent=4, ensure_ascii=False
+        )
