@@ -12,7 +12,7 @@ logger = logging.getLogger("edi.jsonforms")
 
 class JsonSchemaView(BrowserView):
     is_extended_schema = False  # True if schema is generated for an api call and not for the usual form view
-    content_types_without_schema = ["Helptext", "Button Handler"]
+    content_types_without_schema = ["Helptext", "Button Group"]
     is_single_view = False
 
     def __init__(self, context, request):
