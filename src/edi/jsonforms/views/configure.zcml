@@ -11,7 +11,7 @@
     name="convert-all-optionlists"
     for="*"
     class=".convert_all_optionlists.ConvertAllOptionlists"
-    permission="zope2.View"
+    permission="cmf.ManagePortal"
     layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
     />
 
