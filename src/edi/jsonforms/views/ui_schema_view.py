@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
 from urllib.parse import urlencode
 from edi.jsonforms import _
 from Products.Five.browser import BrowserView
 import json
 from jinja2 import meta
 from jinja2.sandbox import SandboxedEnvironment
-from plone import api
 
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
@@ -364,6 +362,7 @@ class UiSchemaView(BrowserView):
                 button_schema["options"]["submitOptions"]["request"]["url"] = []
 
                 for handler in button.restrictedTraverse("@@contentlisting")():
+                    handler = handler.getObject()
                     if handler.portal_type == "Email Handler":
                         request_url = self.context.absolute_url() + "/@send-email"
                         query_params = {"to_address": handler.to_address}
@@ -438,12 +437,6 @@ class UiSchemaView(BrowserView):
                             ):
                                 content_object_title = _("Form submission")
 
-                            # parent_form = handler.aq_parent.aq_parent.aq_parent
-                            # if parent_form.portal_type != "Form":  # unspecified case
-                            #     raise Exception(
-                            #         "Grandgrandparent of File Storage Handler is not a Form"
-                            #     )
-
                             env = SandboxedEnvironment()
                             ast = env.parse(content_object_title)
                             variables_in_title = meta.find_undeclared_variables(ast)
@@ -465,12 +458,6 @@ class UiSchemaView(BrowserView):
 
                         # Encode the query parameters
                         encoded_query = urlencode(query_params)
-
-                        # # replace page after success in case option is set to true
-                        # if handler.redirect_to_new_object:
-                        #     button_schema["options"]["submitOptions"]["request"][
-                        #         "onSuccessRedirect"
-                        #     ] = handler.target_folder.to_object.absolute_url()  # redirect to folder, where the created form submission data is stored
 
                         # Combine the base URL with the encoded query parameters
                         request_url = f"{request_url}?{encoded_query}"
