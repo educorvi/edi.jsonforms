@@ -58,6 +58,7 @@ setup(
         "plone.api>=1.8.4",
         "plone.app.dexterity",
         "pydantic>=2",
+        "jinja2 >=3.1.6"
     ],
     extras_require={
         "test": [
