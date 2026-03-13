@@ -11,6 +11,7 @@ from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 
+from plone import api
 from plone.base.utils import safe_hasattr
 
 from edi.jsonforms.views.common import get_option_name
@@ -422,9 +423,7 @@ class UiSchemaView(BrowserView):
                     elif handler.portal_type == "File Storage Handler":
                         request_url = self.context.absolute_url() + "/@store-as-file"
                         try:
-                            folder_path = handler.target_folder.to_object.absolute_url()
-                            # remove base url and name of plone site
-                            folder_path = "/" + "/".join(folder_path.split("/")[4:])
+                            folder_path = api.content.get_path(obj=handler.target_folder.to_object)
                         except:
                             folder_path = ""
                             button_schema["options"]["disabled"] = True
