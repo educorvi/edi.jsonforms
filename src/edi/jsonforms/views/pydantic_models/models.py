@@ -17,11 +17,11 @@ class HelptextModel(BaseFormElementModel):
         return {}  # Helptext does not contribute to the json schema
 
 
-class ButtonHandlerModel(BaseFormElementModel):
+class ButtonGroupModel(BaseFormElementModel):
     # type: str = "string"
 
     # def __init__(self, form_element: IFormElement, parent_model: BaseFormElementModel):
     #     super().__init__(form_element, parent_model)
 
     def get_json_schema(self) -> dict:
-        return {}  # Button Handler does not contribute to the json schema
+        return {}  # Button Group does not contribute to the json schema

@@ -51,7 +51,14 @@ class IField(IDependentExtended):
     fieldset(
         "advanced-options",
         label=_("Advanced Options"),
-        fields=["minimum", "maximum", "placeholder", "unit", "pattern"],
+        fields=[
+            "minimum",
+            "maximum",
+            "number_of_decimal_digits",
+            "placeholder",
+            "unit",
+            "pattern",
+        ],
     )
 
     minimum = schema.Int(
@@ -71,6 +78,15 @@ class IField(IDependentExtended):
                                        For a Textline/-area/Password this is the maximal length the \
                                        text can have."
         ),
+        required=False,
+    )
+
+    number_of_decimal_digits = schema.Int(
+        title=_("Number of decimal digits"),
+        description=_(
+            "Only use this for the answer type Decimal number. This is the number of digits that can be filled in after the comma."
+        ),
+        min=1,
         required=False,
     )
 
@@ -119,6 +135,16 @@ class IField(IDependentExtended):
             raise Invalid(_("Maximum cannot be smaller or equal to zero."))
 
     @invariant
+    def number_of_decimal_digits_invariant(data):
+        if data.number_of_decimal_digits:
+            if data.answer_type != "number":
+                raise Invalid(
+                    _(
+                        "Number of decimal digits is only a valid option for the answer type Decimal number."
+                    )
+                )
+
+    @invariant
     def placeholder_invariant(data):
         if data.placeholder:
             if data.answer_type not in [
@@ -142,6 +168,16 @@ class IField(IDependentExtended):
                 raise Invalid(
                     _(
                         "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
+                    )
+                )
+
+    @invariant
+    def pattern_invariant(data):
+        if data.pattern:
+            if data.answer_type not in ["text", "textarea"]:
+                raise Invalid(
+                    _(
+                        "A regular expression pattern is only a valid option for the answer types Textline and Textarea."
                     )
                 )
 

@@ -79,7 +79,7 @@ def has_content(object):
     return object.portal_type in [
         "Array",
         "SelectionField",
-        "Button Handler",
+        "Button Group",
         "Fieldset",
         "Complex",
     ]
