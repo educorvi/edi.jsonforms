@@ -5,14 +5,12 @@ from edi.jsonforms.views.common import get_override_fork
 from edi.jsonforms.views.common import get_override_value
 from edi.jsonforms.views.common import get_path
 from plone.base.utils import safe_hasattr
-from typing import Dict
-from typing import Union
 from urllib.parse import quote_plus
 
 
 def get_available_forks(
-    obj: Union[IForm, IWizard, IFormElement],
-) -> Dict[str, Dict[str, Dict[str, str]]]:
+    obj: IForm | IWizard | IFormElement,
+) -> dict[str, dict[str, dict[str, str]]]:
     """
     recursively traverses all children of obj and gets all forks out of the show_conditions and the override fields,
 

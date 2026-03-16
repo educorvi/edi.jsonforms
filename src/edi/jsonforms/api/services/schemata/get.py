@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone import api
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.services import Service
@@ -11,7 +10,7 @@ import json
 
 @implementer(IExpandableElement)
 @adapter(Interface, Interface)
-class Schemata(object):
+class Schemata:
     def __init__(self, context, request):
         self.context = context.aq_explicit
         self.request = request
@@ -19,9 +18,7 @@ class Schemata(object):
     def __call__(self, expand=False):
         result = {
             "schemata": {
-                "@id": "{}/@schemata".format(
-                    self.context.absolute_url(),
-                ),
+                "@id": f"{self.context.absolute_url()}/@schemata",
             },
         }
         if not expand:

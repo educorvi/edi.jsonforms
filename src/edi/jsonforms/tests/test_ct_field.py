@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.content.field import IField  # NOQA E501
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING  # noqa
+from edi.jsonforms.content.field import IField
+from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -43,9 +42,7 @@ class FieldIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IField.providedBy(obj),
-            "IField not provided by {0}!".format(
-                obj,
-            ),
+            f"IField not provided by {obj}!",
         )
 
     def test_ct_field_adding(self):
@@ -58,9 +55,7 @@ class FieldIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IField.providedBy(obj),
-            "IField not provided by {0}!".format(
-                obj.id,
-            ),
+            f"IField not provided by {obj.id}!",
         )
 
         parent = obj.__parent__
@@ -73,4 +68,4 @@ class FieldIntegrationTest(unittest.TestCase):
     def test_ct_field_globally_not_addable(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         fti = queryUtility(IDexterityFTI, name="Field")
-        self.assertFalse(fti.global_allow, "{0} is globally addable!".format(fti.id))
+        self.assertFalse(fti.global_allow, f"{fti.id} is globally addable!")

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel

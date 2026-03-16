@@ -1,14 +1,11 @@
 from pydantic import BaseModel
 from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
 
 
 class FormProperties(BaseModel):
-    allOf: Optional[List[Dict[str, Dict[str, Any]]]]
-    required: Optional[List[str]]
-    dependentRequired: Optional[Dict[str, List[str]]]
+    allOf: list[dict[str, dict[str, Any]]] | None
+    required: list[str] | None
+    dependentRequired: dict[str, list[str]] | None
 
     def __init__(self):
         super().__init__(
@@ -17,13 +14,13 @@ class FormProperties(BaseModel):
             dependentRequired={},
         )
 
-    def update_allOf(self, allOf: List[Dict[str, Dict[str, Any]]]):
+    def update_allOf(self, allOf: list[dict[str, dict[str, Any]]]):
         self.allOf.extend(allOf)
 
-    def update_required(self, required: List[str]):
+    def update_required(self, required: list[str]):
         self.required.extend(required)
 
-    def update_dependentRequired(self, dependentRequired: Dict[str, List[str]]):
+    def update_dependentRequired(self, dependentRequired: dict[str, list[str]]):
         for key, value in dependentRequired.items():
             if key in self.dependentRequired:
                 self.dependentRequired[key].extend(value)

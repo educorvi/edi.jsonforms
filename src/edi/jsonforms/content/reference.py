@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # from plone.app.textfield import RichText
 # from plone.autoform import directives
 from edi.jsonforms import _
@@ -7,7 +6,6 @@ from edi.jsonforms.content.common import IFormElement
 from plone.dexterity.content import Container
 
 # from plone.namedfile import field as namedfile
-from plone.supermodel import model
 from z3c.relationfield.schema import RelationChoice
 from zope.globalrequest import getRequest
 

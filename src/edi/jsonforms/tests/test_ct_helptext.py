@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.content.helptext import IHelptext  # NOQA E501
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING  # noqa
+from edi.jsonforms.content.helptext import IHelptext
+from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -43,9 +42,7 @@ class HelptextIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IHelptext.providedBy(obj),
-            "IHelptext not provided by {0}!".format(
-                obj,
-            ),
+            f"IHelptext not provided by {obj}!",
         )
 
     def test_ct_helptext_adding(self):
@@ -58,9 +55,7 @@ class HelptextIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IHelptext.providedBy(obj),
-            "IHelptext not provided by {0}!".format(
-                obj.id,
-            ),
+            f"IHelptext not provided by {obj.id}!",
         )
 
         parent = obj.__parent__
@@ -73,4 +68,4 @@ class HelptextIntegrationTest(unittest.TestCase):
     def test_ct_helptext_globally_not_addable(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         fti = queryUtility(IDexterityFTI, name="Helptext")
-        self.assertFalse(fti.global_allow, "{0} is globally addable!".format(fti.id))
+        self.assertFalse(fti.global_allow, f"{fti.id} is globally addable!")

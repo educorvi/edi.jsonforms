@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
@@ -9,10 +8,7 @@ from plone.protect import CheckAuthenticator
 from plone.protect import createToken
 from Products.CMFCore.permissions import ModifyPortalContent
 from Products.Five.browser import BrowserView
-from zope.interface import implementer
-from zope.interface import Interface
 
-import json
 import logging
 
 

@@ -1,7 +1,5 @@
 from edi.jsonforms.viewlets.common import get_available_forks
 from plone.app.layout.viewlets import ViewletBase
-from typing import Dict
-from typing import List
 from urllib.parse import quote_plus
 
 import json
@@ -17,7 +15,7 @@ class ForksViewlet(ViewletBase):
         forks = get_available_forks(self.context)
         return bool(forks)
 
-    def create_available_fork_links(self) -> List[Dict]:
+    def create_available_fork_links(self) -> list[dict]:
         """
         calls get_available_forks from viewlets.common and adds the url for each fork
 

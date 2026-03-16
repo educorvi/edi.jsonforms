@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.ui_schema_view import UiSchemaView
@@ -7,8 +6,6 @@ from edi.jsonforms.views.wizard_view import WizardUiSchemaView
 from plone import api
 from plone.app.layout.viewlets import ViewletBase
 from plone.app.layout.viewlets.content import ContentHistoryView
-from typing import Dict
-from typing import List
 from urllib.parse import quote_plus
 
 
@@ -37,7 +34,7 @@ class DeveloperViewlet(ViewletBase):
             return ui_schema()
         return ""
 
-    def get_versions(self) -> List[Dict]:
+    def get_versions(self) -> list[dict]:
         """
         returns a list of the versions in the following format:
         [

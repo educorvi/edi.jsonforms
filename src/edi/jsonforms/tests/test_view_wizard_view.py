@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from edi.jsonforms.testing import EDI_JSONFORMS_FUNCTIONAL_TESTING
 from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from edi.jsonforms.views.wizard_view import IWizardView

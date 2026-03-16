@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.content.fieldset import IFieldset  # NOQA E501
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING  # noqa
+from edi.jsonforms.content.fieldset import IFieldset
+from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.api.exc import InvalidParameterError
 from plone.app.testing import setRoles
@@ -44,9 +43,7 @@ class FieldsetIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IFieldset.providedBy(obj),
-            "IFieldset not provided by {0}!".format(
-                obj,
-            ),
+            f"IFieldset not provided by {obj}!",
         )
 
     def test_ct_fieldset_adding(self):
@@ -59,9 +56,7 @@ class FieldsetIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IFieldset.providedBy(obj),
-            "IFieldset not provided by {0}!".format(
-                obj.id,
-            ),
+            f"IFieldset not provided by {obj.id}!",
         )
 
         parent = obj.__parent__
@@ -74,7 +69,7 @@ class FieldsetIntegrationTest(unittest.TestCase):
     def test_ct_fieldset_globally_not_addable(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         fti = queryUtility(IDexterityFTI, name="Fieldset")
-        self.assertFalse(fti.global_allow, "{0} is globally addable!".format(fti.id))
+        self.assertFalse(fti.global_allow, f"{fti.id} is globally addable!")
 
     def test_ct_fieldset_filter_content_type_true(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])

@@ -6,7 +6,6 @@ from edi.jsonforms.views.common import get_title
 from plone.base.utils import safe_hasattr
 from pydantic import BaseModel
 from pydantic import Field
-from typing import List
 from typing import Optional
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
@@ -27,14 +26,14 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     form_element: IFormElement
     id: str
     title: str
-    description: Optional[str] = None
-    comment: Optional[str] = None
-    type: Optional[str] = None
+    description: str | None = None
+    comment: str | None = None
+    type: str | None = None
     parent: Optional[
         "BaseFormElementModel"
     ]  # actually it can only be an ObjectModel or a model that extends this (Form)
-    required_choice: Optional[bool] = False
-    dependencies: Optional[List[IFormElement]] = Field(default_factory=list)
+    required_choice: bool | None = False
+    dependencies: list[IFormElement] | None = Field(default_factory=list)
 
     class Config:
         arbitrary_types_allowed = True
@@ -102,13 +101,13 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     def set_id(self, id: str):
         self.id = id
 
-    def get_dependencies(self) -> List[IFormElement]:
+    def get_dependencies(self) -> list[IFormElement]:
         return self.dependencies
 
-    def extend_dependencies(self, dependencies: List[IFormElement]):
+    def extend_dependencies(self, dependencies: list[IFormElement]):
         self.dependencies.extend(dependencies)
 
-    def set_dependencies(self, dependencies: List[IFormElement]):
+    def set_dependencies(self, dependencies: list[IFormElement]):
         self.dependencies = dependencies
 
     def check_dependencies(self, is_single_view: bool) -> bool:

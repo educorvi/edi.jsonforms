@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 from edi.jsonforms.content.field import Answer_types
 from edi.jsonforms.content.selection_field import Selection_answer_types
 from edi.jsonforms.content.upload_field import Upload_answer_types
-from edi.jsonforms.testing import EDI_JSONFORMS_FUNCTIONAL_TESTING
 from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from edi.jsonforms.tests._test_required_choice import test_required_choices
 from edi.jsonforms.tests._test_schema_views import setUp_integration_test
@@ -13,8 +11,6 @@ from edi.jsonforms.tests._test_schema_views import (
 )
 from edi.jsonforms.views.common import create_id
 from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
 
 
 # from zope.component import getMultiAdapter

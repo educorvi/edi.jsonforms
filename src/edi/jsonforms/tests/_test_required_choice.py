@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from edi.jsonforms.views.common import create_id
-from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from zope.component import getMultiAdapter
-from zope.interface.interfaces import ComponentLookupError
 
 import json
 

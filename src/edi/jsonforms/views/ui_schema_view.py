@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from edi.jsonforms import _
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list

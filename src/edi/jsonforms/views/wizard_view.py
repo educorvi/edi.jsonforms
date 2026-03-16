@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # from edi.jsonforms import _
 from edi.jsonforms.views.common import create_id

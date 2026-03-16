@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IAdditionalInformation
 from plone.dexterity.content import Item
-from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 from zope import schema
 from zope.interface import implementer
@@ -10,7 +8,6 @@ from zope.interface import implementer
 import json
 import logging
 import requests
-import time
 
 
 logging.basicConfig(level=logging.INFO)

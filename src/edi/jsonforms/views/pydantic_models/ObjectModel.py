@@ -23,13 +23,9 @@ from edi.jsonforms.views.pydantic_models.SelectionFieldModel import SelectionFie
 from edi.jsonforms.views.pydantic_models.UploadFieldModel import UploadFieldModel
 from plone.base.utils import safe_hasattr
 from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
 
-import copy
 import logging
 
 
@@ -91,19 +87,17 @@ def create_model_recursively(
 class ObjectModel(BaseFormElementModel):
     type: str = "object"
 
-    properties: Optional[Dict[str, BaseFormElementModel]] = None
-    allOf: Optional[List[Dict[str, Dict[str, Any]]]] = None
-    required: Optional[List[str]] = None
-    dependentRequired: Optional[Dict[str, List[str]]] = None
+    properties: dict[str, BaseFormElementModel] | None = None
+    allOf: list[dict[str, dict[str, Any]]] | None = None
+    required: list[str] | None = None
+    dependentRequired: dict[str, list[str]] | None = None
 
     def __init__(
         self,
         form_element: IComplex
         | IArray
         | IForm,  # to create the intern object model for array items
-        parent_model: Optional[
-            BaseFormElementModel
-        ],  # is None if form_element is the outer form or if in form-element-view
+        parent_model: BaseFormElementModel | None,  # is None if form_element is the outer form or if in form-element-view
         request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
@@ -115,16 +109,16 @@ class ObjectModel(BaseFormElementModel):
     def set_property(self, property_id: str, property_model: BaseFormElementModel):
         self.properties[property_id] = property_model
 
-    def update_properties(self, properties: Dict[str, BaseFormElementModel]):
+    def update_properties(self, properties: dict[str, BaseFormElementModel]):
         self.properties.update(properties)
 
-    def update_allOf(self, allOf: List[Dict[str, Dict[str, Any]]]):
+    def update_allOf(self, allOf: list[dict[str, dict[str, Any]]]):
         self.allOf.extend(allOf)
 
-    def update_required(self, required: List[str]):
+    def update_required(self, required: list[str]):
         self.required.extend(required)
 
-    def update_dependentRequired(self, dependentRequired: Dict[str, List[str]]):
+    def update_dependentRequired(self, dependentRequired: dict[str, list[str]]):
         for key, value in dependentRequired.items():
             if key in self.dependentRequired:
                 self.dependentRequired[key].extend(value)
@@ -160,7 +154,7 @@ class ObjectModel(BaseFormElementModel):
         self,
         form_element: IFormElement,
         generatorArguments: GeneratorArguments,
-    ) -> Optional[BaseFormElementModel]:
+    ) -> BaseFormElementModel | None:
         """
         creates a model for the given form_element based on its portal_type and returns it
         also makes an entry inside the parent_models's required and dependentRequired and allof lists if necessary
@@ -206,7 +200,7 @@ class ObjectModel(BaseFormElementModel):
         self,
         form_element: IFormElement,
         generatorArguments: GeneratorArguments,
-    ) -> Optional[BaseFormElementModel]:
+    ) -> BaseFormElementModel | None:
         """
         creates a model for the given form_element based on its portal_type and returns it
         makes an entry inside the parent_models's required list if the field is required
@@ -263,7 +257,7 @@ class FieldsetModel(ObjectModel):
     This class is different from the other BaseFormElementModel-classes. It does not store any information, but the init method creates the children and stores them in the parent_model
     """
 
-    parent: Optional[ObjectModel]
+    parent: ObjectModel | None
 
     def __init__(
         self,
@@ -306,7 +300,7 @@ from edi.jsonforms.content.array import IArray
 class ArrayModel(BaseFormElementModel):
     items: ObjectModel = None
     type: str = "array"
-    minItems: Optional[int] = None
+    minItems: int | None = None
 
     def __init__(
         self,

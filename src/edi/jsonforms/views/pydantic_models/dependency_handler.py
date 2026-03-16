@@ -11,8 +11,6 @@ from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
 from plone.base.utils import safe_hasattr
 from typing import Any
-from typing import Dict
-from typing import List
 
 import copy
 import itertools
@@ -38,7 +36,7 @@ def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
 
 def get_dependencies_of_closest_ancestor_with_dependencies(
     model: BaseFormElementModel,
-) -> List[IFormElement]:
+) -> list[IFormElement]:
     """
     returns a shallow copy of the dependencies of the closest ancestor with dependencies, if there is no ancestor with dependencies, an empty list is returned
     """
@@ -99,10 +97,10 @@ def add_dependent_required(
             # properties/arrayyy/items/properties/pflichtfeld-in-array
             for i, p in enumerate(props):
                 if p == "properties" and (
-                    i < len(props) - 2
-                    and obj.portal_type != "Option"
-                    or i < len(props) - 1
-                    and obj.portal_type == "Option"
+                    (i < len(props) - 2
+                    and obj.portal_type != "Option")
+                    or (i < len(props) - 1
+                    and obj.portal_type == "Option")
                 ):
                     cur_statement[p] = {}
                     cur_statement["required"] = [props[i + 1]]
@@ -208,7 +206,7 @@ def add_dependent_options(
 
 def get_dependent_options(
     selectionfield: ISelectionField, is_single_view: bool
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     dependency_option_order = {}
 
     def add_to_dict(option, dependency, target_dict):

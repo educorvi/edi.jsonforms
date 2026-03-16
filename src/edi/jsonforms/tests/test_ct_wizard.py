@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.content.wizard import IWizard  # NOQA E501
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING  # noqa
+from edi.jsonforms.content.wizard import IWizard
+from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.api.exc import InvalidParameterError
 from plone.app.testing import setRoles
@@ -37,9 +36,7 @@ class WizardIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IWizard.providedBy(obj),
-            "IWizard not provided by {0}!".format(
-                obj,
-            ),
+            f"IWizard not provided by {obj}!",
         )
 
     def test_ct_wizard_adding(self):
@@ -52,9 +49,7 @@ class WizardIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             IWizard.providedBy(obj),
-            "IWizard not provided by {0}!".format(
-                obj.id,
-            ),
+            f"IWizard not provided by {obj.id}!",
         )
 
         parent = obj.__parent__
@@ -67,7 +62,7 @@ class WizardIntegrationTest(unittest.TestCase):
     def test_ct_wizard_globally_addable(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         fti = queryUtility(IDexterityFTI, name="Wizard")
-        self.assertTrue(fti.global_allow, "{0} is not globally addable!".format(fti.id))
+        self.assertTrue(fti.global_allow, f"{fti.id} is not globally addable!")
 
     def test_ct_wizard_filter_content_type_true(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])

@@ -16,9 +16,6 @@ from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArgu
 from plone.base.utils import safe_hasattr
 from pydantic import BaseModel
 from pydantic import Field
-from typing import Dict
-from typing import List
-from typing import Optional
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
 
@@ -32,7 +29,7 @@ class OptionModel(BaseModel):
     id: str
     title: str
     parent: ISelectionField
-    dependencies: Optional[List[IOption]] = Field(default_factory=list)
+    dependencies: list[IOption] | None = Field(default_factory=list)
 
     class Config:
         arbitrary_types_allowed = True
@@ -81,7 +78,7 @@ class OptionModel(BaseModel):
 
 
 class OptionListModel(BaseModel):
-    options: List[OptionModel]
+    options: list[OptionModel]
 
     def __init__(self, option_list: OptionList):
         super().__init__(options=[])
@@ -92,14 +89,14 @@ class OptionListModel(BaseModel):
             )
             self.options.append(option_model)
 
-    def get_option_names(self) -> List[str]:
+    def get_option_names(self) -> list[str]:
         return [option.get_option_name() for option in self.options]
 
 
 class SelectionFieldModel(BaseFormElementModel):
-    enum: Optional[List[str]] = None
-    items: Optional[Dict[str, List[str] | str]] = None
-    minItems: Optional[int] = None
+    enum: list[str] | None = None
+    items: dict[str, list[str] | str] | None = None
+    minItems: int | None = None
 
     def __init__(
         self,
@@ -121,7 +118,7 @@ class SelectionFieldModel(BaseFormElementModel):
                 self.minItems = 1
             self.items = {"enum": [], "type": "string"}
 
-    def get_options(self, generatorArguments: GeneratorArguments) -> List[str]:
+    def get_options(self, generatorArguments: GeneratorArguments) -> list[str]:
         """
         gets options as strings of self.form_element.getFolderContents()
         includes dependencies in the computation

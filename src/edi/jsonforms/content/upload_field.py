@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependentExtended
 from plone.dexterity.content import Item

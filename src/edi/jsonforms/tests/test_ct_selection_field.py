@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.content.selection_field import ISelectionField  # NOQA E501
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING  # noqa
+from edi.jsonforms.content.selection_field import ISelectionField
+from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.api.exc import InvalidParameterError
 from plone.app.testing import setRoles
@@ -44,9 +43,7 @@ class SelectionFieldIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             ISelectionField.providedBy(obj),
-            "ISelectionField not provided by {0}!".format(
-                obj,
-            ),
+            f"ISelectionField not provided by {obj}!",
         )
 
     def test_ct_selection_field_adding(self):
@@ -59,9 +56,7 @@ class SelectionFieldIntegrationTest(unittest.TestCase):
 
         self.assertTrue(
             ISelectionField.providedBy(obj),
-            "ISelectionField not provided by {0}!".format(
-                obj.id,
-            ),
+            f"ISelectionField not provided by {obj.id}!",
         )
 
         parent = obj.__parent__
@@ -74,7 +69,7 @@ class SelectionFieldIntegrationTest(unittest.TestCase):
     def test_ct_selection_field_globally_not_addable(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         fti = queryUtility(IDexterityFTI, name="SelectionField")
-        self.assertFalse(fti.global_allow, "{0} is globally addable!".format(fti.id))
+        self.assertFalse(fti.global_allow, f"{fti.id} is globally addable!")
 
     def test_ct_selection_field_filter_content_type_true(self):
         setRoles(self.portal, TEST_USER_ID, ["Contributor"])

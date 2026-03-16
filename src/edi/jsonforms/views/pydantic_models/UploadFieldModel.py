@@ -3,8 +3,6 @@ from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
 from pydantic import BaseModel
-from typing import List
-from typing import Optional
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
 
@@ -16,18 +14,18 @@ logger = logging.getLogger(__name__)
 
 class Upload(BaseModel):
     type: str = "string"
-    format: Optional[str] = "uri"
+    format: str | None = "uri"
 
     def get_json_schema(self):
         return self.model_dump(exclude_none=True)
 
 
 class UploadFieldModel(BaseFormElementModel):
-    minItems: Optional[int] = None
-    maxItems: Optional[int] = None
-    format: Optional[str] = None
-    items: Optional[Upload] = None
-    data: Optional[Upload] = None
+    minItems: int | None = None
+    maxItems: int | None = None
+    format: str | None = None
+    items: Upload | None = None
+    data: Upload | None = None
     # maxSize: Optional[int] = None
     # allowedTypes: Optional[List[str]] = None
 

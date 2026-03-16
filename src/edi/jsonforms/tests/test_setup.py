@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Setup tests for this package."""
 
-from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING  # noqa: E501
+from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID

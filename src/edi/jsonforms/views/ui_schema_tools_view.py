@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 
 # from edi.jsonforms import _
 from edi.jsonforms.views.ui_schema_view import UiSchemaView
 from zope.interface import implementer
 from zope.interface import Interface
 
-import json
 
 
 class IFormElementView(Interface):

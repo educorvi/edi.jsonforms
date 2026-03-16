@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from edi.jsonforms.testing import EDI_JSONFORMS_ACCEPTANCE_TESTING  # noqa: E501
+from edi.jsonforms.testing import EDI_JSONFORMS_ACCEPTANCE_TESTING
 from plone.app.testing import ROBOT_TEST_LEVEL
 from plone.testing import layered
 

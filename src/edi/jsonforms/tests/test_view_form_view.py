@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from edi.jsonforms.testing import EDI_JSONFORMS_FUNCTIONAL_TESTING
 from edi.jsonforms.testing import EDI_JSONFORMS_INTEGRATION_TESTING
 from edi.jsonforms.tests._test_schema_views import setUp_integration_test
@@ -6,11 +5,8 @@ from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_regi
 from edi.jsonforms.tests._test_schema_views import (
     test_json_schema_view_not_matching_interface,
 )
-from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from zope.component import getMultiAdapter
-from zope.interface.interfaces import ComponentLookupError
 
 import unittest
 

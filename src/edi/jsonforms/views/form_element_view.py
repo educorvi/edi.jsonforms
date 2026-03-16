@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 
-from edi.jsonforms import _
 from edi.jsonforms.views.form_view import FormView
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments

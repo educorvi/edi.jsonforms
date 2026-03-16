@@ -3,7 +3,6 @@ from edi.jsonforms.views.common import string_type_fields
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
-from typing import Optional
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
 
@@ -14,13 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 class FieldModel(BaseFormElementModel):
-    minLength: Optional[int] = None
-    maxLength: Optional[int] = None
-    pattern: Optional[str] = None
-    format: Optional[str] = None
-    minimum: Optional[float] = None
-    maximum: Optional[float] = None
-    multipleOf: Optional[float] = None
+    minLength: int | None = None
+    maxLength: int | None = None
+    pattern: str | None = None
+    format: str | None = None
+    minimum: float | None = None
+    maximum: float | None = None
+    multipleOf: float | None = None
 
     def __init__(
         self,

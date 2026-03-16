@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependent
-from plone.app.textfield import RichText
 
 # from plone.autoform import directives
 from plone.dexterity.content import Container
 
 # from plone.namedfile import field as namedfile
-from plone.supermodel import model
 
 # from plone.supermodel.directives import fieldset
 # from z3c.form.browser.radio import RadioFieldWidget

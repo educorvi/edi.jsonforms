@@ -155,7 +155,7 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
         return True
 
     # if show_condition only contains spaces or commas it is also considered as empty so show the field
-    conditions = re.split(",\s*", show_condition)
+    conditions = re.split(r",\s*", show_condition)
     conditions = [quote_plus(c) for c in conditions if c and c.strip() != ""]
     if len(conditions) == 0:
         return True

@@ -177,7 +177,7 @@ def create_rule_within_array(full_path: str, object) -> dict:
         if current_object_path != "":
             index = path.rfind("/properties/")
             current_object_path = (
-                f"$array_item{str(counter - 1)}.{path[index + len('/properties/') :]}"
+                f"$array_item{counter - 1!s}.{path[index + len('/properties/') :]}"
             )
         else:
             current_object_path = transform_scope_to_object_writing_form(current_path)
@@ -224,7 +224,7 @@ def create_rule_within_array(full_path: str, object) -> dict:
 
     # add actual rule to array rule structure
     object_id = transform_scope_to_object_writing_form(path)
-    object_scope = f"$array_item{str(counter - 1)}.{object_id}"
+    object_scope = f"$array_item{counter - 1!s}.{object_id}"
     current_rule["rule"]["arguments"].append(get_rule(object_scope, object))
 
     return array_rule
