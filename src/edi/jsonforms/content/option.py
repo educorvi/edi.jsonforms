@@ -1,7 +1,6 @@
 # from plone.app.textfield import RichText
 # from plone.autoform import directives
 from contextlib import suppress
-
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependent
 from plone.dexterity.content import Item

@@ -1,19 +1,17 @@
 from edi.jsonforms import _
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
-from edi.jsonforms.views.common import (
-    create_id,
-    check_show_condition_in_request,
-    get_unit,
-    get_placeholder,
-    get_title,
-    get_user_helptext,
-    get_view_url,
-    get_edit_url,
-    get_content_url,
-    get_delete_url,
-    has_content,
-)
+from edi.jsonforms.views.common import check_show_condition_in_request
+from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import get_content_url
+from edi.jsonforms.views.common import get_delete_url
+from edi.jsonforms.views.common import get_edit_url
 from edi.jsonforms.views.common import get_option_name
+from edi.jsonforms.views.common import get_placeholder
+from edi.jsonforms.views.common import get_title
+from edi.jsonforms.views.common import get_unit
+from edi.jsonforms.views.common import get_user_helptext
+from edi.jsonforms.views.common import get_view_url
+from edi.jsonforms.views.common import has_content
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 from jinja2 import meta
 from jinja2.sandbox import SandboxedEnvironment

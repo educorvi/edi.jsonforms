@@ -1,9 +1,7 @@
-
 # from edi.jsonforms import _
 from edi.jsonforms.views.ui_schema_view import UiSchemaView
 from zope.interface import implementer
 from zope.interface import Interface
-
 
 
 class IFormElementView(Interface):

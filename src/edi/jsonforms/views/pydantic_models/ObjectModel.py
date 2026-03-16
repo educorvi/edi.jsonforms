@@ -1,10 +1,10 @@
 from edi.jsonforms.content.array import IArray
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.complex import IComplex
+from edi.jsonforms.content.fieldset import IFieldset
 from edi.jsonforms.content.form import Form
 from edi.jsonforms.content.form import IForm
 from edi.jsonforms.content.reference import IReference
-from edi.jsonforms.content.fieldset import IFieldset
 from edi.jsonforms.views.common import check_show_condition_in_request
 
 # from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel

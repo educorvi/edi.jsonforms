@@ -1,7 +1,6 @@
-import logging
-
 from edi.jsonforms.views.common import create_id
 
+import logging
 import re
 
 
