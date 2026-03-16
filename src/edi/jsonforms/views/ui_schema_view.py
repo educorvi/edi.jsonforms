@@ -50,7 +50,7 @@ class UiSchemaView(BrowserView):
         self.lookup_scopes = {}
 
         self.uischema = {
-            "version": "2.0",
+            "version": "2.1",
             "layout": {"type": "VerticalLayout", "elements": []},
         }
 
