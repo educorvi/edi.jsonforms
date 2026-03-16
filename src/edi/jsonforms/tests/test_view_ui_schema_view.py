@@ -15,7 +15,11 @@ import unittest
 
 class ViewsIntegrationTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    ids = {}
+    ids: dict
+
+    def __init__(self):
+        super().__init__()
+        self.ids = {}
 
     def setUp(self):
         setUp_integration_test(self)
@@ -42,10 +46,13 @@ class ShowOnPropertiesTest(unittest.TestCase):
 
     def _test_showon_properties(self, ref_schema):
         computed_schema = json.loads(self.view())["properties"]
+        self.assertDictEqual(ref_schema, computed_schema)
 
     def setUp(self):
         setUp_ui_schema_test(self)
-        # self.field = api.content.create(type="Field", title="a field", container=self.form)
+        # self.field = api.content.create(
+        #     type="Field", title="a field", container=self.form
+        # )
 
     def test_textlike_showon_properties(self):
         pass

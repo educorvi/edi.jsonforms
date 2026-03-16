@@ -1,4 +1,3 @@
-
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.ui_schema_view import UiSchemaView
 from edi.jsonforms.views.wizard_view import WizardJsonSchemaView
@@ -43,11 +42,14 @@ class DeveloperViewlet(ViewletBase):
                 "comment": "Initial release",
                 "json_schema_url": "http://example.com/form/@@version-view?version=1&schema=json",
                 "ui_schema_url": "http://example.com/form/@@version-view?version=1&schema=ui",
-                "forks_schema_url": "http://example.com/form/@@version-view?version=1&schema=forks", # the schema that only contains the differences of the forks
+                "forks_schema_url": "http://example.com/form/@@version-view?version=1&schema=forks",
+                    # the schema that only contains the differences of the forks
                 "forks": [
                     {
-                        "json_schema_url": "http://example.com/@@version-view?version=1&schema=json&fork=fork1", # full json schema of the fork
-                        "ui_schema_url": "http://example.com/@@version-view?version=1&schema=ui&fork=fork1", # full ui schema of the fork
+                        "json_schema_url": "http://example.com/@@version-view?version=1&schema=json&fork=fork1",
+                            # full json schema of the fork
+                        "ui_schema_url": "http://example.com/@@version-view?version=1&schema=ui&fork=fork1",
+                            # full ui schema of the fork
                         "name": "fork1",
                     },
                     ...
@@ -79,20 +81,20 @@ class DeveloperViewlet(ViewletBase):
 
                 forked_json_schemata = getattr(obj, "forked_json_schema_rev", {}) or {}
                 forked_ui_schemata = getattr(obj, "forked_ui_schema_rev", {}) or {}
-                forks = [fork for fork in forked_json_schemata.keys()] + [
-                    fork for fork in forked_ui_schemata.keys()
-                ]
-                forks = sorted(list(set(forks)))  # remove duplicates
+                forks = list(forked_json_schemata) + list(forked_ui_schemata)
+                forks = sorted(set(forks))  # remove duplicates
 
                 fork_urls = []
                 for fork in forks:
                     fork_json_schema_url = (
                         self.context.absolute_url()
-                        + f"/@@version-view?version={version}&schema=json&fork={quote_plus(fork)}"
+                        + f"/@@version-view?version={version}&schema=json"
+                        + f"&fork={quote_plus(fork)}"
                     )
                     fork_ui_schema_url = (
                         self.context.absolute_url()
-                        + f"/@@version-view?version={version}&schema=ui&fork={quote_plus(fork)}"
+                        + f"/@@version-view?version={version}&schema=ui"
+                        + f"&fork={quote_plus(fork)}"
                     )
                     fork_urls.append({
                         "json_schema_url": fork_json_schema_url,

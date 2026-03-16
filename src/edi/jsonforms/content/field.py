@@ -36,7 +36,7 @@ def check_regex(value):
         re.compile(value)
         return True
     except re.error:
-        raise Invalid(_("The provided regular expression isn't valid."))
+        raise Invalid(_("The provided regular expression isn't valid.")) from re.error
 
 
 class IField(IDependentExtended):
@@ -66,9 +66,7 @@ class IField(IDependentExtended):
     minimum = schema.Int(
         title=_("Minimum"),
         description=_(
-            "For a number/integer this is the minimal value it must have. \
-                                       For a Textline/-area/Password this is the minimal length the \
-                                       text must have. (>=)"
+            "For a number/integer this is the minimal value it must have. For a Textline/-area/Password this is the minimal length the text must have. (>=)"  # noqa: E501
         ),
         required=False,
     )
@@ -76,9 +74,7 @@ class IField(IDependentExtended):
     maximum = schema.Int(
         title=_("Maximum"),
         description=_(
-            "For a number/integer this is the maximal value it can have.\
-                                       For a Textline/-area/Password this is the maximal length the \
-                                       text can have."
+            "For a number/integer this is the maximal value it can have. For a Textline/-area/Password this is the maximal length the text can have."  # noqa: E501
         ),
         required=False,
     )
@@ -86,7 +82,7 @@ class IField(IDependentExtended):
     number_of_decimal_digits = schema.Int(
         title=_("Number of decimal digits"),
         description=_(
-            "Only use this for the answer type Decimal number. This is the number of digits that can be filled in after the comma."
+            "Only use this for the answer type Decimal number. This is the number of digits that can be filled in after the comma."  # noqa: E501
         ),
         min=1,
         required=False,
@@ -103,7 +99,7 @@ class IField(IDependentExtended):
     placeholder = schema.TextLine(
         title=_("Placeholder"),
         description=_(
-            "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."
+            "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."  # noqa: E501
         ),
         required=False,
     )
@@ -117,71 +113,72 @@ class IField(IDependentExtended):
 
     @invariant
     def min_max_invariant(data):
-        if data.minimum or data.maximum:
-            if data.answer_type not in [
-                "text",
-                "textarea",
-                "number",
-                "integer",
-                "password",
-            ]:
-                raise Invalid(
-                    _(
-                        "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
-                    )
+        if (data.minimum or data.maximum) and data.answer_type not in [
+            "text",
+            "textarea",
+            "number",
+            "integer",
+            "password",
+        ]:
+            raise Invalid(
+                _(
+                    "Minimum/Maximum are only valid options for the following "
+                    + "answer types: Textline, Textarea, Password, Decimal number, "
+                    + "Whole number."
                 )
-        if data.minimum and data.maximum:
-            if data.maximum < data.minimum:
-                raise Invalid(_("Maximum cannot be smaller than Minimum."))
+            )
+        if data.minimum and data.maximum and data.maximum < data.minimum:
+            raise Invalid(_("Maximum cannot be smaller than Minimum."))
         if data.maximum is not None and data.maximum <= 0:
             raise Invalid(_("Maximum cannot be smaller or equal to zero."))
 
     @invariant
     def number_of_decimal_digits_invariant(data):
-        if data.number_of_decimal_digits:
-            if data.answer_type != "number":
-                raise Invalid(
-                    _(
-                        "Number of decimal digits is only a valid option for the answer type Decimal number."
-                    )
+        if data.number_of_decimal_digits and data.answer_type != "number":
+            raise Invalid(
+                _(
+                    "Number of decimal digits is only a valid option for the "
+                    + "answer type Decimal number."
                 )
+            )
 
     @invariant
     def placeholder_invariant(data):
-        if data.placeholder:
-            if data.answer_type not in [
-                "text",
-                "textarea",
-                "password",
-                "tel",
-                "url",
-                "email",
-            ]:
-                raise Invalid(
-                    _(
-                        "A Placeholder is only possible if the answer type is one of the following: Textline, Textarea, Password, Telephone, URL, Email."
-                    )
+        if data.placeholder and data.answer_type not in [
+            "text",
+            "textarea",
+            "password",
+            "tel",
+            "url",
+            "email",
+        ]:
+            raise Invalid(
+                _(
+                    "A Placeholder is only possible if the answer type is one of "
+                    + "the following: Textline, Textarea, Password, Telephone, URL, "
+                    + "Email."
                 )
+            )
 
     @invariant
     def unit_invariant(data):
-        if data.unit:
-            if data.answer_type not in ["number", "integer"]:
-                raise Invalid(
-                    _(
-                        "Unit is only a valid option for the following answer types: Decimal Number, Whole Number."
-                    )
+        if data.unit and data.answer_type not in ["number", "integer"]:
+            raise Invalid(
+                _(
+                    "Unit is only a valid option for the following answer types: "
+                    + "Decimal Number, Whole Number."
                 )
+            )
 
     @invariant
     def pattern_invariant(data):
-        if data.pattern:
-            if data.answer_type not in ["text", "textarea"]:
-                raise Invalid(
-                    _(
-                        "A regular expression pattern is only a valid option for the answer types Textline and Textarea."
-                    )
+        if data.pattern and data.answer_type not in ["text", "textarea"]:
+            raise Invalid(
+                _(
+                    "A regular expression pattern is only a valid option for the "
+                    + "answer types Textline and Textarea."
                 )
+            )
 
 
 @implementer(IField)

@@ -5,7 +5,8 @@ import json
 
 """
 requirements:
-    * TestClass that calls the test_required_choice() function needs a self.field = [] with all the fields that can be required/optional
+    * TestClass that calls the test_required_choice() function needs a self.field = []
+        with all the fields that can be required/optional
 
     len(self.field) must be at least 3
 """

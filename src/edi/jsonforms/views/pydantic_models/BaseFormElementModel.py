@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class BaseFormElementModel(BaseModel, abc.ABC):
     form_element: IFormElement
-    id: str
+    element_id: str
     title: str
     description: str | None = None
     comment: str | None = None
@@ -52,11 +52,9 @@ class BaseFormElementModel(BaseModel, abc.ABC):
             if safe_hasattr(form_element, "intern_information")
             else None
         )
-        required_choice = (
-            True
-            if safe_hasattr(form_element, "required_choice")
+        required_choice = bool(
+            safe_hasattr(form_element, "required_choice")
             and form_element.required_choice == "required"
-            else False
         )
         dependencies = (
             copy.copy(form_element.dependencies)
@@ -65,7 +63,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         )
         super().__init__(
             form_element=form_element,
-            id=create_id(form_element),
+            element_id=create_id(form_element),
             title=get_title(form_element, request),
             description=description if description else None,
             comment=comment,
@@ -73,7 +71,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
             required_choice=required_choice,
             dependencies=dependencies,
         )
-        # self.id = create_id(form_element)
+        # self.element_id = create_id(form_element)
         # self.form_element = form_element
         # self.title = get_title(form_element, request)
         # self.description = get_description(form_element, request)
@@ -96,10 +94,10 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         return self.required_choice
 
     def get_id(self) -> str:
-        return self.id
+        return self.element_id
 
-    def set_id(self, id: str):
-        self.id = id
+    def set_id(self, element_id: str):
+        self.element_id = element_id
 
     def get_dependencies(self) -> list[IFormElement]:
         return self.dependencies
@@ -114,13 +112,16 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         # check_for_dependencies(self, is_single_view)
         if is_single_view:  # if form-element-view, ignore all dependencies
             return False
-        if self.dependencies:
-            return True
-        else:
-            return False
+        return bool(self.dependencies)
 
     def get_json_dump_exclude_list(self) -> dict:
-        return {"form_element", "parent", "dependencies", "id", "required_choice"}
+        return {
+            "form_element",
+            "parent",
+            "dependencies",
+            "element_id",
+            "required_choice",
+        }
 
     def get_json_schema(self) -> dict:
         return self.model_dump(

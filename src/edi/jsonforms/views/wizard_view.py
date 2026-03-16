@@ -1,4 +1,3 @@
-
 # from edi.jsonforms import _
 from edi.jsonforms.views.common import create_id
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
@@ -78,8 +77,8 @@ class WizardUiSchemaView(UiSchemaView):
 
         self.uischema["layout"]["type"] = "Wizard"
         page_titles = []
-        object = self.context
-        for form in object.listFolderContents():
+        obj = self.context
+        for form in obj.listFolderContents():
             if form.portal_type == "Form":
                 page_titles.append(form.title)
                 vertical_layout = copy.deepcopy(VERTICAL_LAYOUT)
@@ -121,15 +120,15 @@ class WizardJsonSchemaView(JsonSchemaView):
     def combined_json_schema(self):
         # self.set_json_base_schema()
 
-        object = self.context
+        obj = self.context
 
         generatorArguments = GeneratorArguments(
             self.request, self.is_single_view, self.is_extended_schema
         )
-        wizard_model = ObjectModel(object, None, self.request)
+        wizard_model = ObjectModel(obj, None, self.request)
         wizard_model.set_children(generatorArguments)
         self.jsonschema = wizard_model.get_json_schema()
-        # for child in object.listFolderContents():
+        # for child in obj.listFolderContents():
         #     if child.portal_type == "Form":
         #         object_schema = self.get_schema_for_object(
         #             child

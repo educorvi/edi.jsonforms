@@ -1,4 +1,3 @@
-
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
 from Products.Five.browser import BrowserView
@@ -10,9 +9,12 @@ import logging
 logger = logging.getLogger("edi.jsonforms")
 
 
+# CONTENT_TYPES_WITHOUT_SCHEMA = ["Helptext", "Button Group"]
+
+
 class JsonSchemaView(BrowserView):
-    is_extended_schema = False  # True if schema is generated for an api call and not for the usual form view
-    content_types_without_schema = ["Helptext", "Button Group"]
+    is_extended_schema = False  # True if schema is generated for an api call and not
+    #     for the usual form view
     is_single_view = False
 
     def __init__(self, context, request):

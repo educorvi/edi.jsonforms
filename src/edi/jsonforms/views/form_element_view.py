@@ -1,4 +1,3 @@
-
 from edi.jsonforms.views.form_view import FormView
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
@@ -55,21 +54,21 @@ class FormElementUiSchema(UiSchemaView):
     def ui_schema_without_showon(self):
         self.set_ui_base_schema()
 
-        object = self.context
+        obj = self.context
         option = None
-        if object.portal_type in ["Option", "OptionList"]:
-            option = object
-            object = object.aq_parent
-        self.add_child_to_schema(object, self.uischema)
+        if obj.portal_type in ["Option", "OptionList"]:
+            option = obj
+            obj = obj.aq_parent
+        self.add_child_to_schema(obj, self.uischema)
 
-        if option:
-            if "layout" in self.uischema:
-                if "elements" in self.uischema["layout"]:
-                    if len(self.uischema["layout"]["elements"]) > 0:
-                        if "options" in self.uischema["layout"]["elements"][0]:
-                            self.uischema["layout"]["elements"][0]["options"][
-                                "label"
-                            ] = False
+        if (
+            option
+            and "layout" in self.uischema
+            and "elements" in self.uischema["layout"]
+            and len(self.uischema["layout"]["elements"]) > 0
+            and "options" in self.uischema["layout"]["elements"][0]
+        ):
+            self.uischema["layout"]["elements"][0]["options"]["label"] = False
 
         return self.uischema
 
@@ -86,12 +85,12 @@ class FormElementJsonSchema(JsonSchemaView):
     def json_schema(self):
         # self.set_json_base_schema()
 
-        object = self.context
+        obj = self.context
         option = None
-        parent = object.aq_parent
-        if object.portal_type in ["Option", "OptionList"]:
-            option = object
-            object = object.aq_parent
+        parent = obj.aq_parent
+        if obj.portal_type in ["Option", "OptionList"]:
+            option = obj
+            obj = obj.aq_parent
             parent = parent.aq_parent
 
         generatorArguments = GeneratorArguments(
@@ -99,19 +98,17 @@ class FormElementJsonSchema(JsonSchemaView):
         )
         form_model = ObjectModel(parent, None, self.request)
         model = form_model.create_and_add_model_without_dependencies(
-            object, generatorArguments
+            obj, generatorArguments
         )
 
-        if model:
-            if option:
-                model.unset_options()
-                if option.portal_type == "Option":
-                    o = OptionModel.from_option(option)
-                    model.set_option(o)
-                elif option.portal_type == "OptionList":
-                    ol = OptionListModel(option)
-                    model.set_option(ol)
-            # if object.portal_type != "Fieldset":
+        if model and option:
+            model.unset_options()
+            if option.portal_type == "Option":
+                o = OptionModel.from_option(option)
+                model.set_option(o)
+            elif option.portal_type == "OptionList":
+                ol = OptionListModel(option)
+                model.set_option(ol)
 
         self.jsonschema = form_model.get_json_schema()
 

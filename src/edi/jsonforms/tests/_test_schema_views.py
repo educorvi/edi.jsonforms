@@ -6,7 +6,6 @@ from zope.component import getMultiAdapter
 from zope.interface.interfaces import ComponentLookupError
 
 
-
 layer = EDI_JSONFORMS_INTEGRATION_TESTING
 
 
@@ -35,8 +34,8 @@ def setUp_integration_test(self):
     array = api.content.create(type="Array", title="Array", container=form)
     self.ids[array.title] = array.id
 
-    object = api.content.create(type="Complex", title="Object", container=form)
-    self.ids[object.title] = object.id
+    obj = api.content.create(type="Complex", title="Object", container=form)
+    self.ids[obj.title] = obj.id
 
     feldgruppe = api.content.create(type="Fieldset", title="Feldgruppe", container=form)
     self.ids[feldgruppe.title] = feldgruppe.id

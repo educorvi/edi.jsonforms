@@ -24,21 +24,21 @@ logger = logging.getLogger(__name__)
 
 def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
     """
-    returns True if the given model has dependencies that should be checked (if not in single view) and False otherwise
+    returns True if the given model has dependencies that should be checked (if not in
+        single view) and False otherwise
     """
     if is_single_view:  # if form-element-view, ignore all dependencies
         return False
-    elif safe_hasattr(model, "dependencies") and model.dependencies:
-        return True
-    else:
-        return False
+    return safe_hasattr(model, "dependencies") and model.dependencies
 
 
 def get_dependencies_of_closest_ancestor_with_dependencies(
     model: BaseFormElementModel,
 ) -> list[IFormElement]:
     """
-    returns a shallow copy of the dependencies of the closest ancestor with dependencies, if there is no ancestor with dependencies, an empty list is returned
+    returns a shallow copy of the dependencies of the closest ancestor with
+        dependencies, if there is no ancestor with dependencies, an empty list
+        is returned
     """
     parent = model.parent
     while parent:
@@ -49,19 +49,25 @@ def get_dependencies_of_closest_ancestor_with_dependencies(
 
 
 # def add_dependent_required(parent: BaseFormElementModel, child: BaseFormElementModel):
-def add_dependent_required(
+def add_dependent_required(  # noqa: C901
     formProperties: FormProperties,
     child: BaseFormElementModel,
     is_extended_schema: bool = False,
 ):
     """
-    this method changes dependentRequired or/and allOf of the parent based on the dependencies of the child model
-    dependentRequired is changed if the child's dependency is not an Option inside a SelectionField
+    this method changes dependentRequired or/and allOf of the parent based on the
+        dependencies of the child model
+    dependentRequired is changed if the child's dependency is not an Option inside
+        a SelectionField
     allOf is changed if the child's dependency is an Option inside a SelectionField
-    :param formProperties: the properties that will be set to the form at the end of generation.
+    :param formProperties: the properties that will be set to the form at the end
+        of generation.
     :param child: the model which is required and dependent on other models
     """
-    # schema = self.jsonschema  # TODO make this dependent on schema parameter? (if present take schema, change calls accordingly) (at the end of this function the current schema is needed as backup in case all dependencies are invalid)
+    # schema = self.jsonschema  # TODO make this dependent on schema parameter?
+    #     (if present take schema, change calls accordingly) (at the end of this
+    #     function the current schema is needed as backup in case all dependencies
+    #     are invalid)
     # dependencies = copy.copy(child.get_dependencies())
     # dependencies.extend(getattr(child_object, "parent_dependencies", []))
 
@@ -74,8 +80,12 @@ def add_dependent_required(
             dep = dep.to_object
             if dep is None:
                 continue
-        except:
+        except Exception:
             # dependency got deleted, plone error, ignore this dependency
+            logging.warning(
+                f"Dependency of {child.get_id()} could not be accessed, "
+                + "probably because it got deleted."
+            )
             continue
 
         if dep.portal_type == "Option":
@@ -83,10 +93,11 @@ def add_dependent_required(
         else:
             dep_path = get_path(dep)
 
-        def create_statement(obj, obj_path) -> dict:
+        def create_statement(obj, obj_path) -> dict:  # noqa: C901
             """
             creates hiearchy of path as a statement (use in if or then)
-            if portal_type of obj is not Option and only one 'properties' in path, no 'properties' key is created
+            if portal_type of obj is not Option and only one 'properties' in
+                path, no 'properties' key is created
             """
             props = obj_path.split("/")[1:]  # split and remove first empty element
             # if props.count("properties") == 1 and obj.portal_type != "Option":
@@ -97,10 +108,8 @@ def add_dependent_required(
             # properties/arrayyy/items/properties/pflichtfeld-in-array
             for i, p in enumerate(props):
                 if p == "properties" and (
-                    (i < len(props) - 2
-                    and obj.portal_type != "Option")
-                    or (i < len(props) - 1
-                    and obj.portal_type == "Option")
+                    (i < len(props) - 2 and obj.portal_type != "Option")
+                    or (i < len(props) - 1 and obj.portal_type == "Option")
                 ):
                     cur_statement[p] = {}
                     cur_statement["required"] = [props[i + 1]]
@@ -146,8 +155,10 @@ def add_dependent_required(
                 if_statement["else"] = else_statement
         if_then = {**if_statement, **then_statement}
         formProperties.update_allOf([if_then])
-    # Check that at least one dependency wasn't deleted so that 'allOf' and/or 'dependentRequired' changed.
-    # Otherwise add child_object to required-list of the schema, because it is required and not dependent required, if it has no valid dependencies anymore
+    # Check that at least one dependency wasn't deleted so that 'allOf' and/or
+    #     'dependentRequired' changed.
+    # Otherwise add child_object to required-list of the schema, because it is
+    #     required and not dependent required, if it has no valid dependencies anymore
     if (
         allof_copy == formProperties.allOf
         and dependentrequired_copy == formProperties.dependentRequired
@@ -184,9 +195,11 @@ def _order_values(values, order_map):
 
 
 def create_else_statement(child_object: IFormElement) -> dict:
-    if child_object.portal_type == "Field":
-        if child_object.answer_type in string_type_fields:
-            return {"properties": {create_id(child_object): {"maxLength": 0}}}
+    if (
+        child_object.portal_type == "Field"
+        and child_object.answer_type in string_type_fields
+    ):
+        return {"properties": {create_id(child_object): {"maxLength": 0}}}
     return {}
 
 
@@ -196,7 +209,8 @@ def add_dependent_options(
     formProperties: FormProperties,
 ):
     """
-    this method computes the allOf statement for dependent options of a selectionfield and adds it to the form
+    this method computes the allOf statement for dependent options of a
+        selectionfield and adds it to the form
     """
     if is_single_view:
         return
@@ -204,7 +218,7 @@ def add_dependent_options(
     formProperties.update_allOf(get_dependent_options(selectionfield, is_single_view))
 
 
-def get_dependent_options(
+def get_dependent_options(  # noqa: C901
     selectionfield: ISelectionField, is_single_view: bool
 ) -> list[dict[str, Any]]:
     dependency_option_order = {}
@@ -253,8 +267,12 @@ def get_dependent_options(
                 for dep in dependencies:
                     try:
                         add_to_dict(option, dep.to_object, dependency_dict)
-                    except:
+                    except Exception:
                         # dependency got deleted, plone error, ignore this dependency
+                        logging.warning(
+                            f"Dependency of option {option.getId} could not be "
+                            + "accessed, probably because it got deleted."
+                        )
                         continue
 
             else:
@@ -278,7 +296,7 @@ def get_dependent_options(
                 subsets.extend(
                     itertools.combinations(dependency_dict[selectionfield_id], r)
                 )
-            possibilities.append([list((selectionfield_id, sub)) for sub in subsets])
+            possibilities.append([[selectionfield_id, sub] for sub in subsets])
         else:
             possibilities.append(
                 [[selectionfield_id, None]]

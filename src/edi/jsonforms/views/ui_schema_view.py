@@ -1,7 +1,18 @@
-
 from edi.jsonforms import _
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
-from edi.jsonforms.views.common import *
+from edi.jsonforms.views.common import (
+    create_id,
+    check_show_condition_in_request,
+    get_unit,
+    get_placeholder,
+    get_title,
+    get_user_helptext,
+    get_view_url,
+    get_edit_url,
+    get_content_url,
+    get_delete_url,
+    has_content,
+)
 from edi.jsonforms.views.common import get_option_name
 from edi.jsonforms.views.showOn_properties import create_showon_properties
 from jinja2 import meta
@@ -16,7 +27,7 @@ import json
 
 class UiSchemaView(BrowserView):
     tools_on = False
-    rita_dependent_options = {}
+    rita_dependent_options: dict
     is_single_view = False
 
     def __init__(self, context, request):
@@ -68,43 +79,44 @@ class UiSchemaView(BrowserView):
 
         # add children to the schema
         child_schema = self.get_schema_for_child(child_object, scope)
-        if child_schema != None and child_schema != {}:
+        if child_schema is not None and child_schema != {}:
             if "layout" in schema:
                 schema["layout"]["elements"].append(child_schema)
             elif "elements" in schema:
                 schema["elements"].append(child_schema)
             else:
                 print(
-                    "Error in UiSchemaView: could not add child to schema, no layout or elements found in schema"
+                    "Error in UiSchemaView: could not add child to schema, "
+                    + "no layout or elements found in schema"
                 )
 
         # return schema
 
-    def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):
-        type = child.portal_type
+    def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):  # noqa: C901
+        ptype = child.portal_type
         child_schema = {}
 
-        if type == "Field":
+        if ptype == "Field":
             child_schema = self.get_schema_for_field(child, scope)
-        elif type == "SelectionField":
+        elif ptype == "SelectionField":
             child_schema = self.get_schema_for_selectionfield(child, scope)
-        elif type == "UploadField":
+        elif ptype == "UploadField":
             child_schema = self.get_schema_for_uploadfield(child, scope)
-        elif type == "Reference":
+        elif ptype == "Reference":
             child_schema = self.get_schema_for_reference(child, scope)
-        elif type == "Helptext":
+        elif ptype == "Helptext":
             child_schema = self.get_schema_for_helptext(child)
-        elif type == "Button Group":
+        elif ptype == "Button Group":
             child_schema = self.get_schema_for_buttons(child)
-        elif type == "Array":
+        elif ptype == "Array":
             child_schema = self.get_schema_for_array(
                 child, scope, recursive, overwrite_scope
             )
-        elif type == "Complex":
+        elif ptype == "Complex":
             child_schema = self.get_schema_for_object(
                 child, scope, recursive, overwrite_scope
             )
-        elif type == "Fieldset":
+        elif ptype == "Fieldset":
             child_schema = self.get_schema_for_fieldset(child, scope)
 
         # add pre_html and post_html to the schema
@@ -121,7 +133,7 @@ class UiSchemaView(BrowserView):
 
         return child_schema
 
-    def get_schema_for_field(self, field, scope):
+    def get_schema_for_field(self, field, scope):  # noqa: C901
         field_schema = self.get_base_schema(field, scope)
 
         answer_type = field.answer_type
@@ -168,7 +180,7 @@ class UiSchemaView(BrowserView):
 
         return field_schema
 
-    def get_schema_for_selectionfield(self, selectionfield, scope):
+    def get_schema_for_selectionfield(self, selectionfield, scope):  # noqa: C901
         selectionfield_schema = self.get_base_schema(selectionfield, scope)
 
         answer_type = selectionfield.answer_type
@@ -176,7 +188,9 @@ class UiSchemaView(BrowserView):
             selectionfield_schema["options"]["displayAs"] = "radiobuttons"
             selectionfield_schema["options"]["stacked"] = True
         elif answer_type in ["checkbox", "selectmultiple"]:
-            # TODO differentiate between checkbox and selectmultiple, both are displayed as checkboxes
+            # TODO differentiate between checkbox and selectmultiple
+            # both are displayed as checkboxes right now
+            # note: selectmultiple doesn't exist at the moment
             selectionfield_schema["options"]["stacked"] = True
         elif answer_type == "select":
             pass
@@ -193,21 +207,24 @@ class UiSchemaView(BrowserView):
                         option.getObject()
                     )
                     selectionfield_schema["options"]["enumTitles"].update(
-                        dict(zip(keys, vals))
+                        dict(zip(keys, vals, strict=False))
                     )
 
         option_filters = {}
         options = selectionfield.getFolderContents()
         for option in options:
             o = option.getObject()
-            if safe_hasattr(o, "ritarules"):
-                if o.ritarules != "" and o.ritarules is not None:
-                    try:
-                        formatted_rita_rule = json.loads(o.ritarules)
-                        option_filters[get_option_name(o)] = formatted_rita_rule
-                    except (json.JSONDecodeError, TypeError, ValueError):
-                        print(f"Invalid rita rule for option {get_option_name(o)}")
-                        pass
+            if (
+                safe_hasattr(o, "ritarules")
+                and o.ritarules is not None
+                and o.ritarules != ""
+            ):
+                try:
+                    formatted_rita_rule = json.loads(o.ritarules)
+                    option_filters[get_option_name(o)] = formatted_rita_rule
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    print(f"Invalid rita rule for option {get_option_name(o)}")
+                    pass
         if len(option_filters) > 0:
             selectionfield_schema["options"]["optionFilters"] = option_filters
             self.rita_dependent_options[scope + selectionfield.id] = option_filters
@@ -236,16 +253,6 @@ class UiSchemaView(BrowserView):
             uploadfield_schema["options"]["displayAsSingleUploadField"] = False
         else:
             uploadfield_schema["options"]["displayAsSingleUploadField"] = True
-        # if uploadfield.max_number_of_files:
-        #     uploadfield_schema['options']['maxNumberOfFiles'] = uploadfield.max_number_of_files
-        # if uploadfield.min_number_of_files:
-        #     uploadfield_schema['options']['minNumberOfFiles'] = uploadfield.min_number_of_files
-
-        #     if uploadfield.min_number_of_files > 1:
-        #         uploadfield_schema['options']['allowMultipleFiles'] = True
-
-        # if uploadfield.answer_type == 'file-multi':
-        #     uploadfield_schema['options']['allowMultipleFiles'] = True
 
         return uploadfield_schema
 
@@ -265,7 +272,7 @@ class UiSchemaView(BrowserView):
                 )
                 self.set_tools(tools)  # reactivate tools
 
-                # replace scope and showon of referenced object with the one of the reference
+                # replace scope and showon of referenced object with the one of the reference  # noqa: E501
                 obj_schema["scope"] = reference_schema["scope"]
                 if "showOn" in reference_schema:
                     obj_schema["showOn"] = reference_schema["showOn"]
@@ -283,7 +290,7 @@ class UiSchemaView(BrowserView):
                     )
 
                 return obj_schema
-        except:
+        except Exception:
             return {}  # referenced object got deleted, ignore
 
     def helptext_schema(self, htmlData):
@@ -306,7 +313,7 @@ class UiSchemaView(BrowserView):
         helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
         return helptext_schema
 
-    def get_schema_for_buttons(self, button_group):
+    def get_schema_for_buttons(self, button_group):  # noqa: C901
         buttons = button_group.getFolderContents()
         if len(buttons) == 0:
             return {}
@@ -369,7 +376,7 @@ class UiSchemaView(BrowserView):
                             query_params["use_email_of_current_user"] = True
                             query_params["to_address"] = ""
                         # if handler.reply_to_address:
-                        #     query_params["reply_to_address"] = handler.reply_to_address
+                        #    query_params["reply_to_address"] = handler.reply_to_address
                         if handler.email_subject:
                             query_params["subject"] = handler.email_subject
                         if handler.email_text:
@@ -423,7 +430,7 @@ class UiSchemaView(BrowserView):
                             folder_path = api.content.get_path(
                                 obj=handler.target_folder.to_object
                             )
-                        except:
+                        except Exception:
                             folder_path = ""
                             button_schema["options"]["disabled"] = True
 
@@ -443,9 +450,11 @@ class UiSchemaView(BrowserView):
                                 for var in variables_in_title
                             ):
                                 raise Exception(
-                                    "Invalid content object title: only 'user' or variables in the format {{data['field-id']}} are allowed"
+                                    "Invalid content object title: only 'user' "
+                                    + "or variables in the format "
+                                    + "{{data['field-id']}} are allowed"
                                 )
-                        except:
+                        except Exception:
                             content_object_title = ""
                             button_schema["options"]["disabled"] = True
 
@@ -482,52 +491,31 @@ class UiSchemaView(BrowserView):
             )
 
         return array_schema
-        # # don't save scope because one cannot depend on an array
-        # array_schema = self.get_base_schema(array, scope, save_scope=False, has_user_helptext=False)
-        # if overwrite_scope:
-        #     array_scope = overwrite_scope
-        # else:
-        #     array_scope = scope + create_id(array)
 
-        # # add children of array to the schema
-        # if recursive:
-        #     array_schema['options']['descendantControlOverrides'] = self.create_descendantControlOverrides(array_scope, array)
-
-        # self.add_user_info(array, array_schema)
-
-        # # array_schema['options']['label'] = False
-
-        # if array_schema['options'] == {}:
-        #     del array_schema['options']
-
-        # return array_schema
-
-    def get_schema_for_object(
-        self, complex, scope, recursive=True, overwrite_scope=None
-    ):
+    def get_schema_for_object(self, compl, scope, recursive=True, overwrite_scope=None):
+        """
+        compl is the complex object
+        """
         # don't save scope because one cannot depend on a complex object
         complex_schema = self.get_base_schema(
-            complex, scope, save_scope=False, has_user_helptext=False
+            compl, scope, save_scope=False, has_user_helptext=False
         )
-        if overwrite_scope:
-            complex_scope = overwrite_scope
-        else:
-            complex_scope = scope + create_id(complex)
+        complex_scope = overwrite_scope or scope + create_id(compl)
 
         # add children of complex to the schema
         if recursive:
             complex_schema["options"]["descendantControlOverrides"] = (
-                self.create_descendantControlOverrides(complex_scope, complex)
+                self.create_descendantControlOverrides(complex_scope, compl)
             )
 
-        self.add_user_helptext(complex, complex_schema)
+        self.add_user_helptext(compl, complex_schema)
 
         if complex_schema["options"] == {}:
             del complex_schema["options"]
 
         return complex_schema
 
-    def add_child_to_descendantControlOverrides(
+    def add_child_to_descendantControlOverrides(  # noqa: C901
         self, descendantControlOverrides, child_object, base_scope
     ):
         child_tmp_schema = {}
@@ -540,7 +528,6 @@ class UiSchemaView(BrowserView):
             "Complex",
             "Array",
         ]:
-            # descendantControlOverrides = add_control(descendantControlOverrides, child_object, scope)
             child_tmp_schema = self.get_schema_for_child(
                 child_object, base_scope, False
             )
@@ -552,35 +539,35 @@ class UiSchemaView(BrowserView):
                 child_schema["showOn"] = child_tmp_schema["showOn"]
 
             if child_schema != {}:
-                if child_object.portal_type == "UploadField":
-                    if "options" in child_schema:
+                if (
+                    child_object.portal_type == "UploadField"
+                    and "options" in child_schema
+                ):
+                    descendantControlOverrides[child_tmp_schema["scope"] + "/items"] = {
+                        "options": {}
+                    }
+                    if "acceptedFileType" in child_schema["options"]:
                         descendantControlOverrides[
                             child_tmp_schema["scope"] + "/items"
-                        ] = {"options": {}}
-                        if "acceptedFileType" in child_schema["options"]:
+                        ]["options"]["acceptedFileType"] = child_schema["options"][
+                            "acceptedFileType"
+                        ]
+                        del child_schema["options"]["acceptedFileType"]
+                    if "maxFileSize" in child_schema["options"]:
+                        if child_schema["options"]["maxFileSize"] is not None:
                             descendantControlOverrides[
                                 child_tmp_schema["scope"] + "/items"
-                            ]["options"]["acceptedFileType"] = child_schema["options"][
-                                "acceptedFileType"
+                            ]["options"]["maxFileSize"] = child_schema["options"][
+                                "maxFileSize"
                             ]
-                            del child_schema["options"]["acceptedFileType"]
-                        if "maxFileSize" in child_schema["options"]:
-                            if child_schema["options"]["maxFileSize"] is not None:
-                                descendantControlOverrides[
-                                    child_tmp_schema["scope"] + "/items"
-                                ]["options"]["maxFileSize"] = child_schema["options"][
-                                    "maxFileSize"
-                                ]
-                            del child_schema["options"]["maxFileSize"]
-                        if (
-                            descendantControlOverrides[
-                                child_tmp_schema["scope"] + "/items"
-                            ]
-                            == {}
-                        ):
-                            del descendantControlOverrides[
-                                child_tmp_schema["scope"] + "/items"
-                            ]
+                        del child_schema["options"]["maxFileSize"]
+                    if (
+                        descendantControlOverrides[child_tmp_schema["scope"] + "/items"]
+                        == {}
+                    ):
+                        del descendantControlOverrides[
+                            child_tmp_schema["scope"] + "/items"
+                        ]
                 descendantControlOverrides[child_tmp_schema["scope"]] = child_schema
         else:  # ignore this type
             pass
@@ -634,10 +621,14 @@ class UiSchemaView(BrowserView):
         aria_delete = _("Delete element")
 
         html_links = [
-            '<span><a aria-label="{aria_view}" href="{view_url}" title="{view}"><i class="bi bi-eye"></a>\n\
-                        <a aria-label="{aria_edit}" href="{edit_url}" title="{edit}"><i class="bi bi-pen-fill"></a>\n',
-            '<a aria-label="{aria_content}" href="{content_url}" title="{content}"><i class="bi bi-card-list"></i></a>\n',
-            '<a aria-label="{aria_delete}" href="{delete_url}" title="{delete}"><i class="bi bi-trash"></i></a></span>',
+            '<span><a aria-label="{aria_view}" href="{view_url}" title="{view}">'
+            + '<i class="bi bi-eye"></a>\n'
+            + '<a aria-label="{aria_edit}" href="{edit_url}" title="{edit}">'
+            + '<i class="bi bi-pen-fill"></a>\n',
+            '<a aria-label="{aria_content}" href="{content_url}" title="{content}">'
+            + '<i class="bi bi-card-list"></i></a>\n',
+            '<a aria-label="{aria_delete}" href="{delete_url}" title="{delete}">'
+            + '<i class="bi bi-trash"></i></a></span>',
         ]
 
         tools = html_links[0].format(
@@ -734,7 +725,8 @@ class UiSchemaView(BrowserView):
                 group_schema, {"description": group.description}
             )
 
-        # group_schema = self.add_tools_to_schema(group_schema, group) # gets ignored, add html element before group instead
+        # gets ignored, add html element before group instead
+        # group_schema = self.add_tools_to_schema(group_schema, group)
         group_schema = self.add_dependencies_to_schema(group_schema, group)
 
         if self.tools_on and group.aq_parent.portal_type == "Form":

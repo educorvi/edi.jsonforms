@@ -21,7 +21,7 @@ class FieldModel(BaseFormElementModel):
     maximum: float | None = None
     multipleOf: float | None = None
 
-    def __init__(
+    def __init__(  # noqa: C901
         self,
         form_element: IField,
         parent_model: BaseFormElementModel,

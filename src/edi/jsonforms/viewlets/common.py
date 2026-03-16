@@ -12,7 +12,8 @@ def get_available_forks(
     obj: IForm | IWizard | IFormElement,
 ) -> dict[str, dict[str, dict[str, str]]]:
     """
-    recursively traverses all children of obj and gets all forks out of the show_conditions and the override fields,
+    recursively traverses all children of obj and gets all forks out of the
+        show_conditions and the override fields,
 
     returns a dict containing all forks with the following structure:
     {
@@ -37,8 +38,8 @@ def get_available_forks(
             child_path = get_path(child)
             if child_path not in forks[show_condition]:
                 forks[show_condition][child_path] = {}
-            forks[show_condition][child_path]["show_condition"] = (
-                True if not child.negate_condition else False
+            forks[show_condition][child_path]["show_condition"] = bool(
+                not child.negate_condition
             )
 
         # test all possible overwritten attributes
@@ -50,15 +51,12 @@ def get_available_forks(
             "override_placeholder",
         ]:
             if safe_hasattr(child, attr) and getattr(child, attr):
-                # get the condition from the override field, which is in the format 'condition: override value'
+                # get the condition from the override field, which is in the format
+                #     'condition: override value'
                 override_values = getattr(child, attr)
                 for override_value in override_values:
                     fork = get_override_fork(override_value)
-                    if fork not in forks:
-                        forks[fork] = {}
-                    child_path = get_path(child)
-                    if child_path not in forks[fork]:
-                        forks[fork][child_path] = {}
+                    forks.setdefault(fork, {}).setdefault(get_path(child), {})
                     forks[fork][child_path][attr] = get_override_value(override_value)
 
         if safe_hasattr(listing_object, "is_folderish") and listing_object.is_folderish:

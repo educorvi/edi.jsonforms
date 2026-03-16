@@ -19,7 +19,7 @@ def _save_schemata(context, json_schema_view, ui_schema_view):
             available_forks = get_available_forks(context)
             forked_json_schemata = {}
             forked_ui_schemata = {}
-            for fork in available_forks.keys():
+            for fork in available_forks:
                 json_schema_view.request.set("fork", fork)
                 forked_json_schemata[fork] = json_schema_view.get_schema()
                 ui_schema_view.request.set("fork", fork)
@@ -34,7 +34,8 @@ def _save_schemata(context, json_schema_view, ui_schema_view):
 
 def schema_handler(context, event):
     """
-    @param context: Zope object for which the event was fired. Usually this is a Plone content object.
+    @param context: Zope object for which the event was fired. Usually this is a
+                    Plone content object.
 
     @param event: Subclass of event.
     """
@@ -47,7 +48,8 @@ def schema_handler(context, event):
             name="ui-schema-view", context=context, request=request
         )
     except ploneapi.exc.InvalidParameterError:
-        # Views are not available yet (e.g., during site creation before browser layer is active)
+        # Views are not available yet (e.g., during site creation before browser
+        #     layer is active)
         return
 
     _save_schemata(context, schema_view, ui_schema_view)
@@ -55,7 +57,8 @@ def schema_handler(context, event):
 
 def wizard_schema_handler(context, event):
     """
-    @param context: Zope object for which the event was fired. Usually this is a Plone content object.
+    @param context: Zope object for which the event was fired. Usually this is a
+                    Plone content object.
 
     @param event: Subclass of event.
     """
@@ -68,7 +71,8 @@ def wizard_schema_handler(context, event):
             name="wizard-ui-schema", context=context, request=request
         )
     except ploneapi.exc.InvalidParameterError:
-        # Views not available yet (e.g., during site creation before browser layer is active)
+        # Views not available yet (e.g., during site creation before browser
+        #     layer is active)
         return
 
     _save_schemata(context, wizard_json_schema_view, wizard_ui_schema_view)

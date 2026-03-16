@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IAdditionalInformation
 from plone.dexterity.content import Item
@@ -21,7 +23,7 @@ class IOptionList(IAdditionalInformation):
     options = schema.List(
         title=_("Options"),
         description=_(
-            'List of options. Every line contains one option. Options can either be values only or have an id in the format "id:value". IDs are only used if "Use id of options in schema" is checked in the parent field.'
+            'List of options. Every line contains one option. Options can either be values only or have an id in the format "id:value". IDs are only used if "Use id of options in schema" is checked in the parent field.'  # noqa: E501
         ),
         required=True,
         value_type=schema.TextLine(title=_("Option"), required=True),
@@ -44,7 +46,7 @@ class IOptionList(IAdditionalInformation):
     url = schema.URI(
         title=_("URL"),
         description=_(
-            "The URL to fetch options from. If set, options will be overridden by the fetched options."
+            "The URL to fetch options from. If set, options will be overridden by the fetched options."  # noqa: E501
         ),
         required=False,
     )
@@ -73,7 +75,7 @@ class IOptionList(IAdditionalInformation):
     id_mapping = schema.TextLine(
         title=_("ID Mapping"),
         description=_(
-            "The name of the values that should be used as IDs from the fetched options. If not set or does not exist, a fallback value is used."
+            "The name of the values that should be used as IDs from the fetched options. If not set or does not exist, a fallback value is used."  # noqa: E501
         ),
         required=False,
     )
@@ -81,7 +83,7 @@ class IOptionList(IAdditionalInformation):
     value_mapping = schema.TextLine(
         title=_("Value Mapping"),
         description=_(
-            "The name of the values that should be used as display values from the fetched options. If not set or does not exist, a fallback value is used."
+            "The name of the values that should be used as display values from the fetched options. If not set or does not exist, a fallback value is used."  # noqa: E501
         ),
         required=False,
     )
@@ -91,11 +93,16 @@ class IOptionList(IAdditionalInformation):
 class OptionList(Item):
     """ """
 
-    _cache = {}
+    # _cache: dict
 
-    def get_options(self) -> list[str]:
+    # def __init__(self):
+    #     super().__init__()
+    #     self._cache = {}
+
+    def get_options(self) -> list[str]:  # noqa: C901
         """Return the options as a list of strings in the format 'id:value' or 'value'.
-        If a URL is set, fetch the options from the URL,# otherwise return the locally stored options.
+        If a URL is set, fetch the options from the URL,# otherwise return the locally
+            stored options.
         Cache the response for 5 minutes."""
 
         # cache_key = self.url
@@ -126,7 +133,8 @@ class OptionList(Item):
             return []
         if response.status_code != 200:
             logger.error(
-                f"Failed to fetch external options from {self.url}. Status code: {response.status_code}"
+                "Failed to fetch external options from "
+                + f"{self.url}. Status code: {response.status_code}"
             )
             return []
 
@@ -138,7 +146,8 @@ class OptionList(Item):
                 return []
         except json.JSONDecodeError as e:
             logger.error(
-                f"Failed to decode JSON from external options API at {self.url}. Error: {e}"
+                "Failed to decode JSON from external options API at "
+                + f"{self.url}. Error: {e}"
             )
             return []
 
@@ -151,7 +160,8 @@ class OptionList(Item):
             for item in response_options:
                 if not isinstance(item, dict):
                     logger.error(
-                        f"External option item is not a dictionary: {item}. Skipping this item."
+                        f"External option item is not a dictionary: {item}. "
+                        + "Skipping this item."
                     )
                     continue
 
@@ -163,11 +173,16 @@ class OptionList(Item):
                 if (not id_mapping and not value_mapping) or (
                     id_mapping not in item and value_mapping not in item
                 ):
-                    # if id_mapping and value_mapping are not set or both do not exist in the item, use all key-value pairs
+                    # if id_mapping and value_mapping are not set or both do not exist
+                    #      in the item, use all key-value pairs
                     option = " ".join(f"{key} {value}" for key, value in item.items())
                 else:
-                    # if id_mapping or value_mapping exist in the item, use them, if one is missing, use the other one for both id and value
-                    option = f"{item[id_mapping] if id_mapping in item else item[value_mapping]}:{item[value_mapping] if value_mapping in item else item[id_mapping]}"
+                    # if id_mapping or value_mapping exist in the item, use them, if
+                    #      one is missing, use the other one for both id and value
+                    option = (
+                        f"{item[id_mapping] if id_mapping in item else item[value_mapping]}"  # noqa: E501
+                        + f":{item[value_mapping] if value_mapping in item else item[id_mapping]}"  # noqa: E501
+                    )
                 external_options.append(option)
 
         except Exception as e:
@@ -181,10 +196,8 @@ class OptionList(Item):
 
 
 def get_keys_and_values_for_options_list(ol):
-    try:
+    with suppress(AttributeError):
         ol = ol.getObject()
-    except Exception:
-        pass
 
     options = ol.get_options()
     keys = [to.split(":")[0] for to in options]

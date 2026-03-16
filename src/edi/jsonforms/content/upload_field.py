@@ -10,12 +10,6 @@ from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
 
-# upload_answer_types = [
-#     SimpleTerm('file', 'file', _('File upload (single upload)')),                   # input
-#     SimpleTerm('file-multi', 'file-multi', _('File upload (multi-upload)')),        # <input name='datei[]' type='file' multiple>
-# ]
-# Upload_answer_types = SimpleVocabulary(upload_answer_types)
-
 possible_file_types = [
     SimpleTerm("application/pdf", "application/pdf", ".pdf"),
     SimpleTerm("image/jpeg", "image/jpeg", ".jpg/.jpeg"),
@@ -94,7 +88,7 @@ class IUploadField(IDependentExtended):
     accepted_file_types = schema.List(
         title=_("Accepted file types for file upload"),
         description=_(
-            "If no file type is selected, the default is * (all file types are accepted)."
+            "If no file type is selected, the default is * (all file types are accepted)."  # noqa: E501
         ),
         value_type=schema.Choice(source=Possible_file_types),
         required=False,
@@ -133,9 +127,12 @@ class IUploadField(IDependentExtended):
 
     @invariant
     def min_max_invariant(data):
-        if data.max_number_of_files and data.min_number_of_files:
-            if data.max_number_of_files < data.min_number_of_files:
-                raise Invalid(_("Maximum cannot be smaller than Minimum."))
+        if (
+            data.max_number_of_files
+            and data.min_number_of_files
+            and data.max_number_of_files < data.min_number_of_files
+        ):
+            raise Invalid(_("Maximum cannot be smaller than Minimum."))
 
 
 @implementer(IUploadField)

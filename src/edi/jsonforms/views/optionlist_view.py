@@ -1,4 +1,3 @@
-
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 from edi.jsonforms import _
@@ -33,7 +32,7 @@ class ConvertOptionListView(BrowserView):
         optionlist = self.context
         parent_selectionfield = optionlist.aq_parent
         options = get_keys_and_values_for_options_list(optionlist)
-        for key, value in zip(options[0], options[1]):
+        for _key, value in zip(options[0], options[1], strict=False):
             api.content.create(
                 container=parent_selectionfield, type="Option", title=value
             )

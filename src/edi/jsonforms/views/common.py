@@ -9,7 +9,8 @@ try:
     from edi.jsonforms_override.behaviors.interfaces import get_override_fork
     from edi.jsonforms_override.behaviors.interfaces import get_override_value
 except ModuleNotFoundError:
-    # if the import fails, define dummy functions that return empty strings, so that the code doesn't break and the override fields just don't work
+    # if the import fails, define dummy functions that return empty strings, so that
+    #     the code doesn't break and the override fields just don't work
     def get_override_fork(attribute: str):
         return ""
 
@@ -38,13 +39,13 @@ single_answer_types = ["radio", "select"]
 container_types = ["Array", "Fieldset", "Complex"]
 
 
-def create_id(object):
-    id_str = str(object.id)
+def create_id(obj):
+    id_str = str(obj.id)
     return id_str
 
 
-def create_unique_id(object):
-    id_str = str(object.id) + str(object.UID())
+def create_unique_id(obj):
+    id_str = str(obj.id) + str(obj.UID())
     escaped_id_str = id_str.replace(".", "").replace("/", "")
     return escaped_id_str
 
@@ -56,27 +57,27 @@ def get_option_name(option: IOption) -> str:
         return option.title
 
 
-def get_view_url(object):
-    return object.absolute_url()
+def get_view_url(obj):
+    return obj.absolute_url()
 
 
-def get_edit_url(object):
-    return object.absolute_url() + "/edit"
+def get_edit_url(obj):
+    return obj.absolute_url() + "/edit"
 
 
-def get_content_url(object):
-    if has_content(object):
-        return object.absolute_url() + "/folder_contents"
+def get_content_url(obj):
+    if has_content(obj):
+        return obj.absolute_url() + "/folder_contents"
     else:
-        return get_view_url(object)
+        return get_view_url(obj)
 
 
-def get_delete_url(object):
-    return object.absolute_url() + "/delete_confirmation"
+def get_delete_url(obj):
+    return obj.absolute_url() + "/delete_confirmation"
 
 
-def has_content(object):
-    return object.portal_type in [
+def has_content(obj):
+    return obj.portal_type in [
         "Array",
         "SelectionField",
         "Button Group",
@@ -103,44 +104,47 @@ def get_value(overwritten_attribute, attribute, request):
     return attribute
 
 
-def get_title(object, request):
-    title = object.title
+def get_title(obj, request):
+    title = obj.title
     # if object has the attribute override_title, use it instead of the title
-    if hasattr(object, "override_title") and object.override_title:
-        title = get_value(object.override_title, title, request)
+    if hasattr(obj, "override_title") and obj.override_title:
+        title = get_value(obj.override_title, title, request)
     return title
 
 
-def get_description(object, request):
-    description = object.description
-    # if object has the attribute override_description, use it instead of the description
-    if hasattr(object, "override_description") and object.override_description:
-        description = get_value(object.override_description, description, request)
+def get_description(obj, request):
+    description = obj.description
+    # if object has the attribute override_description, use it instead of
+    #     the description
+    if hasattr(obj, "override_description") and obj.override_description:
+        description = get_value(obj.override_description, description, request)
     return description
 
 
 # TODO use as soon as helptext is included in the schema
-def get_user_helptext(object, request):
-    user_helptext = getattr(object, "user_helptext", "")
-    # if object has the attribute override_user_helptext, use it instead of the user_helptext
-    if hasattr(object, "override_user_helptext") and object.override_user_helptext:
-        user_helptext = get_value(object.override_user_helptext, user_helptext, request)
+def get_user_helptext(obj, request):
+    user_helptext = getattr(obj, "user_helptext", "")
+    # if object has the attribute override_user_helptext, use it instead of
+    #     the user_helptext
+    if hasattr(obj, "override_user_helptext") and obj.override_user_helptext:
+        user_helptext = get_value(obj.override_user_helptext, user_helptext, request)
     return user_helptext
 
 
-def get_unit(object, request):
-    unit = object.unit
+def get_unit(obj, request):
+    unit = obj.unit
     # if object has the attribute override_unit, use it instead of the unit
-    if hasattr(object, "override_unit") and object.override_unit:
-        unit = get_value(object.override_unit, unit, request)
+    if hasattr(obj, "override_unit") and obj.override_unit:
+        unit = get_value(obj.override_unit, unit, request)
     return unit
 
 
-def get_placeholder(object, request):
-    placeholder = object.placeholder
-    # if object has the attribute override_placeholder, use it instead of the placeholder
-    if hasattr(object, "override_placeholder") and object.override_placeholder:
-        placeholder = get_value(object.override_placeholder, placeholder, request)
+def get_placeholder(obj, request):
+    placeholder = obj.placeholder
+    # if object has the attribute override_placeholder, use it instead of
+    #     the placeholder
+    if hasattr(obj, "override_placeholder") and obj.override_placeholder:
+        placeholder = get_value(obj.override_placeholder, placeholder, request)
     return placeholder
 
 
@@ -154,7 +158,8 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
     if not show_condition or show_condition == "":
         return True
 
-    # if show_condition only contains spaces or commas it is also considered as empty so show the field
+    # if show_condition only contains spaces or commas it is also considered as
+    #     empty so show the field
     conditions = re.split(r",\s*", show_condition)
     conditions = [quote_plus(c) for c in conditions if c and c.strip() != ""]
     if len(conditions) == 0:
@@ -162,24 +167,16 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
 
     fork = get_fork(request)
 
-    # if no fork is set but a show_condition is set without negation, don't show the field
+    # if no fork is set but a show_condition is set without negation, don't
+    #     show the field
     if not fork and fork != "":
-        if not negate_condition:
-            return False
-        else:
-            return True
+        return negate_condition
 
     # fork and condition are set:
     if not negate_condition:
-        if fork in conditions:
-            return True
-        else:
-            return False
+        return fork in conditions
     else:
-        if fork in conditions:
-            return False
-        else:
-            return True
+        return fork not in conditions
 
 
 def get_path(obj: IFormElement, without_root=False):

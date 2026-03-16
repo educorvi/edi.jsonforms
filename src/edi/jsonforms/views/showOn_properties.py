@@ -1,20 +1,23 @@
+import logging
+
 from edi.jsonforms.views.common import create_id
 
 import re
 
 
 """
-lookup_scopes is a class variable in the ui schema, it gets updated during the computation of the ui schema,
+lookup_scopes is a class variable in the ui schema
+it gets updated during the computation of the ui schema,
 so it saves manual computation time of the scopes
 """
 
 
-def find_scope(lookup_scopes, object):
-    obj_id = create_id(object)
-    if object.portal_type not in ["Option", "Field"]:
+def find_scope(lookup_scopes, obj):
+    obj_id = create_id(obj)
+    if obj.portal_type not in ["Option", "Field"]:
         return {}
-    elif object.portal_type == "Option":
-        parent = object.aq_parent
+    elif obj.portal_type == "Option":
+        parent = obj.aq_parent
         obj_id = create_id(parent)
 
     scope = lookup_scopes.get(obj_id)
@@ -22,8 +25,8 @@ def find_scope(lookup_scopes, object):
     # scope wasn't saved yet, has to be computed manually and then save it
     if scope is None:
         scope = obj_id
-        parent = object.aq_parent
-        if object.portal_type == "Option":
+        parent = obj.aq_parent
+        if obj.portal_type == "Option":
             parent = parent.aq_parent
         while parent.portal_type != "Form":
             if parent.portal_type != "Fieldset":
@@ -39,7 +42,7 @@ def find_scope(lookup_scopes, object):
 
 
 """
-replaces /properties/ with 
+replaces /properties/ with
 """
 
 
@@ -47,7 +50,8 @@ def transform_scope_to_object_writing_form(scope):
     # convert scope to object writing form:
     # replace 'properties/' from the string with .
     path = re.sub(r"properties/", "", scope)
-    # items stays in the path, to check if array exists in path to adapt all rules accordingly
+    # items stays in the path, to check
+    # if array exists in path to adapt all rules accordingly
     path = re.sub(
         r"/items/", ".", path
     )  # TODO temporary until feature for "self" exists
@@ -69,8 +73,8 @@ def transform_scope_to_object_writing_form(scope):
     return path
 
 
-def get_scope(lookup_scopes, object):
-    scope = find_scope(lookup_scopes, object)
+def get_scope(lookup_scopes, obj):
+    scope = find_scope(lookup_scopes, obj)
     return transform_scope_to_object_writing_form(scope)
 
 
@@ -156,11 +160,12 @@ def create_rule_for_text(scope):
 
 """
 scope: is the scope to the object for which the rule is created in object writing form
-full_path: is the scope with / and /properties/ and /items/ (needed for $selfIndices of the rita rules)
+full_path: is the scope with / and /properties/ and /items/ (needed for
+            $selfIndices of the rita rules)
 """
 
 
-def create_rule_within_array(full_path: str, object) -> dict:
+def create_rule_within_array(full_path: str, obj) -> dict:
     array_rule = {}
     paths = re.split(r"/items", full_path)
 
@@ -225,36 +230,37 @@ def create_rule_within_array(full_path: str, object) -> dict:
     # add actual rule to array rule structure
     object_id = transform_scope_to_object_writing_form(path)
     object_scope = f"$array_item{counter - 1!s}.{object_id}"
-    current_rule["rule"]["arguments"].append(get_rule(object_scope, object))
+    current_rule["rule"]["arguments"].append(get_rule(object_scope, obj))
 
     return array_rule
 
 
-def create_rule(scope, object):
+def create_rule(scope, obj):
     rule = {}
-    # object with showOn-rule is in an array -> add array rita logic around the actual rule
+    # object with showOn-rule is in an array ->
+    #   add array rita logic around the actual rule
     if "/items/" in scope:
-        rule = create_rule_within_array(scope, object)
+        rule = create_rule_within_array(scope, obj)
     else:
         scope = transform_scope_to_object_writing_form(scope)
-        rule = get_rule(scope, object)
+        rule = get_rule(scope, obj)
 
     return rule
 
 
-def get_rule(scope, object):
-    if object.portal_type == "Option":
-        enum_value = object.title
-        if object.aq_parent.use_id_in_schema:
-            enum_value = object.id
-        if object.aq_parent.answer_type in ["radio", "select"]:
+def get_rule(scope, obj):
+    if obj.portal_type == "Option":
+        enum_value = obj.title
+        if obj.aq_parent.use_id_in_schema:
+            enum_value = obj.id
+        if obj.aq_parent.answer_type in ["radio", "select"]:
             rule = create_rule_for_single_select_option(scope, enum_value)
-        elif object.aq_parent.answer_type in ["checkbox", "selectmultiple"]:
+        elif obj.aq_parent.answer_type in ["checkbox", "selectmultiple"]:
             rule = create_rule_for_multi_select_option(scope, enum_value)
-    elif object.portal_type == "Field":
-        if object.answer_type == "boolean":
+    elif obj.portal_type == "Field":
+        if obj.answer_type == "boolean":
             rule = create_rule_for_bool(scope)
-        elif object.answer_type in ["number", "integer"]:
+        elif obj.answer_type in ["number", "integer"]:
             rule = create_rule_for_num(scope)
         else:
             rule = create_rule_for_text(scope)
@@ -273,7 +279,8 @@ def create_showon_properties(child, lookup_scopes):
                 "id": "ritaRule-" + create_id(child),
                 "rule": create_rule(scope, dep),
             }
-        except:
+        except Exception as e:
+            logging.warning(f"Error occurred while creating showOn properties: {e}")
             return {}
     else:
         conn = "or"
@@ -294,8 +301,9 @@ def create_showon_properties(child, lookup_scopes):
                 dep_rule = create_rule(scope, dep)
 
                 showOn["rule"]["arguments"].append(dep_rule)
-            except:
+            except Exception as e:
                 # dependency got deleted, plone error
+                logging.warning(f"Dependency got deleted, plone error: {e}")
                 continue
 
         # check that arguments isn't empty (would mean every dependency was deleted)

@@ -24,7 +24,9 @@ class ForksViewlet(ViewletBase):
             {
                 "url": "http://example.com?fork=fork1",
                 "title": "fork1",
-                "data": [(path, attribute, value), (path, attribute2, value2), (path2, ...)]
+                "data": [(path, attribute, value),
+                         (path, attribute2, value2),
+                         (path2, ...)]
             },
             ...
         ]
@@ -36,8 +38,8 @@ class ForksViewlet(ViewletBase):
         for fork in forks:
             # transform data to use in table
             table_data = []
-            for path in forks[fork].keys():
-                for attribute in forks[fork][path].keys():
+            for path in forks[fork]:
+                for attribute in forks[fork][path]:
                     value = forks[fork][path][attribute]
                     table_data.append((path, attribute, value))
 

@@ -13,7 +13,11 @@ import unittest
 
 class ViewsIntegrationTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    ids = {}
+    ids: dict
+
+    def __init__(self):
+        super().__init__()
+        self.ids = {}
 
     def setUp(self):
         setUp_integration_test(self)

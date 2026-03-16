@@ -3,6 +3,8 @@ from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.complex import IComplex
 from edi.jsonforms.content.form import Form
 from edi.jsonforms.content.form import IForm
+from edi.jsonforms.content.reference import IReference
+from edi.jsonforms.content.fieldset import IFieldset
 from edi.jsonforms.views.common import check_show_condition_in_request
 
 # from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel
@@ -32,17 +34,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# in this file to avoid circular imports, since ObjectModel is needed in the create_model_recursively function but also used inside the ObjectModel to create child models for complex fields and arrays
-def create_model_recursively(
+# in this file to avoid circular imports, since ObjectModel is needed in the
+#     create_model_recursively function but also used inside the ObjectModel
+#     to create child models for complex fields and arrays
+def create_model_recursively(  # noqa: C901
     form_element: IFormElement,
     parent_model: BaseFormElementModel,
     generatorArguments: GeneratorArguments,
     recursively: bool = True,
 ) -> BaseFormElementModel:
     """
-    returns an object of the model class based on the portal_type of the input content object
-    it recursively creates child models for complex fields and arrays and adds them to the properties of the created model
-    it also adds the required fields to the required list of the parent model and handles dependencies by
+    returns an object of the model class based on the portal_type of the input
+        content object
+    it recursively creates child models for complex fields and arrays and adds them to
+        the properties of the created model
+    it also adds the required fields to the required list of the parent model and
+        handles dependencies by
     """
     if form_element.portal_type == "Field":
         model = FieldModel(form_element, parent_model, generatorArguments.request)
@@ -70,7 +77,10 @@ def create_model_recursively(
         model = FieldsetModel(form_element, parent_model, generatorArguments.request)
         if recursively:
             model.set_children(generatorArguments)
-        model = None  # Fieldset does not contribute to the json schema, the children are added to the parent model of the Fieldset, so we return None here to avoid adding the fieldset itself as a property to the parent model
+        model = None
+        # Fieldset does not contribute to the json schema, the children are added to
+        #     the parent model of the Fieldset, so we return None here to avoid adding
+        #     the fieldset itself as a property to the parent model
     elif form_element.portal_type == "Helptext":
         # model = HelptextModel(form_element, parent_model)  # has no json schema
         return None
@@ -97,7 +107,8 @@ class ObjectModel(BaseFormElementModel):
         form_element: IComplex
         | IArray
         | IForm,  # to create the intern object model for array items
-        parent_model: BaseFormElementModel | None,  # is None if form_element is the outer form or if in form-element-view
+        parent_model: BaseFormElementModel
+        | None,  # is None if form_element is the outer form or if in form-element-view
         request: WSGIRequest | HTTPRequest,
     ):
         super().__init__(form_element, parent_model, request)
@@ -130,7 +141,8 @@ class ObjectModel(BaseFormElementModel):
         :param generatorArguments: arguments to give through the recursive calls
 
         creates models for all children of the given form_element
-        also sets required, dependentrequired and allof of self based on the children's dependencies and required fields
+        also sets required, dependentrequired and allof of self based on the
+            children's dependencies and required fields
         returns a dict of the created children models (child_id: child_model)
         """
         models = {}
@@ -139,7 +151,8 @@ class ObjectModel(BaseFormElementModel):
                 child = child.getObject()
                 self.create_and_add_model(
                     child, generatorArguments
-                )  # creates child model and adds it to self.properties, dependentRequired etc.
+                )  # creates child model and adds it to self.properties,
+                #        dependentRequired etc.
 
         if self.form_element and isinstance(self.form_element, Form):
             self.update_allOf(generatorArguments.formProperties.allOf)
@@ -156,9 +169,12 @@ class ObjectModel(BaseFormElementModel):
         generatorArguments: GeneratorArguments,
     ) -> BaseFormElementModel | None:
         """
-        creates a model for the given form_element based on its portal_type and returns it
-        also makes an entry inside the parent_models's required and dependentRequired and allof lists if necessary
-        returns None if the form_element should not be shown based on its show_condition and negate_condition
+        creates a model for the given form_element based on its portal_type and
+            returns it
+        also makes an entry inside the parent_models's required and dependentRequired
+            and allof lists if necessary
+        returns None if the form_element should not be shown based on its
+            show_condition and negate_condition
         """
 
         if not check_show_condition_in_request(
@@ -172,7 +188,8 @@ class ObjectModel(BaseFormElementModel):
         if model is None:
             return None
 
-        # give the children the same dependencies as the closest ancestor with dependencies if they have none of their own
+        # give the children the same dependencies as the closest ancestor with
+        #     dependencies if they have none of their own
         if model.get_dependencies() == []:
             parent_dependencies = (
                 get_dependencies_of_closest_ancestor_with_dependencies(model)
@@ -202,9 +219,11 @@ class ObjectModel(BaseFormElementModel):
         generatorArguments: GeneratorArguments,
     ) -> BaseFormElementModel | None:
         """
-        creates a model for the given form_element based on its portal_type and returns it
+        creates a model for the given form_element based on its portal_type and
+            returns it
         makes an entry inside the parent_models's required list if the field is required
-        does not make an entry inside the parent_models's dependentRequired and allOf lists
+        does not make an entry inside the parent_models's dependentRequired and
+            allOf lists
         """
 
         model = create_model_recursively(form_element, self, generatorArguments)
@@ -245,16 +264,11 @@ class ObjectModel(BaseFormElementModel):
 ###############################
 
 
-from edi.jsonforms.content.fieldset import IFieldset
-
-
-# from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
-# from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-
-
 class FieldsetModel(ObjectModel):
     """
-    This class is different from the other BaseFormElementModel-classes. It does not store any information, but the init method creates the children and stores them in the parent_model
+    This class is different from the other BaseFormElementModel-classes. It does not
+        store any information, but the init method creates the children and stores
+        them in the parent_model
     """
 
     parent: ObjectModel | None
@@ -271,7 +285,9 @@ class FieldsetModel(ObjectModel):
         super().set_children(generatorArguments)
         self.parent.update_properties(self.properties)
         self.parent.update_required(self.required)
-        # self.parent.extend_dependencies(self.dependencies) # are not relevant, were already added to the children's dependencies in the create_and_add_model method
+        # self.parent.extend_dependencies(self.dependencies) # are not relevant, were
+        #     already added to the children's dependencies in the
+        #     create_and_add_model method
         self.parent.update_dependentRequired(self.dependentRequired)
 
     def get_json_schema(self) -> dict:
@@ -279,22 +295,6 @@ class FieldsetModel(ObjectModel):
 
 
 ###################################
-
-# import logging
-
-# from typing import Optional
-
-from edi.jsonforms.content.array import IArray
-
-
-# from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
-#     BaseFormElementModel,
-# )
-# from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
-# from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-
-
-# logger = logging.getLogger(__name__)
 
 
 class ArrayModel(BaseFormElementModel):
@@ -314,7 +314,8 @@ class ArrayModel(BaseFormElementModel):
 
     def set_children(self, generatorArguments: GeneratorArguments):
         """
-        :param compute_children_method: creates instances of the children models and returns them as a dict (child_id: child_model)
+        :param compute_children_method: creates instances of the children models and
+            returns them as a dict (child_id: child_model)
         """
         object_model = ObjectModel(
             self.form_element, self.parent, generatorArguments.request
@@ -337,13 +338,13 @@ class ArrayModel(BaseFormElementModel):
         items_schema = self.items.get_json_schema()
         del items_schema[
             "title"
-        ]  # title of the items is not needed in the json schema, since it is not a real form element but just a wrapper for the items of the array
+        ]  # title of the items is not needed in the json schema, since it is not a
+        #       real form element but just a wrapper for the items of the array
         json_schema["items"] = items_schema
         return json_schema
 
 
 ##################################
-from edi.jsonforms.content.reference import IReference
 
 
 class ReferenceModel(BaseFormElementModel):
@@ -371,10 +372,13 @@ class ReferenceModel(BaseFormElementModel):
                 reference_object, parent_model, generatorArguments, False
             )
 
-            # set id of referenced object to the id of the reference, so it can be found in the properties of the parent model
+            # set id of referenced object to the id of the reference, so it can be
+            #     found in the properties of the parent model
             model.set_id(self.id)
 
-            # give referenced object model the same dependencies as the reference and afterwards call set_children, so the children also have those dependencies
+            # give referenced object model the same dependencies as the reference and
+            #     afterwards call set_children, so the children also have those
+            #     dependencies
             dependencies = self.get_dependencies()
             model.set_dependencies(dependencies)
 

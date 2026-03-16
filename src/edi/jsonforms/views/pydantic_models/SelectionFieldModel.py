@@ -34,12 +34,14 @@ class OptionModel(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    def __init__(self, id: str, title: str, parent: ISelectionField):
+    def __init__(
+        self, option_id: str, option_title: str, option_parent: ISelectionField
+    ):
         """
         constructor for OptionModel, sets id, title and parent of the option
         dependencies stay empty
         """
-        super().__init__(id=id, title=title, parent=parent)
+        super().__init__(id=option_id, title=option_title, parent=option_parent)
 
     @classmethod
     def from_option(cls, option: IOption):
@@ -53,12 +55,14 @@ class OptionModel(BaseModel):
         return option_model
 
     @classmethod
-    def from_id_and_title(cls, id: str, title: str, parent: ISelectionField):
+    def from_id_and_title(
+        cls, option_id: str, option_title: str, option_parent: ISelectionField
+    ):
         """
         constructor for OptionModel, sets id, title and parent of the option
         dependencies stay empty
         """
-        return cls(id=id, title=title, parent=parent)
+        return cls(id=option_id, title=option_title, parent=option_parent)
 
     # a get method for name (title or id)
     def get_option_name(self) -> str:
@@ -83,7 +87,7 @@ class OptionListModel(BaseModel):
     def __init__(self, option_list: OptionList):
         super().__init__(options=[])
         o_keys, o_values = get_keys_and_values_for_options_list(option_list)
-        for key, value in zip(o_keys, o_values):
+        for key, value in zip(o_keys, o_values, strict=False):
             option_model = OptionModel.from_id_and_title(
                 key, value, option_list.aq_parent
             )
@@ -123,7 +127,8 @@ class SelectionFieldModel(BaseFormElementModel):
         gets options as strings of self.form_element.getFolderContents()
         includes dependencies in the computation
 
-        :param generatorArguments: can be i.e. is_single_view, to get all options regardless of conditions and dependencies
+        :param generatorArguments: can be i.e. is_single_view, to get all options
+            regardless of conditions and dependencies
         """
         options = self.form_element.getFolderContents()
 
@@ -151,13 +156,12 @@ class SelectionFieldModel(BaseFormElementModel):
                         generatorArguments.is_single_view
                     ):
                         options_list.append(option_model.get_option_name())
-            elif o.portal_type == "OptionList":
-                if show:
-                    keys, vals = get_keys_and_values_for_options_list(o)
-                    if self.form_element.use_id_in_schema:
-                        options_list.extend(keys)
-                    else:
-                        options_list.extend(vals)
+            elif o.portal_type == "OptionList" and show:
+                keys, vals = get_keys_and_values_for_options_list(o)
+                if self.form_element.use_id_in_schema:
+                    options_list.extend(keys)
+                else:
+                    options_list.extend(vals)
         return options_list
 
     def set_option(self, option_model: OptionModel | OptionListModel):
@@ -171,9 +175,8 @@ class SelectionFieldModel(BaseFormElementModel):
 
             if self.type == "string":
                 self.enum.append(option_name)
-            elif self.type == "array":
-                if self.items and "enum" in self.items:
-                    self.items["enum"].append(option_name)
+            elif self.type == "array" and self.items and "enum" in self.items:
+                self.items["enum"].append(option_name)
         elif isinstance(option_model, OptionListModel):
             for option in option_model.options:
                 self.set_option(option)
@@ -184,15 +187,16 @@ class SelectionFieldModel(BaseFormElementModel):
         """
         if self.type == "string":
             self.enum = []
-        elif self.type == "array":
-            if self.items and "enum" in self.items:
-                self.items["enum"] = []
+        elif self.type == "array" and self.items and "enum" in self.items:
+            self.items["enum"] = []
 
     def set_children(self, generatorArguments: GeneratorArguments):
         """
-        sets the options for the selectionfield and adds the allOf of the dependent options to the form
+        sets the options for the selectionfield and adds the allOf of the dependent
+            options to the form
 
-        :param generatorArguments: needed to get is_single_view (ignore dependencies) and formProperties (to add dependent options to the formModel later)
+        :param generatorArguments: needed to get is_single_view (ignore dependencies)
+            and formProperties (to add dependent options to the formModel later)
         """
         options_list = self.get_options(generatorArguments)
 

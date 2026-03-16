@@ -1,5 +1,7 @@
 # from plone.app.textfield import RichText
 # from plone.autoform import directives
+from contextlib import suppress
+
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependent
 from plone.dexterity.content import Item
@@ -36,7 +38,7 @@ class IOption(IDependent):
     dependencies = RelationList(
         title=_("Dependent from this answer option:"),
         description=_(
-            "If this option should only be displayed based on the selection of an option in another question, please specify the option it depends on here. If multiple options are selected as dependencies, this option will be displayed if either of the dependencies is chosen."
+            "If this option should only be displayed based on the selection of an option in another question, please specify the option it depends on here. If multiple options are selected as dependencies, this option will be displayed if either of the dependencies is chosen."  # noqa: E501
         ),
         value_type=RelationChoice(
             vocabulary="plone.app.vocabularies.Catalog",
@@ -46,7 +48,7 @@ class IOption(IDependent):
     )
 
     @invariant
-    def check_dependencies(data):
+    def check_dependencies(data):  # noqa: C901
         # def get_parent_form(context):
         #     current = context
         #     try:
@@ -73,12 +75,10 @@ class IOption(IDependent):
 
         if data.dependencies:
             dependencies = data.dependencies
-            try:
+            with suppress(Exception):
                 # editing process, object already exists and has a context
                 context = data.__context__
                 option_parent = context.aq_parent
-            except Exception:
-                pass
             if context is None:
                 context = getRequest().PUBLISHED.context
                 if context is None:
@@ -94,7 +94,8 @@ class IOption(IDependent):
                 ):  # get parents of the SelectionFields
                     raise Invalid(
                         _(
-                            "Selectionfields of the option and the dependent option must be in the same container."
+                            "Selectionfields of the option and the dependent option"
+                            + "must be in the same container."
                         )
                     )
                 if dep_parent == option_parent:
@@ -102,7 +103,8 @@ class IOption(IDependent):
                         _("Dependency must not be in the same SelectionField.")
                     )
                 # if context == dep:
-                #     raise Invalid(_("Cannot be dependent from itself.")) # already covered by "not in the same SelectionField" check
+                #     raise Invalid(_("Cannot be dependent from itself."))
+                # already covered by "not in the same SelectionField" check
 
 
 @implementer(IOption)

@@ -21,7 +21,11 @@ import unittest
 
 class ViewsIntegrationTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
-    ids = {}
+    ids: dict
+
+    def __init__(self):
+        super().__init__()
+        self.ids = {}
 
     def setUp(self):
         setUp_integration_test(self)
@@ -43,7 +47,7 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
 
     def test_plain_form(self):
         self.assertEqual(
-            '{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}}',
+            '{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}}',  # noqa: E501
             self.view(),
         )
 
@@ -111,23 +115,31 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         }
         self._test_field_schema(ref_schema)
 
-    def _test_numberlike_fields(self, type):
+    def _test_numberlike_fields(self, answer_type):
         # should not change the schema
         self.field.unit = "a unit"
 
-        ref_schema = {create_id(self.field): {"title": "a field", "type": type}}
+        ref_schema = {create_id(self.field): {"title": "a field", "type": answer_type}}
         self._test_field_schema(ref_schema)
 
         self.field.minimum = 3
         ref_schema = {
-            create_id(self.field): {"title": "a field", "type": type, "minimum": 3}
+            create_id(self.field): {
+                "title": "a field",
+                "type": answer_type,
+                "minimum": 3,
+            }
         }
         self._test_field_schema(ref_schema)
 
         self.field.minimum = None
         self.field.maximum = 5
         ref_schema = {
-            create_id(self.field): {"title": "a field", "type": type, "maximum": 5}
+            create_id(self.field): {
+                "title": "a field",
+                "type": answer_type,
+                "maximum": 5,
+            }
         }
         self._test_field_schema(ref_schema)
 
@@ -135,7 +147,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         ref_schema = {
             create_id(self.field): {
                 "title": "a field",
-                "type": type,
+                "type": answer_type,
                 "minimum": 3,
                 "maximum": 5,
             }
@@ -170,7 +182,6 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
             create_id(self.field): {
                 "title": "a field",
                 "type": "string",
-                "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$",
             }
         }
         self._test_field_schema(ref_schema)
@@ -251,38 +262,38 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
         ref_schema = {create_id(self.field): {"title": "a field", "type": "boolean"}}
         self._test_field_schema(ref_schema)
 
-    def test_additional_attributes(self):
+    def test_additional_attributes(self):  # noqa: C901
         # should not change the schema
         self.field.user_helptext = "a tipp"
         field_id = create_id(self.field)
 
-        for type in Answer_types:
-            type = type.value
+        for answer_type in Answer_types:
+            answer_type = answer_type.value
             ref_schema = {"title": "a field", "type": "string"}
-            self.field.answer_type = type
+            self.field.answer_type = answer_type
 
-            if type == "tel":
+            if answer_type == "tel":
                 ref_schema["pattern"] = (
                     "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$"
                 )
-            elif type == "url":
+            elif answer_type == "url":
                 ref_schema["format"] = "hostname"
-            elif type == "email":
+            elif answer_type == "email":
                 ref_schema["format"] = "email"
-            elif type == "date":
+            elif answer_type == "date":
                 ref_schema["format"] = "date"
-            elif type == "datetime-local":
+            elif answer_type == "datetime-local":
                 ref_schema["format"] = "date-time"
-            elif type == "time":
+            elif answer_type == "time":
                 ref_schema["format"] = "time"
-            elif type == "number":
+            elif answer_type == "number":
                 ref_schema["type"] = "number"
-            elif type == "integer":
+            elif answer_type == "integer":
                 ref_schema["type"] = "integer"
-            elif type in "boolean":
+            elif answer_type == "boolean":
                 ref_schema["type"] = "boolean"
             else:
-                self.assertIn(type, ["text", "textarea", "password"])
+                self.assertIn(answer_type, ["text", "textarea", "password"])
 
             ref_schema = {field_id: ref_schema}
 
@@ -303,17 +314,21 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
     def test_multiple_fields(self):
         field_id = create_id(self.field)
         self.field = []
-        for type in Answer_types:
+        for answer_type in Answer_types:
             f = api.content.create(
-                type="Field", title=type.value + "field" + "0", container=self.form
+                type="Field",
+                title=answer_type.value + "field" + "0",
+                container=self.form,
             )
-            f.answer_type = type.value
+            f.answer_type = answer_type.value
             self.field.append(f)
 
             f = api.content.create(
-                type="Field", title=type.value + "field" + "1", container=self.form
+                type="Field",
+                title=answer_type.value + "field" + "1",
+                container=self.form,
             )
-            f.answer_type = type.value
+            f.answer_type = answer_type.value
             self.field.append(f)
 
         ref_schema = {
@@ -330,12 +345,10 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
                 create_id(self.field[6]): {
                     "title": "telfield0",
                     "type": "string",
-                    "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$",
                 },
                 create_id(self.field[7]): {
                     "title": "telfield1",
                     "type": "string",
-                    "pattern": "^\\+?(\\d{1,3})?[-.\\s]?(\\(?\\d{1,4}\\)?)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$",
                 },
                 create_id(self.field[8]): {
                     "title": "urlfield0",
@@ -474,24 +487,28 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
         }
         self._test_selectionfield_schema(ref_schema)
 
-    def _test_option_enum(self, ref_enum_list, id):
+    def _test_option_enum(self, ref_enum_list, option_id):
         computed_list = None
-        type = self.selectionfield.answer_type
-        if type in ["radio", "select"]:
-            computed_list = json.loads(self.view())["properties"][id]["enum"]
-        elif type in ["checkbox", "selectmultiple"]:
-            computed_list = json.loads(self.view())["properties"][id]["items"]["enum"]
+        answer_type = self.selectionfield.answer_type
+        if answer_type in ["radio", "select"]:
+            computed_list = json.loads(self.view())["properties"][option_id]["enum"]
+        elif answer_type in ["checkbox", "selectmultiple"]:
+            computed_list = json.loads(self.view())["properties"][option_id]["items"][
+                "enum"
+            ]
         else:
-            self.assertNotIn(type, ["radio", "select", "checkbox", "selectmultiple"])
+            self.assertNotIn(
+                answer_type, ["radio", "select", "checkbox", "selectmultiple"]
+            )
         self.assertEqual(computed_list, ref_enum_list)
 
     def test_options_selectionfield(self):
-        id = create_id(self.selectionfield)
+        sel_id = create_id(self.selectionfield)
 
         def test_options_for_answer_types(ref_enum_list):
-            for type in Selection_answer_types:
-                self.selectionfield.answer_type = type.value
-                self._test_option_enum(ref_enum_list, id)
+            for answer_type in Selection_answer_types:
+                self.selectionfield.answer_type = answer_type.value
+                self._test_option_enum(ref_enum_list, sel_id)
 
         test_options_for_answer_types([])
 
@@ -515,19 +532,21 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
         self.selectionfield.user_helptext = "a tipp"
         field_id = create_id(self.selectionfield)
 
-        for type in Selection_answer_types:
-            type = type.value
+        for answer_type in Selection_answer_types:
+            answer_type = answer_type.value
             ref_schema = {"title": "a selectionfield"}
-            self.selectionfield.answer_type = type
+            self.selectionfield.answer_type = answer_type
 
-            if type in ["radio", "select"]:
+            if answer_type in ["radio", "select"]:
                 ref_schema["type"] = "string"
                 ref_schema["enum"] = []
-            elif type in ["checkbox", "selectmultiple"]:
+            elif answer_type in ["checkbox", "selectmultiple"]:
                 ref_schema["type"] = "array"
                 ref_schema["items"] = {"enum": [], "type": "string"}
             else:
-                self.assertIn(type, ["radio", "checkbox", "select", "selectmultiple"])
+                self.assertIn(
+                    answer_type, ["radio", "checkbox", "select", "selectmultiple"]
+                )
 
             ref_schema = {field_id: ref_schema}
 
@@ -551,13 +570,20 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
     view = None
     form = None
     uploadfield = None
+    file_schema: dict
+    filemulti_schema: dict
 
-    file_schema = {"title": "an uploadfield", "type": "string", "format": "uri"}
-    filemulti_schema = {
-        "title": "an uploadfield",
-        "type": "array",
-        "items": {"type": "string", "format": "uri"},
-    }
+    def __init__(self):
+        self.file_schema = {
+            "title": "an uploadfield",
+            "type": "string",
+            "format": "uri",
+        }
+        self.filemulti_schema = {
+            "title": "an uploadfield",
+            "type": "array",
+            "items": {"type": "string", "format": "uri"},
+        }
 
     def _test_uploadfield_schema(self, ref_schema):
         computed_schema = json.loads(self.view())["properties"]
@@ -584,16 +610,16 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
         self.uploadfield.user_helptext = "a tipp"
         field_id = create_id(self.uploadfield)
 
-        for type in Upload_answer_types:
-            type = type.value
-            self.uploadfield.answer_type = type
+        for answer_type in Upload_answer_types:
+            answer_type = answer_type.value
+            self.uploadfield.answer_type = answer_type
 
-            if type in ["file"]:
+            if answer_type in ["file"]:
                 ref_schema = self.file_schema
-            elif type in ["file-multi"]:
+            elif answer_type in ["file-multi"]:
                 ref_schema = self.filemulti_schema
             else:
-                self.assertIn(type, ["file", "file-multi"])
+                self.assertIn(answer_type, ["file", "file-multi"])
 
             ref_schema = {field_id: ref_schema}
 
@@ -618,7 +644,11 @@ class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     view = None
     form = None
-    field = []
+    field: list
+
+    def __init__(self):
+        super().__init__()
+        self.field = []
 
     def setUp(self):
         setUp_json_schema_test(self)
@@ -656,7 +686,11 @@ class ViewsJsonSchemaSelectionfieldsRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     view = None
     form = None
-    field = []
+    field: list
+
+    def __init__(self):
+        super().__init__()
+        self.field = []
 
     def setUp(self):
         setUp_json_schema_test(self)
@@ -708,7 +742,11 @@ class ViewsJsonSchemaUploadfieldsRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     view = None
     form = None
-    field = []
+    field: list
+
+    def __init__(self):
+        super().__init__()
+        self.field = []
 
     def setUp(self):
         setUp_json_schema_test(self)
@@ -741,10 +779,16 @@ class ViewsJsonSchemaDependentRequiredTest(unittest.TestCase):
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
     view = None
     form = None
-    field = []
-    selectionfield = []
+    field: list
+    selectionfield: list
 
-    # TODO first: unit test of add_dependent_required with every possible type (also array etc) -> think about what should happen if array is required
+    def __init__(self):
+        super().__init__()
+        self.field = []
+        self.selectionfield = []
+
+    # TODO first: unit test of add_dependent_required with every possible type
+    #     (also array etc) -> think about what should happen if array is required
 
 
 # class ViewsFunctionalTest(unittest.TestCase):

@@ -15,12 +15,6 @@ from zope.interface import implementer
 class IFieldset(IDependent):
     """Marker interface and Dexterity Python Schema for Fieldset"""
 
-    # TODO translate these three
-    # title = schema.TextLine(title=_("Title"))
-    # description = schema.Text(title=_("Description"),
-    #                       description=_("This is description is only for intern use and won't be shown in the form."),
-    #                         required=False)
-
     show_title = schema.Bool(
         title=_("Show title in form"), default=True, required=False
     )

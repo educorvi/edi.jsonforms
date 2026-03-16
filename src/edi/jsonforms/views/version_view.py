@@ -13,6 +13,13 @@ class IVersionView(Interface):
 @implementer(IVersionView)
 class VersionView(BrowserView):
     def __call__(self):
+        return self.get_specific_schema()
+
+    def get_specific_schema(self):  # noqa: C901
+        """
+        returns the json or ui schema for a specific version and fork if given
+            otherwise redirects to the context url
+        """
         repo_tool = api.portal.get_tool(name="portal_repository")
         version = self.request.get("version")
         schema = self.request.get("schema")

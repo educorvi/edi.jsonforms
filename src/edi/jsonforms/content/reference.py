@@ -24,19 +24,22 @@ class IReference(IDependent):
         title=_("Reference"),
         required=True,
         description=_("Reference to another Form Element (e.g. Field or Array)"),
-        # source=CatalogSource(portal_type=['Form', 'Complex', 'Array', 'Fieldset'], base_path=get_base_path),
+        # source=CatalogSource(
+        #     portal_type=["Form", "Complex", "Array", "Fieldset"],
+        #     base_path=get_base_path,
+        # ),
         vocabulary="plone.app.vocabularies.Catalog",
     )
 
     @invariant
-    def check_reference(data):
+    def check_reference(data):  # noqa: C901
         if data.reference:
             try:
                 ref_obj = data.reference
-            except:
+            except Exception as e:
                 raise Invalid(
                     _("The referenced object is either empty or deleted/invalid.")
-                )
+                ) from e
 
             if ref_obj.portal_type == "Fieldset":
                 raise Invalid(_("You cannot reference a Fieldset."))
@@ -57,14 +60,16 @@ class IReference(IDependent):
             def get_parent_form(obj):
                 try:
                     parent = obj.aq_parent
-                except:
+                except Exception:
                     try:
                         parent = data.__context__.aq_parent
-                    except:
+                    except Exception:
                         try:
                             parent = getRequest().PUBLISHED.context.aq_parent
-                        except:
-                            raise Invalid(_("Could not determine the parent Form."))
+                        except Exception as e:
+                            raise Invalid(
+                                _("Could not determine the parent Form.")
+                            ) from e
                 if parent.portal_type in ["Form"]:
                     return parent
                 elif isinstance(parent.portal_type, IFormElement):
