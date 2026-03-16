@@ -12,90 +12,84 @@ from zope.component import queryUtility
 import unittest
 
 
-
-
 class ComplexIntegrationTest(unittest.TestCase):
-
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
 
     def setUp(self):
         """Custom shared utility setup for tests."""
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
         portal_types = self.portal.portal_types
         parent_id = portal_types.constructContent(
-            'Form',
+            "Form",
             self.portal,
-            'parent_container',
-            title='Parent container',
+            "parent_container",
+            title="Parent container",
         )
         self.parent = self.portal[parent_id]
 
     def test_ct_complex_schema(self):
-        fti = queryUtility(IDexterityFTI, name='Complex')
+        fti = queryUtility(IDexterityFTI, name="Complex")
         schema = fti.lookupSchema()
         self.assertEqual(IComplex, schema)
 
     def test_ct_complex_fti(self):
-        fti = queryUtility(IDexterityFTI, name='Complex')
+        fti = queryUtility(IDexterityFTI, name="Complex")
         self.assertTrue(fti)
 
     def test_ct_complex_factory(self):
-        fti = queryUtility(IDexterityFTI, name='Complex')
+        fti = queryUtility(IDexterityFTI, name="Complex")
         factory = fti.factory
         obj = createObject(factory)
 
         self.assertTrue(
             IComplex.providedBy(obj),
-            u'IComplex not provided by {0}!'.format(
+            "IComplex not provided by {0}!".format(
                 obj,
             ),
         )
 
     def test_ct_complex_adding(self):
-        setRoles(self.portal, TEST_USER_ID, ['Contributor'])
+        setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         obj = api.content.create(
             container=self.parent,
-            type='Complex',
-            id='complex',
+            type="Complex",
+            id="complex",
         )
 
         self.assertTrue(
             IComplex.providedBy(obj),
-            u'IComplex not provided by {0}!'.format(
+            "IComplex not provided by {0}!".format(
                 obj.id,
             ),
         )
 
         parent = obj.__parent__
-        self.assertIn('complex', parent.objectIds())
+        self.assertIn("complex", parent.objectIds())
 
         # check that deleting the object works too
         api.content.delete(obj=obj)
-        self.assertNotIn('complex', parent.objectIds())
+        self.assertNotIn("complex", parent.objectIds())
 
     def test_ct_complex_globally_not_addable(self):
-        setRoles(self.portal, TEST_USER_ID, ['Contributor'])
-        fti = queryUtility(IDexterityFTI, name='Complex')
-        self.assertFalse(
-            fti.global_allow,
-            u'{0} is globally addable!'.format(fti.id)
-        )
+        setRoles(self.portal, TEST_USER_ID, ["Contributor"])
+        fti = queryUtility(IDexterityFTI, name="Complex")
+        self.assertFalse(fti.global_allow, "{0} is globally addable!".format(fti.id))
 
     def test_ct_complex_filter_content_type_true(self):
-        setRoles(self.portal, TEST_USER_ID, ['Contributor'])
-        fti = queryUtility(IDexterityFTI, name='Complex')
+        setRoles(self.portal, TEST_USER_ID, ["Contributor"])
+        fti = queryUtility(IDexterityFTI, name="Complex")
         portal_types = self.portal.portal_types
         parent_id = portal_types.constructContent(
             fti.id,
             self.portal,
-            'complex_id',
-            title='Complex container',
-         )
+            "complex_id",
+            title="Complex container",
+        )
         self.parent = self.portal[parent_id]
         with self.assertRaises(InvalidParameterError):
             api.content.create(
                 container=self.parent,
-                type='Document',
-                title='My Content',
+                type="Document",
+                title="My Content",
             )

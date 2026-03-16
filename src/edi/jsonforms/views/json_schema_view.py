@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
 from Products.Five.browser import BrowserView
+
 import json
 import logging
 
-from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
 
 logger = logging.getLogger("edi.jsonforms")
 

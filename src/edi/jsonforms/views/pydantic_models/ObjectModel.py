@@ -1,26 +1,9 @@
-import copy
-import logging
-from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
-
-from edi.jsonforms.views.pydantic_models.dependency_handler import (
-    add_dependent_required,
-    get_dependencies_of_closest_ancestor_with_dependencies,
-)
-from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-from plone.base.utils import safe_hasattr
-from typing import Optional, List, Dict, Any
-
+from edi.jsonforms.content.array import IArray
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.complex import IComplex
-from edi.jsonforms.content.array import IArray
-from edi.jsonforms.content.form import Form, IForm
-
+from edi.jsonforms.content.form import Form
+from edi.jsonforms.content.form import IForm
 from edi.jsonforms.views.common import check_show_condition_in_request
-from edi.jsonforms.views.pydantic_models.FieldModel import FieldModel
-from edi.jsonforms.views.pydantic_models.SelectionFieldModel import (
-    SelectionFieldModel,
-)
-from edi.jsonforms.views.pydantic_models.UploadFieldModel import UploadFieldModel
 
 # from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel
 # from edi.jsonforms.views.pydantic_models.ArrayModel import ArrayModel
@@ -28,6 +11,27 @@ from edi.jsonforms.views.pydantic_models.UploadFieldModel import UploadFieldMode
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
+from edi.jsonforms.views.pydantic_models.dependency_handler import (
+    add_dependent_required,
+)
+from edi.jsonforms.views.pydantic_models.dependency_handler import (
+    get_dependencies_of_closest_ancestor_with_dependencies,
+)
+from edi.jsonforms.views.pydantic_models.FieldModel import FieldModel
+from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+from edi.jsonforms.views.pydantic_models.SelectionFieldModel import SelectionFieldModel
+from edi.jsonforms.views.pydantic_models.UploadFieldModel import UploadFieldModel
+from plone.base.utils import safe_hasattr
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZPublisher.HTTPRequest import WSGIRequest
+
+import copy
+import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -248,6 +252,8 @@ class ObjectModel(BaseFormElementModel):
 
 
 from edi.jsonforms.content.fieldset import IFieldset
+
+
 # from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
 # from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 
@@ -285,6 +291,8 @@ class FieldsetModel(ObjectModel):
 # from typing import Optional
 
 from edi.jsonforms.content.array import IArray
+
+
 # from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
 #     BaseFormElementModel,
 # )

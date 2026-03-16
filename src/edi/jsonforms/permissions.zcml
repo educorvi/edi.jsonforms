@@ -1,75 +1,76 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:zcml="http://namespaces.zope.org/zcml"
-  i18n_domain="plone">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="plone"
+    >
 
   <configure zcml:condition="installed AccessControl.security">
-  <!-- -*- extra stuff goes here -*- -->
+    <!-- -*- extra stuff goes here -*- -->
 
     <permission
         id="edi.jsonforms.AddWizard"
         title="edi.jsonforms: Add Wizard"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddReference"
         title="edi.jsonforms: Add Reference"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddHelptext"
         title="edi.jsonforms: Add Helptext"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddUploadField"
         title="edi.jsonforms: Add UploadField"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddComplex"
         title="edi.jsonforms: Add Complex"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddArray"
         title="edi.jsonforms: Add Array"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddOption"
         title="edi.jsonforms: Add Option"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddSelectionField"
         title="edi.jsonforms: Add SelectionField"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddField"
         title="edi.jsonforms: Add Field"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddFieldset"
         title="edi.jsonforms: Add Fieldset"
-    />
+        />
 
 
     <permission
         id="edi.jsonforms.AddForm"
         title="edi.jsonforms: Add Form"
-    />
+        />
 
 
 

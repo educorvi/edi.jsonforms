@@ -1,93 +1,115 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <rolemap>
   <permissions>
-  <!-- -*- extra stuff goes here -*- -->
+    <!-- -*- extra stuff goes here -*- -->
 
-    <permission name="edi.jsonforms: Add Wizard" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Wizard"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Reference" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Reference"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Helptext" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Helptext"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add UploadField" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add UploadField"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Complex" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Complex"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Array" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Array"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Option" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Option"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add SelectionField" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add SelectionField"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Field" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Field"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Fieldset" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Fieldset"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 
-    <permission name="edi.jsonforms: Add Form" acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
-      <role name="Owner"/>
-      <role name="Contributor"/>
+    <permission acquire="True"
+                name="edi.jsonforms: Add Form"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
+      <role name="Owner" />
+      <role name="Contributor" />
     </permission>
 
 

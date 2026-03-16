@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from edi.jsonforms import _
-import json
+from edi.jsonforms.views.form_view import FormView
+from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-from edi.jsonforms.views.pydantic_models.ObjectModel import (
-    ObjectModel,
-)
-from edi.jsonforms.views.pydantic_models.SelectionFieldModel import (
-    OptionListModel,
-    OptionModel,
-)
+from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
+from edi.jsonforms.views.pydantic_models.SelectionFieldModel import OptionListModel
+from edi.jsonforms.views.pydantic_models.SelectionFieldModel import OptionModel
+from edi.jsonforms.views.ui_schema_view import UiSchemaView
 from zope.interface import implementer
 from zope.interface import Interface
 
-from edi.jsonforms.views.form_view import FormView
-from edi.jsonforms.views.ui_schema_view import UiSchemaView
-from edi.jsonforms.views.json_schema_view import JsonSchemaView
+import json
 
 
 class IFormElementView(Interface):

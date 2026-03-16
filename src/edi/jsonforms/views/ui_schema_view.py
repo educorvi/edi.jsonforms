@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from urllib.parse import urlencode
 from edi.jsonforms import _
-from Products.Five.browser import BrowserView
-import json
+from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+from edi.jsonforms.views.common import *
+from edi.jsonforms.views.common import get_option_name
+from edi.jsonforms.views.showOn_properties import create_showon_properties
 from jinja2 import meta
 from jinja2.sandbox import SandboxedEnvironment
-
-from edi.jsonforms.views.common import *
-from edi.jsonforms.views.showOn_properties import create_showon_properties
-from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
-
 from plone import api
 from plone.base.utils import safe_hasattr
+from Products.Five.browser import BrowserView
+from urllib.parse import urlencode
 
-from edi.jsonforms.views.common import get_option_name
+import json
 
 
 class UiSchemaView(BrowserView):
@@ -423,7 +421,9 @@ class UiSchemaView(BrowserView):
                     elif handler.portal_type == "File Storage Handler":
                         request_url = self.context.absolute_url() + "/@store-as-file"
                         try:
-                            folder_path = api.content.get_path(obj=handler.target_folder.to_object)
+                            folder_path = api.content.get_path(
+                                obj=handler.target_folder.to_object
+                            )
                         except:
                             folder_path = ""
                             button_schema["options"]["disabled"] = True

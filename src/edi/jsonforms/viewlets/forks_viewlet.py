@@ -1,10 +1,10 @@
-import json
-
-from plone.app.layout.viewlets import ViewletBase
-from urllib.parse import quote_plus
-from typing import List, Dict
-
 from edi.jsonforms.viewlets.common import get_available_forks
+from plone.app.layout.viewlets import ViewletBase
+from typing import Dict
+from typing import List
+from urllib.parse import quote_plus
+
+import json
 
 
 class ForksViewlet(ViewletBase):
@@ -43,13 +43,11 @@ class ForksViewlet(ViewletBase):
                     value = forks[fork][path][attribute]
                     table_data.append((path, attribute, value))
 
-            fork_links.append(
-                {
-                    "url": f"{self.context.absolute_url()}?fork={quote_plus(fork)}",
-                    "title": fork,
-                    "data": table_data,
-                }
-            )
+            fork_links.append({
+                "url": f"{self.context.absolute_url()}?fork={quote_plus(fork)}",
+                "title": fork,
+                "data": table_data,
+            })
         return fork_links
 
     def get_available_forks_string(self) -> str:

@@ -11,72 +11,66 @@ from zope.component import queryUtility
 import unittest
 
 
-
-
 class OptionIntegrationTest(unittest.TestCase):
-
     layer = EDI_JSONFORMS_INTEGRATION_TESTING
 
     def setUp(self):
         """Custom shared utility setup for tests."""
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
         portal_types = self.portal.portal_types
         parent_id = portal_types.constructContent(
-            'SelectionField',
+            "SelectionField",
             self.portal,
-            'parent_container',
-            title='Parent container',
+            "parent_container",
+            title="Parent container",
         )
         self.parent = self.portal[parent_id]
 
     def test_ct_option_schema(self):
-        fti = queryUtility(IDexterityFTI, name='Option')
+        fti = queryUtility(IDexterityFTI, name="Option")
         schema = fti.lookupSchema()
         self.assertEqual(IOption, schema)
 
     def test_ct_option_fti(self):
-        fti = queryUtility(IDexterityFTI, name='Option')
+        fti = queryUtility(IDexterityFTI, name="Option")
         self.assertTrue(fti)
 
     def test_ct_option_factory(self):
-        fti = queryUtility(IDexterityFTI, name='Option')
+        fti = queryUtility(IDexterityFTI, name="Option")
         factory = fti.factory
         obj = createObject(factory)
 
         self.assertTrue(
             IOption.providedBy(obj),
-            u'IOption not provided by {0}!'.format(
+            "IOption not provided by {0}!".format(
                 obj,
             ),
         )
 
     def test_ct_option_adding(self):
-        setRoles(self.portal, TEST_USER_ID, ['Contributor'])
+        setRoles(self.portal, TEST_USER_ID, ["Contributor"])
         obj = api.content.create(
             container=self.parent,
-            type='Option',
-            id='option',
+            type="Option",
+            id="option",
         )
 
         self.assertTrue(
             IOption.providedBy(obj),
-            u'IOption not provided by {0}!'.format(
+            "IOption not provided by {0}!".format(
                 obj.id,
             ),
         )
 
         parent = obj.__parent__
-        self.assertIn('option', parent.objectIds())
+        self.assertIn("option", parent.objectIds())
 
         # check that deleting the object works too
         api.content.delete(obj=obj)
-        self.assertNotIn('option', parent.objectIds())
+        self.assertNotIn("option", parent.objectIds())
 
     def test_ct_option_globally_not_addable(self):
-        setRoles(self.portal, TEST_USER_ID, ['Contributor'])
-        fti = queryUtility(IDexterityFTI, name='Option')
-        self.assertFalse(
-            fti.global_allow,
-            u'{0} is globally addable!'.format(fti.id)
-        )
+        setRoles(self.portal, TEST_USER_ID, ["Contributor"])
+        fti = queryUtility(IDexterityFTI, name="Option")
+        self.assertFalse(fti.global_allow, "{0} is globally addable!".format(fti.id))

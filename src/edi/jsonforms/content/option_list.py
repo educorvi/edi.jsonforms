@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-import json
-import logging
+from edi.jsonforms import _
+from edi.jsonforms.content.common import IAdditionalInformation
 from plone.dexterity.content import Item
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
-import requests
 from zope import schema
-
 from zope.interface import implementer
-from edi.jsonforms import _
-from edi.jsonforms.content.common import IAdditionalInformation
+
+import json
+import logging
+import requests
 import time
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

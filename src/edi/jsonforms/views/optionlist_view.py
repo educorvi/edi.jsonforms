@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
-import json
-import logging
-
-from AccessControl import getSecurityManager, Unauthorized
+from AccessControl import getSecurityManager
+from AccessControl import Unauthorized
+from edi.jsonforms import _
+from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 from plone import api
-from plone.protect import CheckAuthenticator, createToken
+from plone.protect import CheckAuthenticator
+from plone.protect import createToken
 from Products.CMFCore.permissions import ModifyPortalContent
 from Products.Five.browser import BrowserView
 from zope.interface import implementer
 from zope.interface import Interface
 
-from edi.jsonforms import _
-from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+import json
+import logging
 
 
 logger = logging.getLogger("edi.jsonforms")

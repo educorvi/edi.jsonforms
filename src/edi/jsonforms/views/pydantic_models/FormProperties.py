@@ -1,5 +1,8 @@
-from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 
 class FormProperties(BaseModel):

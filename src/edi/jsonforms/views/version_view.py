@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-import json
+from plone import api
 from Products.Five.browser import BrowserView
 from zope.interface import implementer
 from zope.interface import Interface
-from plone import api
+
+import json
 
 
 class IVersionView(Interface):

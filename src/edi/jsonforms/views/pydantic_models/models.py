@@ -1,8 +1,9 @@
-import logging
-
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
+
+import logging
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,21 +1,24 @@
-import copy
-import itertools
-import logging
-from plone.base.utils import safe_hasattr
-from typing import Any, Dict, List
-from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.content.common import IFormElement
-from edi.jsonforms.views.common import (
-    create_id,
-    get_path,
-    string_type_fields,
-    single_answer_types,
-)
+from edi.jsonforms.content.selection_field import ISelectionField
+from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import get_option_name
+from edi.jsonforms.views.common import get_path
+from edi.jsonforms.views.common import single_answer_types
+from edi.jsonforms.views.common import string_type_fields
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
-from edi.jsonforms.views.common import get_option_name
+from plone.base.utils import safe_hasattr
+from typing import Any
+from typing import Dict
+from typing import List
+
+import copy
+import itertools
+import logging
+
+
 # from plone.base.utils import safe_hasattr
 
 logger = logging.getLogger(__name__)
@@ -325,10 +328,8 @@ def get_dependent_options(
                 then_enum = {"items": {"enum": ordered_then_enum}}
             else:
                 then_enum = {"enum": ordered_then_enum}
-            allof_list.append(
-                {
-                    "if": if_dict,
-                    "then": {"properties": {parent_object_id: then_enum}},
-                }
-            )
+            allof_list.append({
+                "if": if_dict,
+                "then": {"properties": {parent_object_id: then_enum}},
+            })
     return allof_list

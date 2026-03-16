@@ -1,13 +1,13 @@
-import re
-from urllib.parse import quote_plus
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.option import IOption
+from urllib.parse import quote_plus
+
+import re
+
 
 try:
-    from edi.jsonforms_override.behaviors.interfaces import (
-        get_override_fork,
-        get_override_value,
-    )
+    from edi.jsonforms_override.behaviors.interfaces import get_override_fork
+    from edi.jsonforms_override.behaviors.interfaces import get_override_value
 except ModuleNotFoundError:
     # if the import fails, define dummy functions that return empty strings, so that the code doesn't break and the override fields just don't work
     def get_override_fork(attribute: str):

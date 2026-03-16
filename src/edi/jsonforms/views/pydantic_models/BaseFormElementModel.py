@@ -1,20 +1,21 @@
+from edi.jsonforms.content.common import IFormElement
+from edi.jsonforms.content.form import IForm
+from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import get_description
+from edi.jsonforms.views.common import get_title
+from plone.base.utils import safe_hasattr
+from pydantic import BaseModel
+from pydantic import Field
+from typing import List
+from typing import Optional
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZPublisher.HTTPRequest import WSGIRequest
+
 import abc
 import copy
 import logging
 
-from plone.base.utils import safe_hasattr
-from typing import Optional, List
-from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
-from edi.jsonforms.content.common import IFormElement
-from edi.jsonforms.content.form import IForm
-
-from edi.jsonforms.views.common import (
-    get_title,
-    get_description,
-    create_id,
-)
-from pydantic import BaseModel, Field
 # from edi.jsonforms.views.pydantic_models.schema_generator import (
 #     JsonSchemaGenerator,
 # )

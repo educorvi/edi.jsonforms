@@ -1,7 +1,9 @@
-import logging
-from pydantic import BaseModel
-from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
+from pydantic import BaseModel
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZPublisher.HTTPRequest import WSGIRequest
+
+import logging
 
 
 logger = logging.getLogger(__name__)

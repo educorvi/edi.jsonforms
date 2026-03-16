@@ -3,8 +3,8 @@ from plone import api
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.services import Service
 from zope.component import adapter
-from zope.interface import Interface
 from zope.interface import implementer
+from zope.interface import Interface
 
 import json
 
@@ -12,15 +12,14 @@ import json
 @implementer(IExpandableElement)
 @adapter(Interface, Interface)
 class Schemata(object):
-
     def __init__(self, context, request):
         self.context = context.aq_explicit
         self.request = request
 
     def __call__(self, expand=False):
         result = {
-            'schemata': {
-                '@id': '{}/@schemata'.format(
+            "schemata": {
+                "@id": "{}/@schemata".format(
                     self.context.absolute_url(),
                 ),
             },
@@ -37,10 +36,10 @@ class Schemata(object):
             print(e)
             subjects = []
         query = {}
-        query['portal_type'] = "Document"
-        query['Subject'] = {
-            'query': subjects,
-            'operator': 'or',
+        query["portal_type"] = "Document"
+        query["Subject"] = {
+            "query": subjects,
+            "operator": "or",
         }
         brains = api.content.find(**query)
         items = []
@@ -48,35 +47,33 @@ class Schemata(object):
             # obj = brain.getObject()
             # parent = obj.aq_inner.aq_parent
             items.append({
-                'title': brain.Title,
-                'description': brain.Description,
-                '@id': brain.getURL(),
+                "title": brain.Title,
+                "description": brain.Description,
+                "@id": brain.getURL(),
             })
-        result['schemata']['items'] = items
+        result["schemata"]["items"] = items
         return result
 
 
 class SchemataGet(Service):
-
     def reply(self):
         service_factory = Schemata(self.context, self.request)
-        return service_factory(expand=True)['schemata']
+        return service_factory(expand=True)["schemata"]
+
 
 class JsonSchemaGet(Service):
-
     def reply(self):
         context = self.context
-        view = context.restrictedTraverse('json-schema-view')
+        view = context.restrictedTraverse("json-schema-view")
         view.set_is_extended_schema(True)
-        return view.get_schema()              # kommt sortiert an, einmal entpacken
+        return view.get_schema()  # kommt sortiert an, einmal entpacken
         # return view()                         # kommt unsortiert an, aber muss zweimal entpacken
         # return json.dumps(view.get_schema(), ensure_ascii=False)    # kommt unsortiert an, aber muss zweimal entpacken
         # return json.loads(view())               # kommt sortiert an, einmal entpacken
 
-class UiSchemaGet(Service):
 
+class UiSchemaGet(Service):
     def reply(self):
         context = self.context
-        view = context.restrictedTraverse('ui-schema-view')
+        view = context.restrictedTraverse("ui-schema-view")
         return json.loads(view())
-    

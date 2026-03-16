@@ -1,32 +1,36 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:plone="http://namespaces.plone.org/plone"
-  i18n_domain="edi.jsonforms">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="edi.jsonforms"
+    >
 
-  <adapter factory=".get.Schemata" name="schemata"/>
-
-  <plone:service
-    method="GET"
-    for="zope.interface.Interface"
-    factory=".get.SchemataGet"
-    name="@schemata"
-    permission="zope2.View"
-    />
-  
-  <plone:service
-    method="GET"
-    for="edi.jsonforms.content.form.IForm"
-    factory=".get.JsonSchemaGet"
-    name="@json-schema"
-    permission="zope2.View"
-    />
+  <adapter
+      factory=".get.Schemata"
+      name="schemata"
+      />
 
   <plone:service
-    method="GET"
-    for="edi.jsonforms.content.form.IForm"
-    factory=".get.UiSchemaGet"
-    name="@ui-schema"
-    permission="zope2.View"
-    />
+      method="GET"
+      factory=".get.SchemataGet"
+      for="zope.interface.Interface"
+      permission="zope2.View"
+      name="@schemata"
+      />
+
+  <plone:service
+      method="GET"
+      factory=".get.JsonSchemaGet"
+      for="edi.jsonforms.content.form.IForm"
+      permission="zope2.View"
+      name="@json-schema"
+      />
+
+  <plone:service
+      method="GET"
+      factory=".get.UiSchemaGet"
+      for="edi.jsonforms.content.form.IForm"
+      permission="zope2.View"
+      name="@ui-schema"
+      />
 
 </configure>

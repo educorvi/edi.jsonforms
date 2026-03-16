@@ -11,7 +11,6 @@ import edi.jsonforms
 
 
 class EdiJsonformsLayer(PloneSandboxLayer):
-
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
@@ -19,13 +18,15 @@ class EdiJsonformsLayer(PloneSandboxLayer):
         # The z3c.autoinclude feature is disabled in the Plone fixture base
         # layer.
         import plone.app.dexterity
+
         self.loadZCML(package=plone.app.dexterity)
         import plone.restapi
+
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=edi.jsonforms)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'edi.jsonforms:default')
+        applyProfile(portal, "edi.jsonforms:default")
 
 
 EDI_JSONFORMS_FIXTURE = EdiJsonformsLayer()
@@ -33,13 +34,13 @@ EDI_JSONFORMS_FIXTURE = EdiJsonformsLayer()
 
 EDI_JSONFORMS_INTEGRATION_TESTING = IntegrationTesting(
     bases=(EDI_JSONFORMS_FIXTURE,),
-    name='EdiJsonformsLayer:IntegrationTesting',
+    name="EdiJsonformsLayer:IntegrationTesting",
 )
 
 
 EDI_JSONFORMS_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(EDI_JSONFORMS_FIXTURE,),
-    name='EdiJsonformsLayer:FunctionalTesting',
+    name="EdiJsonformsLayer:FunctionalTesting",
 )
 
 
@@ -49,5 +50,5 @@ EDI_JSONFORMS_ACCEPTANCE_TESTING = FunctionalTesting(
         REMOTE_LIBRARY_BUNDLE_FIXTURE,
         z2.ZSERVER_FIXTURE,
     ),
-    name='EdiJsonformsLayer:AcceptanceTesting',
+    name="EdiJsonformsLayer:AcceptanceTesting",
 )

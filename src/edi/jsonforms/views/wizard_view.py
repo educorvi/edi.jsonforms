@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
 # from edi.jsonforms import _
-import copy
-import json
-from Products.Five.browser import BrowserView
+from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-from edi.jsonforms.views.pydantic_models.ObjectModel import (
-    ObjectModel,
-)
+from edi.jsonforms.views.pydantic_models.ObjectModel import ObjectModel
+from edi.jsonforms.views.ui_schema_view import UiSchemaView
+from Products.Five.browser import BrowserView
 from zope.interface import implementer
 from zope.interface import Interface
 
-from edi.jsonforms.views.json_schema_view import JsonSchemaView
-from edi.jsonforms.views.ui_schema_view import UiSchemaView
-from edi.jsonforms.views.common import create_id
+import copy
+import json
 
 
 class IWizardView(Interface):

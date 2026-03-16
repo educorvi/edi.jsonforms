@@ -1,10 +1,9 @@
 from edi.jsonforms.content.form import IForm
-from zope.lifecycleevent import IObjectModifiedEvent
-from plone.app.versioningbehavior.utils import get_change_note
-from plone import api as ploneapi
-from zope.globalrequest import getRequest
-
 from edi.jsonforms.viewlets.common import get_available_forks
+from plone import api as ploneapi
+from plone.app.versioningbehavior.utils import get_change_note
+from zope.globalrequest import getRequest
+from zope.lifecycleevent import IObjectModifiedEvent
 
 
 def _save_schemata(context, json_schema_view, ui_schema_view):

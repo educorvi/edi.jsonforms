@@ -1,12 +1,14 @@
-import logging
-from typing import Optional
-from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
-
 from edi.jsonforms.content.field import IField
 from edi.jsonforms.views.common import string_type_fields
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
+from typing import Optional
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZPublisher.HTTPRequest import WSGIRequest
+
+import logging
+
 
 logger = logging.getLogger(__name__)
 

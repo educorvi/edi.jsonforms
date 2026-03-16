@@ -1,29 +1,29 @@
-import logging
-from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
-
-from edi.jsonforms.views.pydantic_models.dependency_handler import (
-    add_dependent_options,
-    check_for_dependencies,
-)
-from plone.base.utils import safe_hasattr
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
-
-from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.content.option import IOption
-from edi.jsonforms.content.option_list import (
-    OptionList,
-    get_keys_and_values_for_options_list,
-)
-from edi.jsonforms.views.common import (
-    create_id,
-    check_show_condition_in_request,
-    single_answer_types,
-)
+from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
+from edi.jsonforms.content.option_list import OptionList
+from edi.jsonforms.content.selection_field import ISelectionField
+from edi.jsonforms.views.common import check_show_condition_in_request
+from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import single_answer_types
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
+from edi.jsonforms.views.pydantic_models.dependency_handler import add_dependent_options
+from edi.jsonforms.views.pydantic_models.dependency_handler import (
+    check_for_dependencies,
+)
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+from plone.base.utils import safe_hasattr
+from pydantic import BaseModel
+from pydantic import Field
+from typing import Dict
+from typing import List
+from typing import Optional
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZPublisher.HTTPRequest import WSGIRequest
+
+import logging
+
 
 logger = logging.getLogger(__name__)
 

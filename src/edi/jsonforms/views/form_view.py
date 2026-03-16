@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from edi.jsonforms import _
-from Products.Five.browser import BrowserView
-from typing import Callable
 from plone import api
 from plone.app.layout.viewlets.content import ContentHistoryView
 from plone.protect.interfaces import IDisableCSRFProtection
-from zope.interface import Interface, implementer, alsoProvides
+from Products.Five.browser import BrowserView
+from typing import Callable
+from zope.interface import alsoProvides
+from zope.interface import implementer
+from zope.interface import Interface
 
 
 class IFormToolsView(Interface):

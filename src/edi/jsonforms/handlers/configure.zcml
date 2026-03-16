@@ -1,19 +1,20 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:browser="http://namespaces.zope.org/browser"
-  xmlns:plone="http://namespaces.plone.org/plone"
-  xmlns:i18n="http://namespaces.zope.org/i18n"
-  i18n_domain="edi.jsonforms">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="edi.jsonforms"
+    >
 
   <subscriber
-    for="edi.jsonforms.content.form.IForm
+      for="edi.jsonforms.content.form.IForm
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
-    handler=".schema_handler.schema_handler"
-  />
+      handler=".schema_handler.schema_handler"
+      />
 
   <subscriber
-    for="edi.jsonforms.content.wizard.IWizard
+      for="edi.jsonforms.content.wizard.IWizard
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
-    handler=".schema_handler.wizard_schema_handler"
-  />
+      handler=".schema_handler.wizard_schema_handler"
+      />
 </configure>

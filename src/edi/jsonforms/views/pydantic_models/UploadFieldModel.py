@@ -1,13 +1,15 @@
-import logging
-from typing import Optional, List
-from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
-from pydantic import BaseModel
-
 from edi.jsonforms.content.upload_field import IUploadField
-
 from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
+from pydantic import BaseModel
+from typing import List
+from typing import Optional
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZPublisher.HTTPRequest import WSGIRequest
+
+import logging
+
 
 logger = logging.getLogger(__name__)
 

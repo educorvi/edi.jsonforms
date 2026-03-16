@@ -1,19 +1,22 @@
+from edi.jsonforms import _
 from plone.app.textfield import RichText
 from plone.app.z3cform.widget import RelatedItemsFieldWidget
+from plone.autoform import directives
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
-from plone.autoform import directives
+from z3c.form.browser.radio import RadioFieldWidget
+from z3c.relationfield.schema import RelationChoice
+from z3c.relationfield.schema import RelationList
 from zope import schema
 from zope.globalrequest import getRequest
-from zope.interface import Invalid, invariant
+from zope.interface import Invalid
+from zope.interface import invariant
+from zope.schema.vocabulary import SimpleTerm
 
 # from zope.interface import provider
 # from zope.schema.interfaces import IContextSourceBinder
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-from z3c.relationfield.schema import RelationChoice, RelationList
-from z3c.form.browser.radio import RadioFieldWidget
+from zope.schema.vocabulary import SimpleVocabulary
 
-from edi.jsonforms import _
 
 required_categories = [
     SimpleTerm("optional", "optional", _("Optional")),

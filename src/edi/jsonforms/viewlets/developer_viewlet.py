@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List
-from urllib.parse import quote_plus
-from plone.app.layout.viewlets import ViewletBase
-from plone.app.layout.viewlets.content import ContentHistoryView
 from edi.jsonforms.views.json_schema_view import JsonSchemaView
 from edi.jsonforms.views.ui_schema_view import UiSchemaView
-from edi.jsonforms.views.wizard_view import WizardJsonSchemaView, WizardUiSchemaView
+from edi.jsonforms.views.wizard_view import WizardJsonSchemaView
+from edi.jsonforms.views.wizard_view import WizardUiSchemaView
 from plone import api
+from plone.app.layout.viewlets import ViewletBase
+from plone.app.layout.viewlets.content import ContentHistoryView
+from typing import Dict
+from typing import List
+from urllib.parse import quote_plus
 
 
 class DeveloperViewlet(ViewletBase):
@@ -95,22 +97,18 @@ class DeveloperViewlet(ViewletBase):
                         self.context.absolute_url()
                         + f"/@@version-view?version={version}&schema=ui&fork={quote_plus(fork)}"
                     )
-                    fork_urls.append(
-                        {
-                            "json_schema_url": fork_json_schema_url,
-                            "ui_schema_url": fork_ui_schema_url,
-                            "name": fork,
-                        }
-                    )
+                    fork_urls.append({
+                        "json_schema_url": fork_json_schema_url,
+                        "ui_schema_url": fork_ui_schema_url,
+                        "name": fork,
+                    })
 
-                historylist.append(
-                    {
-                        "version_id": version,
-                        "comment": release.get("comments"),
-                        "json_schema_url": json_schema_url,
-                        "ui_schema_url": ui_schema_url,
-                        "forks_schema_url": forks_schema_url,
-                        "forks": fork_urls,
-                    }
-                )
+                historylist.append({
+                    "version_id": version,
+                    "comment": release.get("comments"),
+                    "json_schema_url": json_schema_url,
+                    "ui_schema_url": ui_schema_url,
+                    "forks_schema_url": forks_schema_url,
+                    "forks": fork_urls,
+                })
         return historylist
