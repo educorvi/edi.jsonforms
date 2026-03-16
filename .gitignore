@@ -1,42 +1,47 @@
-__pycache__
-.coverage
-.coverage.*
-*.idea/*
+# python related
 *.egg-info
-*.log
-*.mo
-*.py?
-*.swp
-.*project
-# dirs
-/.settings/
-bin/
-buildout-cache/
-develop-eggs/
-eggs/
-htmlcov/
-include/
-lib/
-local/
+*.pyc
+*.pyo
+
+# tools related
+__pycache__/
+.coverage
+.mypy_cache
+.pytest_cache
+.ruff_cache
+/build/
+coverage.xml
+dist/
+docs/_build
 node_modules/
-parts/
-dist/*
-test.plone_addon/
-var/
-.vscode/
-.tox/
-reports/
-venv/
-*/static/js/old/
-# files
+
+# venv / buildout related
+.eggs/
 .installed.cfg
 .mr.developer.cfg
-coverage.xml
+.venv/
+bin/
+develop-eggs/
+eggs/
+etc/
+include/
+lib/
 lib64
-local.cfg
-log.html
-output.xml
-pip-selfcheck.json
+parts/
 pyvenv.cfg
-report.html
-# excludes
+var/
+
+# mxdev
+.installed.txt
+.lock
+/.mxdev_cache/
+/.make-sentinels/
+/*-mxdev.txt
+/instance/
+/reports/
+/sources/
+/venv/
+constraints*.txt
+requirements*.txt
+
+jsonforms-fresh/

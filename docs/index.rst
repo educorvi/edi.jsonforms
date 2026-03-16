@@ -1,5 +1,0 @@
-=============
-edi.jsonforms
-=============
-
-User documentation
