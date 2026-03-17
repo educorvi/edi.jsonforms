@@ -3,10 +3,10 @@
 from contextlib import suppress
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependent
+from plone import api
 from plone.dexterity.content import Item
 from z3c.relationfield.schema import RelationChoice
 from z3c.relationfield.schema import RelationList
-from plone import api
 
 # from plone.namedfile import field as namedfile
 # from plone.supermodel import model

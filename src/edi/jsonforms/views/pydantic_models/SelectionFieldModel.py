@@ -13,6 +13,7 @@ from edi.jsonforms.views.pydantic_models.dependency_handler import (
     check_for_dependencies,
 )
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
+from plone import api
 from plone.base.utils import safe_hasattr
 from pydantic import BaseModel
 from pydantic import Field
@@ -49,7 +50,9 @@ class OptionModel(BaseModel):
             parent=option.aq_parent,
         )
         if safe_hasattr(option, "dependencies"):
-            option_model.dependencies = option.dependencies
+            option_model.dependencies = api.relation.get(
+                source=option, relationship="dependencies"
+            )
         return option_model
 
     @classmethod
@@ -70,13 +73,10 @@ class OptionModel(BaseModel):
             return self.option_title
 
     def check_dependencies(self, is_single_view: bool) -> bool:
-        return check_for_dependencies(self, is_single_view)
-        # if is_single_view:  # if form-element-view, ignore all dependencies
-        #     return False
-        # if self.dependencies:
-        #     return True
-        # else:
-        #     return False
+        # return check_for_dependencies(self, is_single_view)
+        if is_single_view:  # if form-element-view, ignore all dependencies
+            return False
+        return bool(self.dependencies)
 
 
 class OptionListModel(BaseModel):
