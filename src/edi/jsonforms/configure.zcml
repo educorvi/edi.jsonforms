@@ -14,7 +14,6 @@
     Better import explicit packages or configurations ;)
   -->
   <!--<includeDependencies package="." />-->
-  <include package="plone.base" />
 
   <!-- has to be loaded before permissions are used, so keep above views aso. -->
   <include file="permissions.zcml" />

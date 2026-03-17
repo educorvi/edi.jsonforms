@@ -8,6 +8,12 @@
 
   -*- extra stuff goes here -*-
 
+  <include package="plone.app.contentmenu" />
+  <include
+      package="Products.CMFCore"
+      file="permissions.zcml"
+      />
+
   <browser:page
       name="version-view"
       for="edi.jsonforms.content.form.IForm"
