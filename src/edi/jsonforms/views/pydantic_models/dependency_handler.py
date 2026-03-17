@@ -9,6 +9,7 @@ from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
+from plone import api
 from plone.base.utils import safe_hasattr
 from typing import Any
 
@@ -29,7 +30,11 @@ def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
     """
     if is_single_view:  # if form-element-view, ignore all dependencies
         return False
-    return safe_hasattr(model, "dependencies") and model.dependencies
+    return (
+        api.relation.get(source=model, relationship="dependencies")
+        if safe_hasattr(model, "dependencies")
+        else []
+    )
 
 
 def get_dependencies_of_closest_ancestor_with_dependencies(
@@ -263,7 +268,9 @@ def get_dependent_options(  # noqa: C901
         if option.portal_type == "Option":
             option = option.getObject()
             if check_for_dependencies(option, is_single_view):
-                dependencies = option.dependencies
+                dependencies = api.relation.get(
+                    source=option, relationship="dependencies"
+                )
                 for dep in dependencies:
                     try:
                         add_to_dict(option, dep.to_object, dependency_dict)

@@ -256,7 +256,8 @@ class UiSchemaView(BrowserView):
 
     def get_schema_for_reference(self, reference, scope):
         try:
-            obj = reference.reference.to_object
+            target = api.relation.get(source=reference, relationship="reference")
+            obj = target[0].to_object if target else None
             if obj:
                 reference_schema = self.get_base_schema(
                     reference, scope, has_user_helptext=False
@@ -425,6 +426,7 @@ class UiSchemaView(BrowserView):
                     elif handler.portal_type == "File Storage Handler":
                         request_url = self.context.absolute_url() + "/@store-as-file"
                         try:
+                            # ignore access permissions of target folder
                             folder_path = api.content.get_path(
                                 obj=handler.target_folder.to_object
                             )
@@ -660,7 +662,7 @@ class UiSchemaView(BrowserView):
         if self.is_single_view:
             return child_schema
         # add showOn dependencies
-        if child_object.dependencies:
+        if api.relation.get(source=child_object, relationship="dependencies"):
             showOn = create_showon_properties(child_object, self.lookup_scopes)
             if showOn != {}:
                 child_schema["showOn"] = showOn

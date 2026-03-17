@@ -3,6 +3,7 @@ from edi.jsonforms.content.form import IForm
 from edi.jsonforms.views.common import create_id
 from edi.jsonforms.views.common import get_description
 from edi.jsonforms.views.common import get_title
+from plone import api
 from plone.base.utils import safe_hasattr
 from pydantic import BaseModel
 from pydantic import Field
@@ -31,7 +32,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     type: str | None = None
     parent: Optional[
         "BaseFormElementModel"
-    ]  # actually it can only be an ObjectModel or a model that extends this (Form)
+    ]  # actually it can only be an ObjectModel or a model that extends it (Form)
     required_choice: bool | None = False
     dependencies: list[IFormElement] | None = Field(default_factory=list)
 
@@ -57,7 +58,11 @@ class BaseFormElementModel(BaseModel, abc.ABC):
             and form_element.required_choice == "required"
         )
         dependencies = (
-            copy.copy(form_element.dependencies)
+            # get a mutable copy (changes to this list do not affect the form
+            #     element's dependencies)
+            copy.copy(
+                api.relation.get(source=form_element, relationship="dependencies")
+            )
             if safe_hasattr(form_element, "dependencies")
             else []
         )
@@ -71,27 +76,16 @@ class BaseFormElementModel(BaseModel, abc.ABC):
             required_choice=required_choice,
             dependencies=dependencies,
         )
-        # self.element_id = create_id(form_element)
-        # self.form_element = form_element
-        # self.title = get_title(form_element, request)
-        # self.description = get_description(form_element, request)
-        # self.comment = (
-        #     form_element.intern_information
-        #     if safe_hasattr(form_element, "intern_information")
-        #     else None
-        # )
-        # self.parent = parent_model
-        # self.required = (
-        #     form_element.required_choice
-        #     if safe_hasattr(form_element, "required_choice")
-        #     else False
-        # )
-        # if safe_hasattr(form_element, "dependencies"):
-        #     self.dependencies = copy.copy(form_element.dependencies)
 
     @property
     def is_required(self) -> bool:
         return self.required_choice
+
+    def set_required_choice(self, required_choice: str):
+        """
+        required_choice can be "optional" or "required"
+        """
+        self.required_choice = required_choice == "required"
 
     def get_id(self) -> str:
         return self.element_id

@@ -1,4 +1,5 @@
 from edi.jsonforms.views.common import create_id
+from plone import api
 
 import logging
 import re
@@ -266,8 +267,9 @@ def get_rule(scope, obj):
     return rule
 
 
-def create_showon_properties(child, lookup_scopes):
-    dependencies = child.dependencies
+def create_showon_properties(child, lookup_scopes):  # noqa: C901
+    dependencies = api.relation.get(source=child, relationship="dependencies")
+    showOn = {}
     if len(dependencies) == 1:
         try:
             dep = dependencies[0].to_object
@@ -281,7 +283,7 @@ def create_showon_properties(child, lookup_scopes):
         except Exception as e:
             logging.warning(f"Error occurred while creating showOn properties: {e}")
             return {}
-    else:
+    elif len(dependencies) > 1:
         conn = "or"
         if child.connection_type:
             conn = "and"

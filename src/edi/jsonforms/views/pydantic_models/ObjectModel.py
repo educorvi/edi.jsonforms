@@ -6,7 +6,6 @@ from edi.jsonforms.content.form import Form
 from edi.jsonforms.content.form import IForm
 from edi.jsonforms.content.reference import IReference
 from edi.jsonforms.views.common import check_show_condition_in_request
-from zope.container.interfaces import IContainer
 
 # from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel
 # from edi.jsonforms.views.pydantic_models.ArrayModel import ArrayModel
@@ -24,8 +23,10 @@ from edi.jsonforms.views.pydantic_models.FieldModel import FieldModel
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from edi.jsonforms.views.pydantic_models.SelectionFieldModel import SelectionFieldModel
 from edi.jsonforms.views.pydantic_models.UploadFieldModel import UploadFieldModel
+from plone import api
 from plone.base.utils import safe_hasattr
 from typing import Any
+from zope.container.interfaces import IContainer
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
 
@@ -350,7 +351,7 @@ class ArrayModel(BaseFormElementModel):
 
 class ReferenceModel(BaseFormElementModel):
     # targetType: str
-    target: BaseFormElementModel = None
+    target: BaseFormElementModel | None = None
 
     def __init__(
         self,
@@ -360,14 +361,15 @@ class ReferenceModel(BaseFormElementModel):
     ):
         super().__init__(form_element, parent_model, generatorArguments.request)
 
-        reference_object = form_element.reference.to_object
-        if reference_object:
+        # api.relation.get always returns a list
+        target = api.relation.get(source=form_element, relationship="reference")
+        if target:
+            reference_object = target[0].to_object
+
             # set required of reference to the required_choice of the referenced object
-            self.required_choice = (
-                reference_object.required_choice
-                if safe_hasattr(reference_object, "required_choice")
-                else False
-            )
+            self.set_required_choice(reference_object.required_choice) if safe_hasattr(
+                reference_object, "required_choice"
+            ) else False
 
             model = create_model_recursively(
                 reference_object, parent_model, generatorArguments, False
@@ -375,7 +377,7 @@ class ReferenceModel(BaseFormElementModel):
 
             # set id of referenced object to the id of the reference, so it can be
             #     found in the properties of the parent model
-            model.set_id(self.id)
+            model.set_id(self.get_id())
 
             # give referenced object model the same dependencies as the reference and
             #     afterwards call set_children, so the children also have those

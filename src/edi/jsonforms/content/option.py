@@ -6,6 +6,7 @@ from edi.jsonforms.content.common import IDependent
 from plone.dexterity.content import Item
 from z3c.relationfield.schema import RelationChoice
 from z3c.relationfield.schema import RelationList
+from plone import api
 
 # from plone.namedfile import field as namedfile
 # from plone.supermodel import model
@@ -73,8 +74,8 @@ class IOption(IDependent):
                 return None
             return current
 
-        if data.dependencies:
-            dependencies = data.dependencies
+        dependencies = api.relation.get(source=data, relationship="dependencies")
+        if dependencies:
             with suppress(Exception):
                 # editing process, object already exists and has a context
                 context = data.__context__

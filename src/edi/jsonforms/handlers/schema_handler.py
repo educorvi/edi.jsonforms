@@ -1,5 +1,5 @@
 from edi.jsonforms.viewlets.common import get_available_forks
-from plone import api as ploneapi
+from plone import api
 from plone.app.versioningbehavior.utils import get_change_note
 from zope.globalrequest import getRequest
 
@@ -41,13 +41,13 @@ def schema_handler(context, event):
     """
     request = getRequest()
     try:
-        schema_view = ploneapi.content.get_view(
+        schema_view = api.content.get_view(
             name="json-schema-view", context=context, request=request
         )
-        ui_schema_view = ploneapi.content.get_view(
+        ui_schema_view = api.content.get_view(
             name="ui-schema-view", context=context, request=request
         )
-    except ploneapi.exc.InvalidParameterError:
+    except api.exc.InvalidParameterError:
         # Views are not available yet (e.g., during site creation before browser
         #     layer is active)
         return
@@ -64,13 +64,13 @@ def wizard_schema_handler(context, event):
     """
     request = getRequest()
     try:
-        wizard_json_schema_view = ploneapi.content.get_view(
+        wizard_json_schema_view = api.content.get_view(
             name="wizard-json-schema", context=context, request=request
         )
-        wizard_ui_schema_view = ploneapi.content.get_view(
+        wizard_ui_schema_view = api.content.get_view(
             name="wizard-ui-schema", context=context, request=request
         )
-    except ploneapi.exc.InvalidParameterError:
+    except api.exc.InvalidParameterError:
         # Views not available yet (e.g., during site creation before browser
         #     layer is active)
         return
