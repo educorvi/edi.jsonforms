@@ -1,6 +1,6 @@
 from edi.jsonforms import _
 from plone.app.textfield import RichText
-from plone.app.z3cform.widget import RelatedItemsFieldWidget
+from plone.app.z3cform.widgets.contentbrowser import ContentBrowserFieldWidget
 from plone.autoform import directives
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
@@ -220,7 +220,7 @@ class IDependent(IAdditionalInformation):
     # TODO change to new widget when updating to plone >= 6.1
     directives.widget(
         "dependencies",
-        RelatedItemsFieldWidget,
+        ContentBrowserFieldWidget,
         vocabulary="plone.app.vocabularies.Catalog",
         pattern_options={
             # "basePath": get_base_path,
