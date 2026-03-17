@@ -32,6 +32,7 @@ class IOption(IDependent):
         ),
         readonly=True,
         default=False,
+        required=False,
     )
 
     dependencies = RelationList(
