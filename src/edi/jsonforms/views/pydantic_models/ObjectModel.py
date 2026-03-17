@@ -6,6 +6,7 @@ from edi.jsonforms.content.form import Form
 from edi.jsonforms.content.form import IForm
 from edi.jsonforms.content.reference import IReference
 from edi.jsonforms.views.common import check_show_condition_in_request
+from zope.container.interfaces import IContainer
 
 # from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel
 # from edi.jsonforms.views.pydantic_models.ArrayModel import ArrayModel
@@ -146,8 +147,8 @@ class ObjectModel(BaseFormElementModel):
         returns a dict of the created children models (child_id: child_model)
         """
         models = {}
-        if safe_hasattr(self.form_element, "getFolderContents"):
-            for child in self.form_element.getFolderContents():
+        if IContainer.providedBy(self.form_element):
+            for child in self.form_element.restrictedTraverse("@@contentlisting")():
                 child = child.getObject()
                 self.create_and_add_model(
                     child, generatorArguments

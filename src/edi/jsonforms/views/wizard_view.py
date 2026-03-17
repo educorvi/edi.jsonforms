@@ -83,7 +83,7 @@ class WizardUiSchemaView(UiSchemaView):
                 page_titles.append(form.title)
                 vertical_layout = copy.deepcopy(VERTICAL_LAYOUT)
                 form_id = create_id(form)
-                for child in form.getFolderContents():
+                for child in form.restrictedTraverse("@@contentlisting")():
                     self.add_child_to_schema(
                         child.getObject(),
                         vertical_layout,

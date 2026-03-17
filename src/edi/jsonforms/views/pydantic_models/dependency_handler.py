@@ -171,7 +171,7 @@ def _get_option_order_map(selectionfield):
     # TODO what happens to OptionLists?
     order_map = {}
     index = 0
-    for option in selectionfield.getFolderContents():
+    for option in selectionfield.restrictedTraverse("@@contentlisting")():
         if option.portal_type != "Option":
             continue
         option_obj = option.getObject()
@@ -254,7 +254,7 @@ def get_dependent_options(  # noqa: C901
             target_dict["SHOWALWAYS"].append(get_option_name(option))
 
     allof_list = []
-    options = selectionfield.getFolderContents()
+    options = selectionfield.restrictedTraverse("@@contentlisting")()
     parent_object_id = create_id(selectionfield)
     dependency_dict = {"SHOWALWAYS": []}
     parent_option_order = _get_option_order_map(selectionfield)

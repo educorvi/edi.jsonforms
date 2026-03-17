@@ -124,13 +124,14 @@ class SelectionFieldModel(BaseFormElementModel):
 
     def get_options(self, generatorArguments: GeneratorArguments) -> list[str]:
         """
-        gets options as strings of self.form_element.getFolderContents()
+        gets options as strings of
+            self.form_element.restrictedTraverse("@@contentlisting")()
         includes dependencies in the computation
 
         :param generatorArguments: can be i.e. is_single_view, to get all options
             regardless of conditions and dependencies
         """
-        options = self.form_element.getFolderContents()
+        options = self.form_element.restrictedTraverse("@@contentlisting")()
 
         options_list = []
         for o in options:

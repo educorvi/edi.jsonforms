@@ -48,7 +48,7 @@ class UiSchemaView(BrowserView):
         self.set_ui_base_schema()
 
         form = self.context
-        children = form.getFolderContents()
+        children = form.restrictedTraverse("@@contentlisting")()
         for child in children:
             self.add_child_to_schema(child.getObject(), self.uischema)
 
@@ -195,7 +195,7 @@ class UiSchemaView(BrowserView):
 
         if selectionfield.use_id_in_schema:
             selectionfield_schema["options"]["enumTitles"] = {}
-            for option in selectionfield.getFolderContents():
+            for option in selectionfield.restrictedTraverse("@@contentlisting")():
                 if option.portal_type == "Option":
                     selectionfield_schema["options"]["enumTitles"][
                         create_id(option)
@@ -209,7 +209,7 @@ class UiSchemaView(BrowserView):
                     )
 
         option_filters = {}
-        options = selectionfield.getFolderContents()
+        options = selectionfield.restrictedTraverse("@@contentlisting")()
         for option in options:
             o = option.getObject()
             if (
@@ -312,7 +312,7 @@ class UiSchemaView(BrowserView):
         return helptext_schema
 
     def get_schema_for_buttons(self, button_group):  # noqa: C901
-        buttons = button_group.getFolderContents()
+        buttons = button_group.restrictedTraverse("@@contentlisting")()
         if len(buttons) == 0:
             return {}
 
@@ -395,7 +395,7 @@ class UiSchemaView(BrowserView):
                         )
                         i = 1
                         query_params = {}
-                        endpoints = handler.getFolderContents()
+                        endpoints = handler.restrictedTraverse("@@contentlisting")()
                         for endpoint in endpoints:
                             endpoint = endpoint.getObject()
                             if endpoint.portal_type == "Endpoint":
@@ -577,7 +577,7 @@ class UiSchemaView(BrowserView):
                 container_base_scope += "/items/properties/"
             elif child_object.portal_type == "Complex":
                 container_base_scope += "/properties/"
-            for c in child_object.getFolderContents():
+            for c in child_object.restrictedTraverse("@@contentlisting")():
                 c_object = c.getObject()
                 if not check_show_condition_in_request(
                     self.request, c_object.show_condition, c_object.negate_condition
@@ -600,7 +600,7 @@ class UiSchemaView(BrowserView):
             base_scope += "/items"
         base_scope += "/properties/"
 
-        for child in parent_object.getFolderContents():
+        for child in parent_object.restrictedTraverse("@@contentlisting")():
             child_object = child.getObject()
             if not check_show_condition_in_request(
                 self.request, child_object.show_condition, child_object.negate_condition
@@ -737,7 +737,7 @@ class UiSchemaView(BrowserView):
         if recursive:
             group_schema["elements"] = []
 
-            children = group.getFolderContents()
+            children = group.restrictedTraverse("@@contentlisting")()
             for child in children:
                 child_object = child.getObject()
                 if not check_show_condition_in_request(

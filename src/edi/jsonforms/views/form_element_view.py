@@ -28,7 +28,7 @@ class FormElementView(FormView):
         """Check if a field is a selection field and if it has options."""
         context = self.context
         if context.portal_type == "SelectionField":
-            options = context.getFolderContents()
+            options = context.restrictedTraverse("@@contentlisting")()
             if len(options) == 0:
                 return True
         return False
@@ -83,8 +83,6 @@ class FormElementJsonSchema(JsonSchemaView):
         return json.dumps(jsonschema, ensure_ascii=False, indent=4)
 
     def json_schema(self):
-        # self.set_json_base_schema()
-
         obj = self.context
         option = None
         parent = obj.aq_parent
@@ -101,6 +99,8 @@ class FormElementJsonSchema(JsonSchemaView):
             obj, generatorArguments
         )
 
+        # form element view of option only shows option itself
+        # and not the other options/optionlists in the same selectionfield
         if model and option:
             model.unset_options()
             if option.portal_type == "Option":
