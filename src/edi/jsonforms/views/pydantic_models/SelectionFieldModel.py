@@ -26,28 +26,26 @@ logger = logging.getLogger(__name__)
 
 
 class OptionModel(BaseModel):
-    id: str
-    title: str
+    option_id: str
+    option_title: str
     parent: ISelectionField
     dependencies: list[IOption] | None = Field(default_factory=list)
 
     class Config:
         arbitrary_types_allowed = True
 
-    def __init__(
-        self, option_id: str, option_title: str, option_parent: ISelectionField
-    ):
+    def __init__(self, option_id: str, option_title: str, parent: ISelectionField):
         """
         constructor for OptionModel, sets id, title and parent of the option
         dependencies stay empty
         """
-        super().__init__(id=option_id, title=option_title, parent=option_parent)
+        super().__init__(option_id=option_id, option_title=option_title, parent=parent)
 
     @classmethod
     def from_option(cls, option: IOption):
         option_model = cls(
-            id=create_id(option),
-            title=option.title,
+            option_id=create_id(option),
+            option_title=option.title,
             parent=option.aq_parent,
         )
         if safe_hasattr(option, "dependencies"):
@@ -56,20 +54,20 @@ class OptionModel(BaseModel):
 
     @classmethod
     def from_id_and_title(
-        cls, option_id: str, option_title: str, option_parent: ISelectionField
+        cls, option_id: str, option_title: str, parent: ISelectionField
     ):
         """
         constructor for OptionModel, sets id, title and parent of the option
         dependencies stay empty
         """
-        return cls(id=option_id, title=option_title, parent=option_parent)
+        return cls(option_id=option_id, option_title=option_title, parent=parent)
 
     # a get method for name (title or id)
     def get_option_name(self) -> str:
         if self.parent.use_id_in_schema:
-            return self.id
+            return self.option_id
         else:
-            return self.title
+            return self.option_title
 
     def check_dependencies(self, is_single_view: bool) -> bool:
         return check_for_dependencies(self, is_single_view)
