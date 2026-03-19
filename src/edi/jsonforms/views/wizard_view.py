@@ -71,9 +71,9 @@ class WizardUiSchemaView(UiSchemaView):
     def __init__(self, context, request):
         super().__init__(context, request)
 
-    def __call__(self):
-        uischema = self.combined_ui_schema()
-        return json.dumps(uischema, ensure_ascii=False, indent=4)
+    # overwrite get_schema from UiSchemaView
+    def get_schema(self):
+        return self.combined_ui_schema()
 
     def combined_ui_schema(self):
         self.set_ui_base_schema()
@@ -117,9 +117,9 @@ class WizardJsonSchemaView(JsonSchemaView):
     def __init__(self, context, request):
         super().__init__(context, request)
 
-    def __call__(self):
-        jsonschema = self.combined_json_schema()
-        return json.dumps(jsonschema, ensure_ascii=False, indent=4)
+    # overwrite get_schema from JsonSchemaView
+    def get_schema(self):
+        return self.combined_json_schema()
 
     def combined_json_schema(self):
         # self.set_json_base_schema()
