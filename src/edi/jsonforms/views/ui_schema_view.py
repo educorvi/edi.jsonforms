@@ -423,7 +423,9 @@ class UiSchemaView(BrowserView):
                     elif handler.portal_type == "File Storage Handler":
                         request_url = self.context.absolute_url() + "/@store-as-file"
                         try:
-                            folder_path = api.content.get_path(obj=handler.target_folder.to_object)
+                            folder_path = api.content.get_path(
+                                obj=handler.target_folder.to_object
+                            )
                         except:
                             folder_path = ""
                             button_schema["options"]["disabled"] = True
@@ -466,7 +468,9 @@ class UiSchemaView(BrowserView):
 
                 buttons_schema["buttons"].append(button_schema)
 
-        self.add_tools_to_schema(buttons_schema, button_group)
+        if self.tools_on and button_group.aq_parent.portal_type == "Form":
+            helptext_schema = self.helptext_schema(self.get_tools_html(button_group))
+            self.uischema["layout"]["elements"].append(helptext_schema)
         return buttons_schema
 
     def get_schema_for_array(self, array, scope, recursive=True, overwrite_scope=None):
