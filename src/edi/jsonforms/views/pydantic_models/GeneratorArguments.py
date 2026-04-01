@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 from pydantic import BaseModel
 from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class GeneratorArguments(BaseModel):
-    request: WSGIRequest | HTTPRequest
+    request: Union[WSGIRequest, HTTPRequest]
     is_single_view: bool
     is_extended_schema: bool
     formProperties: FormProperties
@@ -18,7 +19,7 @@ class GeneratorArguments(BaseModel):
 
     def __init__(
         self,
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
         is_single_view: bool,
         is_extended_schema: bool = False,
     ):

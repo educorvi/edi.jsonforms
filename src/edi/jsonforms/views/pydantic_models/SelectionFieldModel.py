@@ -12,7 +12,7 @@ except ImportError:
     from Products.CMFPlone.utils import safe_hasattr
 
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.content.option import IOption
@@ -103,14 +103,14 @@ class OptionListModel(BaseModel):
 
 class SelectionFieldModel(BaseFormElementModel):
     enum: Optional[List[str]] = None
-    items: Optional[Dict[str, List[str] | str]] = None
+    items: Optional[Dict[str, Union[List[str], str]]] = None
     minItems: Optional[int] = None
 
     def __init__(
         self,
         form_element: ISelectionField,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
     ):
         super().__init__(form_element, parent_model, request)
 
@@ -168,7 +168,7 @@ class SelectionFieldModel(BaseFormElementModel):
                         options_list.extend(vals)
         return options_list
 
-    def set_option(self, option_model: OptionModel | OptionListModel):
+    def set_option(self, option_model: Union[OptionModel, OptionListModel]):
         """
         sets the option for the selectionfield
         ignores dependencies of the options

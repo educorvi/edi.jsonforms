@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional, List, Union
 from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 from pydantic import BaseModel
 
@@ -33,7 +33,7 @@ class UploadFieldModel(BaseFormElementModel):
         self,
         form_element: IUploadField,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
     ):
         super().__init__(form_element, parent_model, request)
         if self.is_required:

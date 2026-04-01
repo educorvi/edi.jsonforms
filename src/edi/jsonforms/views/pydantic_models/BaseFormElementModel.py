@@ -6,7 +6,7 @@ try:
     from plone.base.utils import safe_hasattr
 except ImportError:
     from Products.CMFPlone.utils import safe_hasattr
-from typing import Optional, List
+from typing import Optional, List, Union
 from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
 from edi.jsonforms.content.common import IFormElement
@@ -43,11 +43,11 @@ class BaseFormElementModel(BaseModel, abc.ABC):
 
     def __init__(
         self,
-        form_element: IFormElement | IForm,
+        form_element: Union[IFormElement, IForm],
         parent_model: Optional[
             "BaseFormElementModel"
         ],  # only None if form_element is the outer form
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
     ):
         description = get_description(form_element, request)
         comment = (

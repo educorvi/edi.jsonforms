@@ -12,7 +12,7 @@ try:
     from plone.base.utils import safe_hasattr
 except ImportError:
     from Products.CMFPlone.utils import safe_hasattr
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.complex import IComplex
@@ -98,13 +98,14 @@ class ObjectModel(BaseFormElementModel):
 
     def __init__(
         self,
-        form_element: IComplex
-        | IArray
-        | IForm,  # to create the intern object model for array items
+        form_element: Union[
+            IComplex, IArray, IForm
+        ],  # to create the intern object model for array items
+        # to create the intern object model for array items
         parent_model: Optional[
             BaseFormElementModel
         ],  # is None if form_element is the outer form or if in form-element-view
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
     ):
         super().__init__(form_element, parent_model, request)
         self.properties = {}
@@ -267,7 +268,7 @@ class FieldsetModel(ObjectModel):
         self,
         form_element: IFieldset,
         parent_model: ObjectModel,
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
     ):
         super().__init__(form_element, parent_model, request)
 
@@ -308,7 +309,7 @@ class ArrayModel(BaseFormElementModel):
         self,
         form_element: IArray,
         parent_model: BaseFormElementModel,
-        request: WSGIRequest | HTTPRequest,
+        request: Union[WSGIRequest, HTTPRequest],
     ):
         super().__init__(form_element, parent_model, request)
         if self.is_required:
