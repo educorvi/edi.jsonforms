@@ -14,7 +14,11 @@ from edi.jsonforms.views.showOn_properties import transform_scope_to_object_writ
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 
 from plone import api
-from plone.base.utils import safe_hasattr
+
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
 
 from edi.jsonforms.views.common import get_option_name
 

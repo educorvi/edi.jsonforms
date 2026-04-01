@@ -2,7 +2,10 @@ import abc
 import copy
 import logging
 
-from plone.base.utils import safe_hasattr
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
 from typing import Optional, List
 from ZPublisher.HTTPRequest import WSGIRequest, HTTPRequest
 
