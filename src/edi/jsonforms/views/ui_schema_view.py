@@ -398,26 +398,27 @@ class UiSchemaView(BrowserView):
                                 self.context.absolute_url() + "/@webservice-request"
                             )
                             i = 1
-                            query_params = {}
+                            headers = {}
                             endpoints = handler.getFolderContents()
                             for endpoint in endpoints:
                                 endpoint = endpoint.getObject()
                                 if endpoint.portal_type == "Endpoint":
-                                    query_params[f"endpoint_{i}_url"] = endpoint.url
+                                    headers[f"endpoint-{i}-url"] = endpoint.url
                                     if (
                                         endpoint.api_key_header_name
                                         and endpoint.api_key
                                     ):
-                                        query_params[
-                                            f"endpoint_{i}_api_key_header_name"
-                                        ] = endpoint.api_key_header_name
-                                        query_params[f"endpoint_{i}_api_key"] = (
+                                        headers[f"endpoint-{i}-api-key-header-name"] = (
+                                            endpoint.api_key_header_name
+                                        )
+                                        headers[f"endpoint-{i}-api-key"] = (
                                             endpoint.api_key
                                         )
                                 i += 1
 
-                            encoded_query = urlencode(query_params)
-                            request_url = f"{request_url}?{encoded_query}"
+                            button_schema["options"]["submitOptions"]["request"][
+                                "headers"
+                            ].update(headers)
 
                             button_schema["options"]["submitOptions"]["request"][
                                 "url"
