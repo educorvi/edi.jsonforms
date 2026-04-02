@@ -477,7 +477,6 @@ class UiSchemaView(BrowserView):
                             button_schema["options"]["submitOptions"]["request"][
                                 "url"
                             ].append(request_url)
-                    buttons_schema["buttons"].append(button_schema)
                 elif button.portal_type == "AI Summary Button":
                     button_schema["options"]["submitOptions"] = {
                         "action": "summary",
