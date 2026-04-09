@@ -6,6 +6,10 @@
     <metal:block fill-slot="content-core">
 
       <div class="m-3" tal:define="json context/@@json-schema-view; ui context/@@ui-schema-tools-view">
+        <link rel="stylesheet" href="++resource++edi.jsonforms/css/vue-json-form.css" />
+        <link rel="stylesheet" href="++resource++edi.jsonforms/css/bootstrap/bootstrap-icons.min.css" />
+        <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
       </div>
 

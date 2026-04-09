@@ -8,6 +8,10 @@
     <metal:block fill-slot="content-core">
       <div class="m-3" tal:define="json view/form_element_jsonschema; ui view/form_element_uischema">
 
+        <link rel="stylesheet" href="++resource++edi.jsonforms/css/vue-json-form.css" />
+        <link rel="stylesheet" href="++resource++edi.jsonforms/css/bootstrap/bootstrap-icons.min.css" />
+        <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+
         <vue-json-form tal:attributes="json-schema json; ui-schema ui" return-data-as-scopes="false"></vue-json-form>
         <div tal:condition="view/empty_selection_field">
           <p class="bg-warning" style="display: inline; padding: 5px 10px;" i18n:translate="">Please add options to this selection field.</p>
