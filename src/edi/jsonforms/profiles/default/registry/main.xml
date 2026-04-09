@@ -4,30 +4,5 @@
     i18n:domain="edi.jsonforms">
 
 <!-- -*- extra stuff goes here -*- -->
-        <records interface="Products.CMFPlone.interfaces.IResourceRegistry" prefix="plone.resources/edi.jsonforms-vue-json-form-js">
-            <value key="js">++resource++edi.jsonforms/js/vue-json-form.umd.js</value>
-        </records>
 
-        <records interface="Products.CMFPlone.interfaces.IResourceRegistry" prefix="plone.resources/edi.jsonforms-vue-json-form-css">
-            <value key="css">
-                <element>++resource++edi.jsonforms/css/vue-json-form.css</element>
-            </value>
-        </records>
-
-        <records interface="Products.CMFPlone.interfaces.IResourceRegistry" prefix="plone.resources/edi.jsonforms-bootstrap-icons-css">
-            <value key="css">
-                <element>++resource++edi.jsonforms/css/bootstrap/bootstrap-icons.min.css</element>
-            </value>
-        </records>
-
-        <records interface="Products.CMFPlone.interfaces.IBundleRegistry" prefix="plone.bundles/edi-jsonforms">
-            <value key="enabled">True</value>
-            <value key="depends">plone</value>
-            <value key="merge_with">default</value>
-            <value key="resources">
-                <element>edi.jsonforms-vue-json-form-css</element>
-                <element>edi.jsonforms-bootstrap-icons-css</element>
-                <element>edi.jsonforms-vue-json-form-js</element>
-            </value>
-        </records>
 </registry>
