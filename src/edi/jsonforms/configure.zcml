@@ -50,10 +50,10 @@
   <include package=".handlers" />
   <include package=".viewlets" />
 
-  <!--<plone:static
+  <plone:static
     name="edi.jsonforms"
-    type="plone"
-    directory="static" />-->
+    type="resource"
+    directory="static" />
 
   <browser:resourceDirectory
     name="edi.jsonforms"
