@@ -11,7 +11,7 @@
 
         <link rel="stylesheet" href="++resource++edi.jsonforms/css/vue-json-form.css" />
         <link rel="stylesheet" href="++resource++edi.jsonforms/css/bootstrap/bootstrap-icons.min.css" />
-        <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
+        <script defer type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script>
 
         <!-- <script type="text/javascript" src="++resource++edi.jsonforms/js/vue-json-form.umd.js"></script> -->
 
