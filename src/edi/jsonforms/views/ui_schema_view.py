@@ -482,8 +482,13 @@ class UiSchemaView(BrowserView):
                         "action": "summary",
                         "summary": {
                             "apiEndpoint": button.endpoint,
+                            "copyToClipboard": True,
                         },
                     }
+                    if safe_hasattr(button, "feedback") and button.feedback:
+                        button_schema["options"]["submitOptions"]["summary"][
+                            "feedbackUrl"
+                        ] = button.feedback
 
                     # get path to document
                     try:
@@ -500,6 +505,22 @@ class UiSchemaView(BrowserView):
                     button_schema["options"]["submitOptions"]["summary"]["field"] = (
                         path_to_doc
                     )
+
+                    # get path to field that contains the document type
+                    try:
+                        path_to_doctype_field = get_path(button.doctype_field.to_object)
+                        path_to_doctype_field = transform_scope_to_object_writing_form(
+                            path_to_doctype_field
+                        )
+                        button_schema["options"]["submitOptions"]["summary"][
+                            "documentTypeField"
+                        ] = path_to_doctype_field
+                    except Exception as e:
+                        logger.warning(
+                            f"Could not get path to doctype field for button {button.id}: {e}"
+                        )
+                        path_to_doctype_field = ""
+                        button_schema["options"]["disabled"] = True
 
                     # get endpoint url to save summary as page
                     try:
