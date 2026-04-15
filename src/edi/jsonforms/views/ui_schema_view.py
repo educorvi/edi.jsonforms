@@ -6,15 +6,23 @@ from Products.Five.browser import BrowserView
 import json
 from jinja2 import meta
 from jinja2.sandbox import SandboxedEnvironment
+import logging
 
 from edi.jsonforms.views.common import *
 from edi.jsonforms.views.showOn_properties import create_showon_properties
+from edi.jsonforms.views.showOn_properties import transform_scope_to_object_writing_form
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 
 from plone import api
-from plone.base.utils import safe_hasattr
+
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
 
 from edi.jsonforms.views.common import get_option_name
+
+logger = logging.getLogger(__name__)
 
 
 class UiSchemaView(BrowserView):
@@ -53,7 +61,7 @@ class UiSchemaView(BrowserView):
         self.lookup_scopes = {}
 
         self.uischema = {
-            "version": "2.0",
+            "version": "2.1",
             "layout": {"type": "VerticalLayout", "elements": []},
         }
 
@@ -328,145 +336,217 @@ class UiSchemaView(BrowserView):
                 }
                 button_schema["options"]["variant"] = button.button_variant
                 buttons_schema["buttons"].append(button_schema)
-            elif button.portal_type == "Button":
+            elif button.portal_type in ["Button", "AI Summary Button"]:
                 button_schema = {
                     "type": "Button",
                     "buttonType": "submit",
-                    "text": "",  # FILL
+                    "text": button.button_label,
                     "options": {
-                        "variant": "primary",
-                        "submitOptions": {
-                            "action": "request",
-                            "request": {
-                                "url": "",  # FILL
-                                "method": "POST",
-                                "headers": {
-                                    "Accept": "application/json",
-                                    "Content-Type": "application/json",
-                                },
-                                "onSuccessRedirect": "",
-                            },
-                        },
+                        "variant": button.button_variant,
+                        "submitOptions": {},
                     },
                 }
-                button_schema["text"] = button.button_label
-                button_schema["options"]["variant"] = button.button_variant
-                if (
-                    safe_hasattr(button, "page_after_success")
-                    and button.page_after_success
-                    and button.page_after_success != ""
-                ):
-                    button_schema["options"]["submitOptions"]["request"][
-                        "onSuccessRedirect"
-                    ] = button.page_after_success
 
-                button_schema["options"]["submitOptions"]["request"]["url"] = []
-
-                for handler in button.restrictedTraverse("@@contentlisting")():
-                    handler = handler.getObject()
-                    if handler.portal_type == "Email Handler":
-                        request_url = self.context.absolute_url() + "/@send-email"
-                        query_params = {"to_address": handler.to_address}
-
-                        if handler.use_email_of_current_user:
-                            query_params["use_email_of_current_user"] = True
-                            query_params["to_address"] = ""
-                        # if handler.reply_to_address:
-                        #     query_params["reply_to_address"] = handler.reply_to_address
-                        if handler.email_subject:
-                            query_params["subject"] = handler.email_subject
-                        if handler.email_text:
-                            query_params["email_text"] = handler.email_text
-
-                        # Encode the query parameters
-                        encoded_query = urlencode(query_params)
-
-                        # Combine the base URL with the encoded query parameters
-                        request_url = f"{request_url}?{encoded_query}"
-
+                if button.portal_type == "Button":
+                    button_schema["options"]["submitOptions"] = {
+                        "action": "request",
+                        "request": {
+                            "url": [],  # FILL
+                            "method": "POST",
+                            "headers": {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                            },
+                        },
+                    }
+                    if (
+                        safe_hasattr(button, "page_after_success")
+                        and button.page_after_success
+                        and button.page_after_success != ""
+                    ):
                         button_schema["options"]["submitOptions"]["request"][
-                            "url"
-                        ].append(request_url)
-                    elif handler.portal_type == "Webservice Handler":
-                        request_url = (
-                            self.context.absolute_url() + "/@webservice-request"
-                        )
-                        i = 1
-                        query_params = {}
-                        endpoints = handler.getFolderContents()
-                        for endpoint in endpoints:
-                            endpoint = endpoint.getObject()
-                            if endpoint.portal_type == "Endpoint":
-                                query_params[f"endpoint_{i}_url"] = endpoint.url
-                                if endpoint.api_key_header_name and endpoint.api_key:
-                                    query_params[
-                                        f"endpoint_{i}_api_key_header_name"
-                                    ] = endpoint.api_key_header_name
-                                    query_params[f"endpoint_{i}_api_key"] = (
-                                        endpoint.api_key
-                                    )
-                            i += 1
+                            "onSuccessRedirect"
+                        ] = button.page_after_success
 
-                        encoded_query = urlencode(query_params)
-                        request_url = f"{request_url}?{encoded_query}"
+                    for handler in button.restrictedTraverse("@@contentlisting")():
+                        handler = handler.getObject()
+                        if handler.portal_type == "Email Handler":
+                            request_url = self.context.absolute_url() + "/@send-email"
+                            query_params = {"to_address": handler.to_address}
 
-                        button_schema["options"]["submitOptions"]["request"][
-                            "url"
-                        ].append(request_url)
-                    elif handler.portal_type == "Annotation Storage Handler":
-                        request_url = (
-                            self.context.absolute_url() + "/@store-as-annotation"
-                        )
-                        button_schema["options"]["submitOptions"]["request"][
-                            "url"
-                        ].append(request_url)
-                    elif handler.portal_type == "File Storage Handler":
-                        request_url = self.context.absolute_url() + "/@store-as-file"
-                        try:
-                            folder_path = api.content.get_path(obj=handler.target_folder.to_object)
-                        except:
-                            folder_path = ""
-                            button_schema["options"]["disabled"] = True
+                            if handler.use_email_of_current_user:
+                                query_params["use_email_of_current_user"] = True
+                                query_params["to_address"] = ""
+                            # if handler.reply_to_address:
+                            #     query_params["reply_to_address"] = handler.reply_to_address
+                            if handler.email_subject:
+                                query_params["subject"] = handler.email_subject
+                            if handler.email_text:
+                                query_params["email_text"] = handler.email_text
 
-                        try:
-                            content_object_title = handler.content_object_title
-                            if (
-                                not content_object_title
-                                or content_object_title.isspace()
-                            ):
-                                content_object_title = _("Form submission")
+                            # Encode the query parameters
+                            encoded_query = urlencode(query_params)
 
-                            env = SandboxedEnvironment()
-                            ast = env.parse(content_object_title)
-                            variables_in_title = meta.find_undeclared_variables(ast)
-                            if any(
-                                var not in ["data", "user"]
-                                for var in variables_in_title
-                            ):
-                                raise Exception(
-                                    "Invalid content object title: only 'user' or variables in the format {{data['field-id']}} are allowed"
+                            # Combine the base URL with the encoded query parameters
+                            request_url = f"{request_url}?{encoded_query}"
+
+                            button_schema["options"]["submitOptions"]["request"][
+                                "url"
+                            ].append(request_url)
+                        elif handler.portal_type == "Webservice Handler":
+                            request_url = (
+                                self.context.absolute_url() + "/@webservice-request"
+                            )
+                            i = 1
+                            headers = {}
+                            endpoints = handler.getFolderContents()
+                            for endpoint in endpoints:
+                                endpoint = endpoint.getObject()
+                                if endpoint.portal_type == "Endpoint":
+                                    headers[f"endpoint-{i}-url"] = endpoint.url
+                                    if (
+                                        endpoint.api_key_header_name
+                                        and endpoint.api_key
+                                    ):
+                                        headers[f"endpoint-{i}-api-key-header-name"] = (
+                                            endpoint.api_key_header_name
+                                        )
+                                        headers[f"endpoint-{i}-uid"] = (
+                                            endpoint.UID()
+                                        )  # don't save api key in the ui-schema for security reasons
+                                        # the api key is retrieved in the backend using the endpoint's UID and added to the request headers there
+                                i += 1
+
+                            button_schema["options"]["submitOptions"]["request"][
+                                "headers"
+                            ].update(headers)
+
+                            button_schema["options"]["submitOptions"]["request"][
+                                "url"
+                            ].append(request_url)
+                        elif handler.portal_type == "Annotation Storage Handler":
+                            request_url = (
+                                self.context.absolute_url() + "/@store-as-annotation"
+                            )
+                            button_schema["options"]["submitOptions"]["request"][
+                                "url"
+                            ].append(request_url)
+                        elif handler.portal_type == "File Storage Handler":
+                            request_url = (
+                                self.context.absolute_url() + "/@store-as-file"
+                            )
+                            try:
+                                folder_path = api.content.get_path(
+                                    obj=handler.target_folder.to_object
                                 )
-                        except:
-                            content_object_title = ""
-                            button_schema["options"]["disabled"] = True
+                            except:
+                                folder_path = ""
+                                button_schema["options"]["disabled"] = True
 
+                            try:
+                                content_object_title = handler.content_object_title
+                                if (
+                                    not content_object_title
+                                    or content_object_title.isspace()
+                                ):
+                                    content_object_title = _("Form submission")
+
+                                env = SandboxedEnvironment()
+                                ast = env.parse(content_object_title)
+                                variables_in_title = meta.find_undeclared_variables(ast)
+                                if any(
+                                    var not in ["data", "user"]
+                                    for var in variables_in_title
+                                ):
+                                    raise Exception(
+                                        "Invalid content object title: only 'user' or variables in the format {{data['field-id']}} are allowed"
+                                    )
+                            except:
+                                content_object_title = ""
+                                button_schema["options"]["disabled"] = True
+
+                            query_params = {
+                                "folder_path": folder_path,
+                                "content_object_title": content_object_title,
+                            }
+
+                            # Encode the query parameters
+                            encoded_query = urlencode(query_params)
+
+                            # Combine the base URL with the encoded query parameters
+                            request_url = f"{request_url}?{encoded_query}"
+                            button_schema["options"]["submitOptions"]["request"][
+                                "url"
+                            ].append(request_url)
+                elif button.portal_type == "AI Summary Button":
+                    button_schema["options"]["submitOptions"] = {
+                        "action": "summary",
+                        "summary": {
+                            "apiEndpoint": button.endpoint,
+                            "copyToClipboard": True,
+                        },
+                    }
+                    if safe_hasattr(button, "feedback") and button.feedback:
+                        button_schema["options"]["submitOptions"]["summary"][
+                            "feedbackUrl"
+                        ] = button.feedback
+
+                    # get path to document
+                    try:
+                        path_to_doc = get_path(button.doc_to_summarize.to_object)
+                        path_to_doc = transform_scope_to_object_writing_form(
+                            path_to_doc
+                        )
+                    except Exception as e:
+                        logger.warning(
+                            f"Could not get path to document to summarize for button {button.id}: {e}"
+                        )
+                        path_to_doc = ""
+                        button_schema["options"]["disabled"] = True
+                    button_schema["options"]["submitOptions"]["summary"]["field"] = (
+                        path_to_doc
+                    )
+
+                    # get path to field that contains the document type
+                    try:
+                        path_to_doctype_field = get_path(button.doctype_field.to_object)
+                        path_to_doctype_field = transform_scope_to_object_writing_form(
+                            path_to_doctype_field
+                        )
+                        button_schema["options"]["submitOptions"]["summary"][
+                            "documentTypeField"
+                        ] = path_to_doctype_field
+                    except Exception as e:
+                        logger.warning(
+                            f"Could not get path to doctype field for button {button.id}: {e}"
+                        )
+                        path_to_doctype_field = ""
+                        button_schema["options"]["disabled"] = True
+
+                    # get endpoint url to save summary as page
+                    try:
+                        url = self.context.absolute_url() + "/@save-ai-summary-as-page"
+                        folder_path = api.content.get_path(
+                            obj=button.folder_to_save_in.to_object
+                        )
                         query_params = {
-                            "folder_path": folder_path,
-                            "content_object_title": content_object_title,
+                            "folder_to_save_in": folder_path,
                         }
-
-                        # Encode the query parameters
-                        encoded_query = urlencode(query_params)
-
-                        # Combine the base URL with the encoded query parameters
-                        request_url = f"{request_url}?{encoded_query}"
-                        button_schema["options"]["submitOptions"]["request"][
-                            "url"
-                        ].append(request_url)
-
+                        save_as_page_url = f"{url}?{urlencode(query_params)}"
+                    except Exception as e:
+                        logger.warning(
+                            f"Could not get save URL for button {button.id}: {e}"
+                        )
+                        save_as_page_url = ""
+                        button_schema["options"]["disabled"] = True
+                    button_schema["options"]["submitOptions"]["summary"]["saveUrl"] = (
+                        save_as_page_url
+                    )
                 buttons_schema["buttons"].append(button_schema)
 
-        self.add_tools_to_schema(buttons_schema, button_group)
+        if self.tools_on and button_group.aq_parent.portal_type == "Form":
+            helptext_schema = self.helptext_schema(self.get_tools_html(button_group))
+            self.uischema["layout"]["elements"].append(helptext_schema)
         return buttons_schema
 
     def get_schema_for_array(self, array, scope, recursive=True, overwrite_scope=None):

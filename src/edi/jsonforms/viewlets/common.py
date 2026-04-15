@@ -1,6 +1,9 @@
 from urllib.parse import quote_plus
-from plone.base.utils import safe_hasattr
 
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
 from edi.jsonforms.content.form import IForm
 from edi.jsonforms.content.wizard import IWizard
 from edi.jsonforms.content.common import IFormElement

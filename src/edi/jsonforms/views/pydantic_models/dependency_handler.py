@@ -1,7 +1,6 @@
 import copy
 import itertools
 import logging
-from plone.base.utils import safe_hasattr
 from typing import Any, Dict, List
 from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.content.common import IFormElement
@@ -16,7 +15,11 @@ from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
 )
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
 from edi.jsonforms.views.common import get_option_name
-# from plone.base.utils import safe_hasattr
+
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
 
 logger = logging.getLogger(__name__)
 

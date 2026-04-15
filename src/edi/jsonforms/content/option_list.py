@@ -98,7 +98,12 @@ class OptionList(Item):
     def get_options(self) -> list[str]:
         """Return the options as a list of strings in the format 'id:value' or 'value'.
         If a URL is set, fetch the options from the URL,# otherwise return the locally stored options.
-        Cache the response for 5 minutes."""
+        Cache the response for 5 minutes.
+
+        expects the response to be a JSON array of objects, e.g. [{"id": "1", "name": "Option 1"}, {"id": "2", "name": "Option 2"}]
+            - if id_mapping and value_mapping are set and exist in the item, use them for id and value, e.g. "1:Option 1"
+            - if id_mapping and value_mapping are not set or do not exist in the item, use all key-value pairs, e.g. "id 1 name Option 1"
+        """
 
         # cache_key = self.url
         # current_time = time.time()

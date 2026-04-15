@@ -7,7 +7,11 @@ from edi.jsonforms.views.pydantic_models.dependency_handler import (
     get_dependencies_of_closest_ancestor_with_dependencies,
 )
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
-from plone.base.utils import safe_hasattr
+
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
 from typing import Optional, List, Dict, Any
 
 from edi.jsonforms.content.common import IFormElement

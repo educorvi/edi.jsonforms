@@ -5,7 +5,12 @@ from edi.jsonforms.views.pydantic_models.dependency_handler import (
     add_dependent_options,
     check_for_dependencies,
 )
-from plone.base.utils import safe_hasattr
+
+try:
+    from plone.base.utils import safe_hasattr
+except ImportError:
+    from Products.CMFPlone.utils import safe_hasattr
+
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
