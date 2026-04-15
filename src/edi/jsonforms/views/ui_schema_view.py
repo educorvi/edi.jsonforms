@@ -776,15 +776,14 @@ class UiSchemaView(BrowserView):
         return self.create_group(fieldset, scope, recursive)
 
     def get_base_schema(self, child, scope, save_scope=True, has_user_helptext=True):
-        child_id = create_id(child)
-        child_scope = scope + child_id
+        child_scope = scope + create_id(child)
         base_schema = {
             "type": "Control",
             "scope": child_scope,
         }
 
         if save_scope:
-            self.lookup_scopes[child_id] = child_scope
+            self.lookup_scopes[create_unique_id(child)] = child_scope
 
         if has_user_helptext:
             self.add_user_helptext(child, base_schema)
