@@ -4,7 +4,7 @@ dynamic = ["version"]
 description = "Webforms based on JSON-Schema and UI-Schema for Plone"
 readme = "README.md"
 license = "GPL-2.0-only"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 authors = [
     { name = "Nina Mücke and Lars Walther", email = "nina.muecke@educorvi.de" },
 ]
