@@ -29,13 +29,15 @@ class UiSchemaView(BrowserView):
     tools_on = False
     rita_dependent_options = {}
     is_single_view = False
+    scope = "/properties/"
 
-    def __init__(self, context, request):
+    def __init__(self, context, request, scope="/properties/"):
         super().__init__(context, request)
         self.uischema = {}
 
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
+        self.scope = scope
 
         self.rita_dependent_options = {}
 
@@ -52,7 +54,7 @@ class UiSchemaView(BrowserView):
         form = self.context
         children = form.getFolderContents()
         for child in children:
-            self.add_child_to_schema(child.getObject(), self.uischema)
+            self.add_child_to_schema(child.getObject(), self.uischema, self.scope)
 
         return self.uischema
 
