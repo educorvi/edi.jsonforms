@@ -29,13 +29,15 @@ class UiSchemaView(BrowserView):
     tools_on = False
     rita_dependent_options = {}
     is_single_view = False
+    scope = "/properties/"
 
-    def __init__(self, context, request):
+    def __init__(self, context, request, scope="/properties/"):
         super().__init__(context, request)
         self.uischema = {}
 
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
+        self.scope = scope
 
         self.rita_dependent_options = {}
 
@@ -52,7 +54,7 @@ class UiSchemaView(BrowserView):
         form = self.context
         children = form.getFolderContents()
         for child in children:
-            self.add_child_to_schema(child.getObject(), self.uischema)
+            self.add_child_to_schema(child.getObject(), self.uischema, self.scope)
 
         return self.uischema
 
@@ -776,15 +778,14 @@ class UiSchemaView(BrowserView):
         return self.create_group(fieldset, scope, recursive)
 
     def get_base_schema(self, child, scope, save_scope=True, has_user_helptext=True):
-        child_id = create_id(child)
-        child_scope = scope + child_id
+        child_scope = scope + create_id(child)
         base_schema = {
             "type": "Control",
             "scope": child_scope,
         }
 
         if save_scope:
-            self.lookup_scopes[child_id] = child_scope
+            self.lookup_scopes[create_unique_id(child)] = child_scope
 
         if has_user_helptext:
             self.add_user_helptext(child, base_schema)
