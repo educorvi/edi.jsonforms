@@ -19,6 +19,9 @@ from zope.globalrequest import getRequest
 
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependent, IFormElement
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class IReference(IDependent):
@@ -36,7 +39,8 @@ class IReference(IDependent):
         if data.reference:
             try:
                 ref_obj = data.reference
-            except:
+            except Exception as e:
+                logger.warning(f"Error accessing reference object: {e}")
                 raise Invalid(
                     _("The referenced object is either empty or deleted/invalid.")
                 )
@@ -60,13 +64,18 @@ class IReference(IDependent):
             def get_parent_form(obj):
                 try:
                     parent = obj.aq_parent
-                except:
+                except Exception as e:
+                    logger.warning(f"Error accessing parent object: {e}")
                     try:
                         parent = data.__context__.aq_parent
-                    except:
+                    except Exception as e:
+                        logger.warning(f"Error accessing context parent object: {e}")
                         try:
                             parent = getRequest().PUBLISHED.context.aq_parent
-                        except:
+                        except Exception as e:
+                            logger.warning(
+                                f"Error accessing request parent object: {e}"
+                            )
                             raise Invalid(_("Could not determine the parent Form."))
 
                 if parent.portal_type in ["Form"]:
