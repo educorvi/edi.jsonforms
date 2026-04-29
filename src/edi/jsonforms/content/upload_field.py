@@ -87,7 +87,15 @@ class IUploadField(IDependentExtended):
     #                             required=True)
 
     fieldset(
-        "advanced-options", label=_("Advanced Options"), fields=["accepted_file_types"]
+        "advanced-options",
+        label=_("Advanced Options"),
+        fields=[
+            "max_file_size",
+            "max_number_of_files",
+            "min_number_of_files",
+            "accepted_file_types",
+            "display_as_array",
+        ],
     )
 
     accepted_file_types = schema.List(

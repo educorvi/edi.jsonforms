@@ -1,4 +1,4 @@
-from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import create_id, create_unique_id
 import re
 
 
@@ -9,12 +9,12 @@ so it saves manual computation time of the scopes
 
 
 def find_scope(lookup_scopes, object):
-    obj_id = create_id(object)
+    obj_id = create_unique_id(object)
     if object.portal_type not in ["Option", "Field"]:
         return {}
     elif object.portal_type == "Option":
         parent = object.aq_parent
-        obj_id = create_id(parent)
+        obj_id = create_unique_id(parent)
 
     scope = lookup_scopes.get(obj_id)
 

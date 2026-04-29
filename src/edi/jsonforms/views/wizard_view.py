@@ -35,9 +35,8 @@ class IWizardToolsView(Interface):
 @implementer(IWizardToolsView)
 class WizardToolsView(BrowserView):
     def __call__(self):
-        # TODO add tools functionality
         self.jsonschema = WizardJsonSchemaView(self.context, self.request)()
-        self.uischema = WizardUiSchemaView(self.context, self.request)()
+        self.uischema = WizardUiSchemaView(self.context, self.request, tools_on=True)()
         return self.index()
 
 
@@ -68,8 +67,9 @@ submit_button = {
 
 
 class WizardUiSchemaView(UiSchemaView):
-    def __init__(self, context, request):
+    def __init__(self, context, request, tools_on=False):
         super().__init__(context, request)
+        self.set_tools(tools_on)
 
     # overwrite get_schema from UiSchemaView
     def get_schema(self):
@@ -77,7 +77,6 @@ class WizardUiSchemaView(UiSchemaView):
 
     def combined_ui_schema(self):
         self.set_ui_base_schema()
-        VERTICAL_LAYOUT = copy.deepcopy(self.uischema)
 
         self.uischema["layout"]["type"] = "Wizard"
         page_titles = []
@@ -85,31 +84,34 @@ class WizardUiSchemaView(UiSchemaView):
         for form in object.listFolderContents():
             if form.portal_type == "Form":
                 page_titles.append(form.title)
-                vertical_layout = copy.deepcopy(VERTICAL_LAYOUT)
                 form_id = create_id(form)
-                for child in form.getFolderContents():
-                    self.add_child_to_schema(
-                        child.getObject(),
-                        vertical_layout,
-                        f"/properties/{form_id}/properties/",
-                    )
-                vertical_layout["layout"]["elements"].append(copy.deepcopy(buttons))
-                self.uischema["layout"]["elements"].append(vertical_layout["layout"])
+                uischemaview = UiSchemaView(
+                    form, self.request, scope=f"/properties/{form_id}/properties/"
+                )
+                uischemaview.set_tools(self.tools_on)
+                vertical_layout = uischemaview.get_schema()["layout"]
+                vertical_layout["elements"].append(copy.deepcopy(buttons))
+                self.uischema["layout"]["elements"].append(vertical_layout)
 
-        if self.uischema["layout"]["elements"]:
+        if self.uischema["layout"][
+            "elements"
+        ]:  # delete "previous" button from first page
             del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
-        if len(self.uischema["layout"]["elements"]) == 1:
+        if (
+            len(self.uischema["layout"]["elements"]) == 1
+        ):  # replace "next" button with "submit" button from first page if only one page exists
             self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = (
                 submit_button
             )
-        elif len(self.uischema["layout"]["elements"]) > 1:
+        elif (
+            len(self.uischema["layout"]["elements"]) > 1
+        ):  # replace "next" button with "submit" button from last page
             self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = (
                 submit_button
             )
 
         self.uischema["layout"]["pages"] = self.uischema["layout"].pop("elements")
-        self.uischema["layout"]["options"] = {}
-        self.uischema["layout"]["options"]["pageTitles"] = page_titles
+        self.uischema["layout"]["options"] = {"pageTitles": page_titles}
         return self.uischema
 
 
