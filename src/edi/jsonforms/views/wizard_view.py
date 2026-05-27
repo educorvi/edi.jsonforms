@@ -9,7 +9,6 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 import copy
-import json
 
 
 class IWizardView(Interface):
@@ -95,7 +94,8 @@ class WizardUiSchemaView(UiSchemaView):
             del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
         if (
             len(self.uischema["layout"]["elements"]) == 1
-        ):  # replace "next" button with "submit" button from first page if only one page exists
+        ):  # replace "next" button with "submit" button from first page if only
+            # one page exists
             self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = (
                 submit_button
             )

@@ -2,10 +2,12 @@ from edi.jsonforms import _
 from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
 from edi.jsonforms.views.common import check_show_condition_in_request
 from edi.jsonforms.views.common import create_id
+from edi.jsonforms.views.common import create_unique_id
 from edi.jsonforms.views.common import get_content_url
 from edi.jsonforms.views.common import get_delete_url
 from edi.jsonforms.views.common import get_edit_url
 from edi.jsonforms.views.common import get_option_name
+from edi.jsonforms.views.common import get_path
 from edi.jsonforms.views.common import get_placeholder
 from edi.jsonforms.views.common import get_title
 from edi.jsonforms.views.common import get_unit
@@ -13,24 +15,19 @@ from edi.jsonforms.views.common import get_user_helptext
 from edi.jsonforms.views.common import get_view_url
 from edi.jsonforms.views.common import has_content
 from edi.jsonforms.views.showOn_properties import create_showon_properties
+from edi.jsonforms.views.showOn_properties import transform_scope_to_object_writing_form
 from jinja2 import meta
 from jinja2.sandbox import SandboxedEnvironment
-import logging
-
-from edi.jsonforms.views.common import *
-from edi.jsonforms.views.showOn_properties import create_showon_properties
-from edi.jsonforms.views.showOn_properties import transform_scope_to_object_writing_form
-from edi.jsonforms.content.option_list import get_keys_and_values_for_options_list
-
 from plone import api
 from plone.base.utils import safe_hasattr
 from Products.Five.browser import BrowserView
 from urllib.parse import urlencode
+
 import json
+import logging
+
 
 logger = logging.getLogger(__name__)
-
-from edi.jsonforms.views.common import get_option_name
 
 
 class UiSchemaView(BrowserView):
@@ -102,7 +99,9 @@ class UiSchemaView(BrowserView):
 
         # return schema
 
-    def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):  # noqa: C901
+    def get_schema_for_child(  # noqa: C901
+        self, child, scope, recursive=True, overwrite_scope=None
+    ) -> dict:
         ptype = child.portal_type
         child_schema = {}
 
@@ -384,8 +383,6 @@ class UiSchemaView(BrowserView):
                             if handler.use_email_of_current_user:
                                 query_params["use_email_of_current_user"] = True
                                 query_params["to_address"] = ""
-                            # if handler.reply_to_address:
-                            #     query_params["reply_to_address"] = handler.reply_to_address
                             if handler.email_subject:
                                 query_params["subject"] = handler.email_subject
                             if handler.email_text:
@@ -420,8 +417,10 @@ class UiSchemaView(BrowserView):
                                         )
                                         headers[f"endpoint-{i}-uid"] = (
                                             endpoint.UID()
-                                        )  # don't save api key in the ui-schema for security reasons
-                                        # the api key is retrieved in the backend using the endpoint's UID and added to the request headers there
+                                        )  # don't save api key in the ui-schema for
+                                        # security reasons, the api key is retrieved in
+                                        # the backend using the endpoint's UID and
+                                        # added to the request headers there
                                 i += 1
 
                             button_schema["options"]["submitOptions"]["request"][
@@ -449,7 +448,7 @@ class UiSchemaView(BrowserView):
                                 )
                             except Exception as e:
                                 logger.warning(
-                                    f"Could not get folder path for button {button.id}: {e}"
+                                    f"Could not get folder path for button {button.id}: {e}"  # noqa: E501
                                 )
                                 folder_path = ""
                                 button_schema["options"]["disabled"] = True
@@ -476,7 +475,7 @@ class UiSchemaView(BrowserView):
                                     )
                             except Exception as e:
                                 logger.warning(
-                                    f"Invalid content object title for button {button.id}: {e}"
+                                    f"Invalid content object title for button {button.id}: {e}"  # noqa: E501
                                 )
                                 content_object_title = ""
                                 button_schema["options"]["disabled"] = True
@@ -515,7 +514,7 @@ class UiSchemaView(BrowserView):
                         )
                     except Exception as e:
                         logger.warning(
-                            f"Could not get path to document to summarize for button {button.id}: {e}"
+                            f"Could not get path to document to summarize for button {button.id}: {e}"  # noqa: E501
                         )
                         path_to_doc = ""
                         button_schema["options"]["disabled"] = True
@@ -534,7 +533,7 @@ class UiSchemaView(BrowserView):
                         ] = path_to_doctype_field
                     except Exception as e:
                         logger.warning(
-                            f"Could not get path to doctype field for button {button.id}: {e}"
+                            f"Could not get path to doctype field for button {button.id}: {e}"  # noqa: E501
                         )
                         path_to_doctype_field = ""
                         button_schema["options"]["disabled"] = True

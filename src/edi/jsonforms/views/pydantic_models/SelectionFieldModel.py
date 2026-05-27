@@ -9,9 +9,6 @@ from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
     BaseFormElementModel,
 )
 from edi.jsonforms.views.pydantic_models.dependency_handler import add_dependent_options
-from edi.jsonforms.views.pydantic_models.dependency_handler import (
-    check_for_dependencies,
-)
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from plone import api
 from plone.base.utils import safe_hasattr
