@@ -16,6 +16,10 @@ from zope.interface import implementer
 from zope.interface import Invalid
 from zope.interface import invariant
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class IReference(IDependent):
     """Marker interface and Dexterity Python Schema for Reference"""
@@ -37,6 +41,7 @@ class IReference(IDependent):
             try:
                 ref_obj = data.reference
             except Exception as e:
+                logger.warning(f"Error accessing reference object: {e}")
                 raise Invalid(
                     _("The referenced object is either empty or deleted/invalid.")
                 ) from e
@@ -60,19 +65,25 @@ class IReference(IDependent):
             def get_parent_form(obj):
                 try:
                     parent = obj.aq_parent
-                except Exception:
+                except Exception as e:
+                    logger.warning(f"Error accessing parent object: {e}")
                     try:
                         parent = data.__context__.aq_parent
-                    except Exception:
+                    except Exception as e:
+                        logger.warning(f"Error accessing context parent object: {e}")
                         try:
                             parent = getRequest().PUBLISHED.context.aq_parent
                         except Exception as e:
+                            logger.warning(
+                                f"Error accessing request parent object: {e}"
+                            )
                             raise Invalid(
                                 _("Could not determine the parent Form.")
                             ) from e
+
                 if parent.portal_type in ["Form"]:
                     return parent
-                elif isinstance(parent.portal_type, IFormElement):
+                elif IFormElement.providedBy(parent):
                     return get_parent_form(parent)
                 else:
                     raise Invalid(_("The referenced object is not within a Form."))
