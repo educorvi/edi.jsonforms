@@ -28,7 +28,7 @@ BACKEND_FOLDER=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 ifdef PLONE_VERSION
 PLONE_VERSION := $(PLONE_VERSION)
 else
-PLONE_VERSION := 6.2.0a1
+PLONE_VERSION := 6.2.0
 endif
 
 ifdef CI

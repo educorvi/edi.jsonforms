@@ -6,6 +6,10 @@
 .idea/
 .tox/
 
+requirements.txt
+src/edi/jsonforms/locales/en/LC_MESSAGES/edi.jsonforms.mo
+src/edi/jsonforms/locales/de/LC_MESSAGES/edi.jsonforms.mo
+
 # tools related
 __pycache__/
 .coverage
