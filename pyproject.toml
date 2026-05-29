@@ -59,6 +59,10 @@ target = "plone"
 [tool.uv]
 managed = false
 
+[[tool.uv.index]]
+name = "uvc-plone"
+url = "https://pypi.bg-kooperation.de"
+
 [tool.hatch.version]
 path = "src/edi/jsonforms/__init__.py"
 

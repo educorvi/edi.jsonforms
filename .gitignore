@@ -2,6 +2,9 @@
 *.egg-info
 *.pyc
 *.pyo
+.coverage.py310-Plone60
+.idea/
+.tox/
 
 # tools related
 __pycache__/
