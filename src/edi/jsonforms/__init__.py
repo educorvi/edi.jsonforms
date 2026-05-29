@@ -5,7 +5,7 @@ from zope.i18nmessageid import MessageFactory
 import logging
 
 
-__version__ = "0.10.dev0"
+__version__ = "2.0.0a1"
 
 PACKAGE_NAME = "edi.jsonforms"
 
