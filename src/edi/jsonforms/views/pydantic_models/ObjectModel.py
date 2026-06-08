@@ -42,7 +42,7 @@ def create_model_recursively(
     parent_model: BaseFormElementModel,
     generatorArguments: GeneratorArguments,
     recursively: bool = True,
-) -> BaseFormElementModel:
+) -> BaseFormElementModel | None:
     """
     returns an object of the model class based on the portal_type of the input content object
     it recursively creates child models for complex fields and arrays and adds them to the properties of the created model
@@ -78,6 +78,8 @@ def create_model_recursively(
     elif form_element.portal_type == "Helptext":
         # model = HelptextModel(form_element, parent_model)  # has no json schema
         return None
+    elif form_element.portal_type == "Helptext Modal":
+        return None  # has no json schema
     elif form_element.portal_type == "Button Group":
         # model = ButtonGroupModel(form_element, parent_model)  # has no json schema
         return None
