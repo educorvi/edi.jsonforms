@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-12 15:48+0000\n"
+"POT-Creation-Date: 2026-06-08 13:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,7 +57,7 @@ msgstr ""
 msgid "API Key Name"
 msgstr ""
 
-#: ./content/upload_field.py:94
+#: ./content/upload_field.py:102
 msgid "Accepted file types for file upload"
 msgstr "Akzeptierte Dateitypen auswählen"
 
@@ -71,7 +71,7 @@ msgstr "Zusatzinformationen"
 
 #: ./content/common.py:246
 #: ./content/field.py:53
-#: ./content/upload_field.py:90
+#: ./content/upload_field.py:91
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
 
@@ -90,6 +90,10 @@ msgstr "Eine Optionenliste stellt eine Sammlung vordefinierter Auswahlmöglichke
 #: ./profiles/default/types/Array.xml
 msgid "Array"
 msgstr "Array"
+
+#: ./content/helptext_modal.py:42
+msgid "Button Label"
+msgstr ""
 
 #: ./content/common.py:200
 msgid "Cannot be dependent from itself or a child from itself."
@@ -112,6 +116,14 @@ msgstr "Checkboxen (Mehrfachauswahl)"
 msgid "Choose the answer type"
 msgstr "Auswahl des Antworttyps"
 
+#: ./content/helptext_modal.py:49
+msgid "Choose the variant of the button that opens the Modal."
+msgstr "Variante des Buttons, der das Modal öffnet."
+
+#: ./content/helptext_modal.py:48
+msgid "Color variant of the button"
+msgstr "Farbvariante des Buttons"
+
 #: ./profiles/default/types/Complex.xml
 msgid "Complex"
 msgstr "Objekt"
@@ -120,7 +132,7 @@ msgstr "Objekt"
 msgid "Condition for showing this field"
 msgstr "Bedingung, um dieses Feld anzuzeigen"
 
-#: ./views/ui_schema_view.py:670
+#: ./views/ui_schema_view.py:761
 msgid "Content"
 msgstr "Inhalt"
 
@@ -134,10 +146,10 @@ msgstr "Optionsliste zu Optionen konvertieren"
 
 #: ./content/option.py:70
 msgid "Could not determine parent SelectionField."
-msgstr ""
+msgstr "Das zugehörige Auswahlfeld konnte nicht gefunden werden."
 
 #: ./content/option.py:88
-#: ./content/reference.py:63
+#: ./content/reference.py:79
 msgid "Could not determine the parent Form."
 msgstr "Der Elternfragebogen konnte nicht gefunden werden."
 
@@ -153,11 +165,11 @@ msgstr "Datum und Uhrzeit"
 msgid "Decimal number"
 msgstr "Dezimalzahl"
 
-#: ./views/ui_schema_view.py:675
+#: ./views/ui_schema_view.py:766
 msgid "Delete"
 msgstr "Löschen"
 
-#: ./views/ui_schema_view.py:649
+#: ./views/ui_schema_view.py:740
 msgid "Delete element"
 msgstr "Element löschen"
 
@@ -167,11 +179,11 @@ msgstr "Abhängigkeiten"
 
 #: ./content/option.py:94
 msgid "Dependency must be an option."
-msgstr ""
+msgstr "Die Abhängigkeit muss eine Option sein."
 
 #: ./content/option.py:105
 msgid "Dependency must not be in the same SelectionField."
-msgstr ""
+msgstr "Die Abhängigkeit darf sich nicht im selben Auswahlfeld befinden."
 
 #: ./content/common.py:155
 #: ./content/option.py:40
@@ -186,7 +198,7 @@ msgstr "Beschreibung des Feldes bzw. der Frage"
 msgid "Developer Fields"
 msgstr "Entwicklerfelder"
 
-#: ./content/upload_field.py:127
+#: ./content/upload_field.py:135
 msgid "Display upload field as array"
 msgstr "Upload-Feld als Array darstellen"
 
@@ -196,7 +208,7 @@ msgstr "Upload-Feld als Array darstellen"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: ./views/ui_schema_view.py:647
+#: ./views/ui_schema_view.py:738
 msgid "Edit element"
 msgstr "Element bearbeiten"
 
@@ -207,6 +219,10 @@ msgstr "Email"
 #: ./content/option_list.py:35
 msgid "External Options"
 msgstr "Externe Optionen"
+
+#: ./content/helptext_modal.py:14
+msgid "Extra Large"
+msgstr "Etra groß"
 
 #: ./profiles/default/types/Field.xml
 msgid "Field"
@@ -226,11 +242,11 @@ msgstr "Für eine Dezimal-/Ganzzahl ist dies der minimale Wert, den sie haben mu
 
 #: ./content/common.py:82
 msgid "Forked JSON-Schemata"
-msgstr ""
+msgstr "JSON-Schema Forks"
 
 #: ./content/common.py:89
 msgid "Forked UI-Schemata"
-msgstr ""
+msgstr "UI-Schema Forks"
 
 #: ./content/common.py:96
 msgid "Forks"
@@ -256,7 +272,7 @@ msgstr "Web-Ansicht"
 msgid "Form View with tools"
 msgstr "Werkzeug-Ansicht"
 
-#: ./views/ui_schema_view.py:439
+#: ./views/ui_schema_view.py:477
 msgid "Form submission"
 msgstr "Formularübermittlung"
 
@@ -281,6 +297,10 @@ msgstr "HTML, das vor dem Feld eingefügt wird."
 msgid "Helptext"
 msgstr "Hinweistext"
 
+#: ./profiles/default/types/Helptext_Modal.xml
+msgid "Helptext Modal"
+msgstr "Hinweistext Modal"
+
 #: ./content/common.py:122
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr "Hier können zusätzliche Informationen für das Software-Team bereitgestellt werden, die beachtet werden sollen, wenn der Fragebogen erstellt wird."
@@ -293,7 +313,7 @@ msgstr "Tooltip (Icon mit Popup-Fenster für Benutzerhinweise)"
 msgid "ID Mapping"
 msgstr ""
 
-#: ./content/upload_field.py:95
+#: ./content/upload_field.py:103
 msgid "If no file type is selected, the default is * (all file types are accepted)."
 msgstr "Die ausgewählten Dateitypen müssen nach rechts verschoben werden. Wenn keine Dateitypen ausgewählt werden, ist der Default * (alle Dateitypen werden akzeptiert)."
 
@@ -330,6 +350,10 @@ msgstr "Label der Antwortoption"
 msgid "Label of the button to add new elements. Default: +"
 msgstr "Label des Knopfes, um neue Elemente hinzuzufügen. Default: +"
 
+#: ./content/helptext_modal.py:13
+msgid "Large"
+msgstr "Groß"
+
 #: ./content/option_list.py:25
 msgid "List of options. Every line contains one option. Options can either be values only or have an id in the format \"id:value\". IDs are only used if \"Use id of options in schema\" is checked in the parent field."
 msgstr "Liste der Optionen. Jede Zeile enthält eine Option. Optionen können entweder nur Werte sein oder eine ID im Format „id:wert“ haben. IDs werden nur verwendet, wenn „Nutze die ID der Optionen im Schema“ im übergeordneten Feld aktiviert ist."
@@ -343,41 +367,53 @@ msgid "Maximum cannot be smaller or equal to zero."
 msgstr "Das Maximum kann nicht kleiner oder gleich 0 sein."
 
 #: ./content/field.py:133
-#: ./content/upload_field.py:137
+#: ./content/upload_field.py:145
 msgid "Maximum cannot be smaller than Minimum."
 msgstr "Das Maximum kann nicht kleiner als das Minimum sein."
 
-#: ./content/upload_field.py:103
+#: ./content/upload_field.py:111
 msgid "Maximum file size (in MB)"
 msgstr "Maximale Dateigröße (in MB)"
 
-#: ./content/upload_field.py:104
+#: ./content/upload_field.py:112
 msgid "Maximum file size for each uploaded file. If empty, there is no limit."
 msgstr "Maximale Dateigröße für jede hochgeladene Datei. Wenn keine angegeben ist, gibt es kein Limit."
 
-#: ./content/upload_field.py:111
+#: ./content/upload_field.py:119
 msgid "Maximum number of files"
 msgstr "Maximale Anzahl an Dateien"
 
-#: ./content/upload_field.py:112
+#: ./content/upload_field.py:120
 msgid "Maximum number of files that can be uploaded. If empty, there is no limit."
 msgstr "Maximale Anzahl an Dateien, die hochgeladen werden können. Wenn keine angegeben ist, gibt es kein Limit."
+
+#: ./content/helptext_modal.py:12
+msgid "Medium"
+msgstr "Mittel"
 
 #: ./content/field.py:65
 msgid "Minimum"
 msgstr "Minimum"
 
-#: ./content/upload_field.py:120
+#: ./content/upload_field.py:128
 msgid "Minimum number of files"
 msgstr "Minimale Anzahl an Dateien"
 
-#: ./content/upload_field.py:121
+#: ./content/upload_field.py:129
 msgid "Minimum number of files that must be uploaded."
 msgstr "Minimale Anzahl an Dateien, die hochgeladen werden müssen."
 
 #: ./content/field.py:127
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 msgstr "Minimum/Maximum sind nur gültige Optionen für die folgenden Antworttypen: Textzeile, Textfeld, Passwort, Dezimalzahl, Ganzzahl."
+
+#: ./content/helptext_modal.py:29
+msgid "Modal Content"
+msgstr "Modal Inhalt"
+
+#: ./content/helptext_modal.py:23
+msgid "Modal Title"
+msgstr "Modal Titel"
 
 #: ./content/common.py:138
 msgid "Negate all show conditions"
@@ -389,7 +425,7 @@ msgstr "Anzahl Nachkommastellen"
 
 #: ./content/field.py:142
 msgid "Number of decimal digits is only a valid option for the answer type Decimal number."
-msgstr ""
+msgstr "Anzahl Nachkommastellen ist nur eine valide Option für den Antworttypen Dezimalzahl."
 
 #: ./content/common.py:189
 msgid "Object from which is dependent must be in the same Complex, Array, Fieldset or Form."
@@ -444,12 +480,12 @@ msgstr "Bitte fügen Sie Optionen zu diesem Auswahlfeld hinzu."
 msgid "Radiobuttons (single selection)"
 msgstr "Radiobuttons (Einfachauswahl)"
 
-#: ./content/reference.py:24
+#: ./content/reference.py:31
 #: ./profiles/default/types/Reference.xml
 msgid "Reference"
 msgstr "Referenz"
 
-#: ./content/reference.py:26
+#: ./content/reference.py:33
 msgid "Reference to another Form Element (e.g. Field or Array)"
 msgstr "Referenz auf ein anderes Fragebogenelement (z. B. Feld oder Array)"
 
@@ -476,9 +512,9 @@ msgstr "Auswahlfeld"
 
 #: ./content/option.py:99
 msgid "Selectionfields of the option and the dependent option must be in the same container."
-msgstr ""
+msgstr "Das Auswahlfeld der Option und das der abhängigen Option müssen sich im selben Container (Fragebogen, Array, ...) befinden."
 
-#: ./views/ui_schema_view.py:648
+#: ./views/ui_schema_view.py:739
 msgid "Show element content"
 msgstr "Elementinhalt anzeigen"
 
@@ -486,6 +522,10 @@ msgstr "Elementinhalt anzeigen"
 #: ./content/fieldset.py:26
 msgid "Show title in form"
 msgstr "Titel im Fragebogen anzeigen"
+
+#: ./content/helptext_modal.py:11
+msgid "Small"
+msgstr "Klein"
 
 #: ./content/field.py:17
 msgid "Telephone"
@@ -536,19 +576,19 @@ msgstr "Der Name der Werte, die aus den abgerufenen Optionen als Anzeige-Werte v
 msgid "The provided regular expression isn't valid."
 msgstr "Der angegebene reguläre Ausdruck ist nicht valide."
 
-#: ./content/reference.py:37
+#: ./content/reference.py:45
 msgid "The referenced object is either empty or deleted/invalid."
 msgstr "Das referenzierte Objekt ist entweder leer/ungültig oder wurde gelöscht."
 
-#: ./content/reference.py:69
+#: ./content/reference.py:86
 msgid "The referenced object is not within a Form."
 msgstr "Das referenzierte Objekt befindet sich nicht in einem Fragebogen."
 
-#: ./content/reference.py:76
+#: ./content/reference.py:94
 msgid "The referenced object is not within the same Form."
 msgstr "Das referenzierte Objekt befindet sich nicht im gleichen Fragebogen."
 
-#: ./content/upload_field.py:128
+#: ./content/upload_field.py:136
 msgid "The user will be forced to upload files individually."
 msgstr "Der Formularbenutzer wird gezwungen, Dateien einzeln hochzuladen."
 
@@ -556,13 +596,29 @@ msgstr "Der Formularbenutzer wird gezwungen, Dateien einzeln hochzuladen."
 msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt werden soll. Wenn keine Bedingung angegeben ist, wird das Feld immer angegeben. Wenn \"bedingung\" angegeben ist, wird das Feld nur angezeigt, wenn die Bedingung erfüllt ist. Die Bedingung wird mit dem Query-Parameter \"fork\" der URL überprüft. Mehrere Bedingungen können durch ein Komma getrennt werden. Beispiel: \"bedingung1, bedingung2, bedingung3\". Wenn eine der Bedingungen erfüllt ist, wird das Feld angezeigt, ansonsten nicht."
 
+#: ./content/helptext_modal.py:30
+msgid "This content is displayed inside the Modal."
+msgstr "Der Inhalt wird als Modal dargestellt."
+
 #: ./profiles/default/types/Helptext.xml
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr "Dieser Hinweistext kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden und als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
 
-#: ./views/ui_schema_view.py:286
+#: ./profiles/default/types/Helptext_Modal.xml
+msgid "This helptext is displayed as a modal element and can be added between two Fields/Fieldsets. It can be used as a helptext for the user to fill out the form."
+msgstr "Dieser Hinweistext wird als Modal angezeigt und kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden. Er kann als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
+
+#: ./views/ui_schema_view.py:297
 msgid "This is a reference."
 msgstr "Dies ist eine Referenz."
+
+#: ./content/helptext_modal.py:43
+msgid "This label is displayed on the button that opens the Modal."
+msgstr "Das Label wird im Button angezeigt, der das Modal öffnet."
+
+#: ./content/helptext_modal.py:24
+msgid "This title is displayed inside the Modal."
+msgstr "Der Titel wird im Modal dargestellt."
 
 #: ./content/field.py:22
 msgid "Time"
@@ -624,7 +680,7 @@ msgstr ""
 msgid "View"
 msgstr "View"
 
-#: ./views/ui_schema_view.py:646
+#: ./views/ui_schema_view.py:737
 msgid "View element"
 msgstr "Element anzeigen"
 
@@ -636,27 +692,31 @@ msgstr "Warnung: Diese Aktion konvertiert die Optionsliste zu einzelnen Optionen
 msgid "Whole number"
 msgstr "Ganzzahl"
 
+#: ./content/helptext_modal.py:35
+msgid "Width of the Modal"
+msgstr "Breite des Modals"
+
 #: ./profiles/default/types/Wizard.xml
 msgid "Wizard"
 msgstr ""
 
-#: ./content/reference.py:51
+#: ./content/reference.py:61
 msgid "You cannot depend on the object that is referenced."
 msgstr "Es kann keine Abhängigkeit zu dem Objekt geben, das referenziert wird."
 
-#: ./content/reference.py:40
+#: ./content/reference.py:49
 msgid "You cannot reference a Fieldset."
 msgstr "Feldgruppen können nicht referenziert werden."
 
-#: ./content/reference.py:44
+#: ./content/reference.py:53
 msgid "You cannot reference a Form."
 msgstr "Fragebögen können nicht referenziert werden."
 
-#: ./content/reference.py:42
+#: ./content/reference.py:51
 msgid "You cannot reference a Reference."
 msgstr "Referenzen können nicht referenziert werden."
 
-#: ./content/reference.py:46
+#: ./content/reference.py:55
 msgid "You cannot reference the object itself."
 msgstr "Es kann nicht das Objekt selbst referenziert werden."
 
