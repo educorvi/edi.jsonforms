@@ -222,7 +222,7 @@ msgstr "Externe Optionen"
 
 #: ./content/helptext_modal.py:14
 msgid "Extra Large"
-msgstr "Etra groß"
+msgstr "Extra groß"
 
 #: ./profiles/default/types/Field.xml
 msgid "Field"
