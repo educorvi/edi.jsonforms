@@ -1,4 +1,4 @@
-from edi.jsonforms.views.common import create_id, create_unique_id
+from edi.jsonforms.views.common import create_id, create_unique_id, get_path
 import re
 
 
@@ -8,31 +8,25 @@ so it saves manual computation time of the scopes
 """
 
 
-def find_scope(lookup_scopes, object):
+def find_scope(lookup_scopes, object, reference=None) -> str:
     obj_id = create_unique_id(object)
     if object.portal_type not in ["Option", "Field"]:
-        return {}
+        return ""
     elif object.portal_type == "Option":
         parent = object.aq_parent
         obj_id = create_unique_id(parent)
 
+    if reference:
+        obj_id = obj_id + "_" + create_unique_id(reference)
     scope = lookup_scopes.get(obj_id)
 
     # scope wasn't saved yet, has to be computed manually and then save it
     if scope is None:
-        scope = obj_id
         parent = object.aq_parent
         if object.portal_type == "Option":
             parent = parent.aq_parent
-        while parent.portal_type != "Form":
-            if parent.portal_type != "Fieldset":
-                if parent.portal_type == "Array":
-                    scope = create_id(parent) + "/items/properties/" + scope
-                else:
-                    scope = create_id(parent) + "/properties/" + scope
-            parent = parent.aq_parent
-        scope = "/properties/" + scope
-    lookup_scopes[obj_id] = scope
+        scope = get_path(object, reference)
+        lookup_scopes[obj_id] = scope
 
     return scope
 
@@ -260,14 +254,14 @@ def get_rule(scope, object):
     return rule
 
 
-def create_showon_properties(child, lookup_scopes):
+def create_showon_properties(child, lookup_scopes, reference=None):
     dependencies = child.dependencies
     if len(dependencies) == 1:
         try:
             dep = dependencies[0].to_object
             if dep is None:
                 return {}
-            scope = find_scope(lookup_scopes, dep)
+            scope = find_scope(lookup_scopes, dep, reference)
             showOn = {
                 "id": "ritaRule-" + create_id(child),
                 "rule": create_rule(scope, dep),
@@ -289,7 +283,7 @@ def create_showon_properties(child, lookup_scopes):
                 dep = dep.to_object
                 if dep is None:
                     continue
-                scope = find_scope(lookup_scopes, dep)
+                scope = find_scope(lookup_scopes, dep, reference)
                 dep_rule = create_rule(scope, dep)
 
                 showOn["rule"]["arguments"].append(dep_rule)

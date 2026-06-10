@@ -2,6 +2,7 @@ import re
 from urllib.parse import quote_plus
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.option import IOption
+from edi.jsonforms.content.reference import IReference
 
 try:
     from edi.jsonforms_override.behaviors.interfaces import (
@@ -182,7 +183,7 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
             return True
 
 
-def get_path(obj: IFormElement, without_root=False):
+def get_path(obj: IFormElement, reference: IReference | None = None) -> str:
     """
     get the path of an object in the json schema (leaves out fieldsets)
     e.g. /properties/object1/properties/selectionfield1/properties/option1
@@ -194,4 +195,10 @@ def get_path(obj: IFormElement, without_root=False):
             path = create_id(obj) + "/items/properties/" + path
         elif obj.portal_type != "Fieldset":
             path = create_id(obj) + "/properties/" + path
-    return "/properties/" + path
+    path = "/properties/" + path
+
+    if reference:
+        path_of_reference = get_path(reference)
+        path_of_referenced_object = get_path(reference.reference.to_object)
+        path = path.replace(path_of_referenced_object, path_of_reference)
+    return path

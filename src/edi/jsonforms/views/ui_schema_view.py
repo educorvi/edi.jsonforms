@@ -31,6 +31,9 @@ class UiSchemaView(BrowserView):
     is_single_view = False
     scope = "/properties/"
 
+    reference_parent = None  # to check if current child has reference as a parent
+    # TODO this is a temporary ugly fix
+
     def __init__(self, context, request, scope="/properties/"):
         super().__init__(context, request)
         self.uischema = {}
@@ -38,6 +41,7 @@ class UiSchemaView(BrowserView):
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
         self.scope = scope
+        self.reference_parent = None
 
         self.rita_dependent_options = {}
 
@@ -93,7 +97,9 @@ class UiSchemaView(BrowserView):
 
         # return schema
 
-    def get_schema_for_child(self, child, scope, recursive=True, overwrite_scope=None):
+    def get_schema_for_child(
+        self, child, scope, recursive=True, overwrite_scope=None
+    ) -> dict:
         type = child.portal_type
         child_schema = {}
 
@@ -265,6 +271,7 @@ class UiSchemaView(BrowserView):
         return uploadfield_schema
 
     def get_schema_for_reference(self, reference, scope):
+        self.reference_parent = reference
         try:
             obj = reference.reference.to_object
             if obj:
@@ -300,6 +307,8 @@ class UiSchemaView(BrowserView):
                 return obj_schema
         except:
             return {}  # referenced object got deleted, ignore
+        finally:
+            self.reference_parent = None  # reset
 
     def helptext_schema(self, htmlData):
         # helptext as html-element
@@ -645,6 +654,7 @@ class UiSchemaView(BrowserView):
             "UploadField",
             "Complex",
             "Array",
+            "Reference",
         ]:
             # descendantControlOverrides = add_control(descendantControlOverrides, child_object, scope)
             child_tmp_schema = self.get_schema_for_child(
@@ -690,6 +700,12 @@ class UiSchemaView(BrowserView):
                 descendantControlOverrides[child_tmp_schema["scope"]] = child_schema
         else:  # ignore this type
             pass
+
+        if child_object.portal_type == "Reference":
+            try:
+                child_object = child_object.reference.to_object
+            except:  # referenced object got deleted, ignore
+                return descendantControlOverrides
 
         # add it recursively if child_object is a container type
         if child_object.portal_type in ["Complex", "Array"]:
@@ -778,7 +794,9 @@ class UiSchemaView(BrowserView):
             return child_schema
         # add showOn dependencies
         if child_object.dependencies:
-            showOn = create_showon_properties(child_object, self.lookup_scopes)
+            showOn = create_showon_properties(
+                child_object, self.lookup_scopes, self.reference_parent
+            )
             if showOn != {}:
                 child_schema["showOn"] = showOn
         return child_schema
