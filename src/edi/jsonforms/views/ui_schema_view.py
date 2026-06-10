@@ -271,6 +271,7 @@ class UiSchemaView(BrowserView):
         return uploadfield_schema
 
     def get_schema_for_reference(self, reference, scope):
+        save_ref = self.reference_parent
         self.reference_parent = reference
         try:
             obj = reference.reference.to_object
@@ -308,7 +309,7 @@ class UiSchemaView(BrowserView):
         except:
             return {}  # referenced object got deleted, ignore
         finally:
-            self.reference_parent = None  # reset
+            self.reference_parent = save_ref  # reset
 
     def helptext_schema(self, htmlData):
         # helptext as html-element
@@ -705,6 +706,14 @@ class UiSchemaView(BrowserView):
             try:
                 child_object = child_object.reference.to_object
             except:  # referenced object got deleted, ignore
+                logger.warning(
+                    f"Could not get referenced object for {child_object.id}, it might have been deleted"
+                )
+                return descendantControlOverrides
+            if not child_object:
+                logger.warning(
+                    f"Referenced object for {child_object.id} not found, it might have been deleted"
+                )
                 return descendantControlOverrides
 
         # add it recursively if child_object is a container type

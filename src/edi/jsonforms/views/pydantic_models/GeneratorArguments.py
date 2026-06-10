@@ -25,7 +25,7 @@ class GeneratorArguments(BaseModel):
         request: WSGIRequest | HTTPRequest,
         is_single_view: bool,
         is_extended_schema: bool = False,
-        reference: str | None = None,
+        reference: IReference | None = None,
     ):
         super().__init__(
             request=request,

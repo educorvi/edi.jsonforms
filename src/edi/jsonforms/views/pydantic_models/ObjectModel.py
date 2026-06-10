@@ -405,9 +405,15 @@ class ReferenceModel(BaseFormElementModel):
     def set_children(self, generatorArguments: GeneratorArguments):
         save_ref = generatorArguments.reference
         generatorArguments.reference = self.form_element
-        if safe_hasattr(self.target, "set_children"):
-            self.target.set_children(generatorArguments)
-        generatorArguments.reference = save_ref
+        try:
+            if safe_hasattr(self.target, "set_children"):
+                self.target.set_children(generatorArguments)
+        except Exception as e:
+            logger.error(
+                f"Error while setting children for reference {self.id} with target {self.form_element.reference.to_object.absolute_url()}: {e}"
+            )
+        finally:
+            generatorArguments.reference = save_ref
 
     # method to get json schema, overwrites standard method
     def get_json_schema(self) -> dict:
