@@ -702,9 +702,15 @@ class UiSchemaView(BrowserView):
         else:  # ignore this type
             pass
 
+        is_reference = False
+        save_tools_on = self.tools_on
         if child_object.portal_type == "Reference":
             try:
                 child_object = child_object.reference.to_object
+                is_reference = True
+                self.set_tools(
+                    False
+                )  # to deactivate tools for children of referenced object
             except:  # referenced object got deleted, ignore
                 logger.warning(
                     f"Could not get referenced object for {child_object.id}, it might have been deleted"
@@ -734,6 +740,9 @@ class UiSchemaView(BrowserView):
                         descendantControlOverrides, c_object, container_base_scope
                     )
                 )
+
+        if is_reference:
+            self.set_tools(save_tools_on)  # reactivate tools
 
         return descendantControlOverrides
 
