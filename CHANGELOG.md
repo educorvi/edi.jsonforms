@@ -9,6 +9,14 @@
 
 <!-- towncrier release notes start -->
 
+## 2.0.0a4 (2026-06-23)
+
+
+### Bug fixes:
+
+- update dependency [#3a0c29e](https://github.com/educorvi/edi.jsonforms/issues/3a0c29e)
+- remove bootstrap-icons.css file [#2e956fd](https://github.com/educorvi/edi.jsonforms/issues/2e956fd)
+
 ## 2.0.0a3 (2026-06-23)
 
 
