@@ -24,9 +24,11 @@
              data-bs-parent="#accordionDeveloper"
         >
           <div class="accordion-body">
-            <pre class="rounded"><code class="language-json theme-atom-one-dark"
-                    tal:content="view/get_json_schema"
-              ></code></pre>
+            <metal:json use-macro="context/@@edi_jsonforms_macros/macros/json_code_block"
+                        tal:define="
+                          json_content view/get_json_schema;
+                        "
+            />
           </div>
         </div>
       </div>
@@ -48,9 +50,11 @@
              data-bs-parent="#accordionDeveloper"
         >
           <div class="accordion-body">
-            <pre class="rounded"><code class="language-json theme-atom-one-dark"
-                    tal:content="view/get_ui_schema"
-              ></code></pre>
+            <metal:json use-macro="context/@@edi_jsonforms_macros/macros/json_code_block"
+                        tal:define="
+                          json_content view/get_ui_schema;
+                        "
+            />
           </div>
         </div>
       </div>

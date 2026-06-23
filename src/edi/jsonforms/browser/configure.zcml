@@ -15,6 +15,14 @@
       layer="edi.jsonforms.interfaces.IEdiJsonformsLayer"
       />
 
+  <!-- Shared macros, reusable from other addons via context/@@edi_jsonforms_macros -->
+  <browser:page
+      name="edi_jsonforms_macros"
+      for="*"
+      template="macros.pt"
+      permission="zope2.View"
+      />
+
   <!-- Publish static files -->
   <plone:static
       directory="static"
