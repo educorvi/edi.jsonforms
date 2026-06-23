@@ -9,6 +9,13 @@
 
 <!-- towncrier release notes start -->
 
+## 2.0.0a3 (2026-06-23)
+
+
+### Bug fixes:
+
+- fix dependency retrieval [#c559fad](https://github.com/educorvi/edi.jsonforms/issues/c559fad)
+
 ## 2.0.0a2 (2026-06-11)
 
 
