@@ -16,6 +16,8 @@ def remove_bootstrap_icons_bundle(setup_context):
     for key in keys_to_delete:
         del registry.records[key]
     if keys_to_delete:
-        logger.info("Removed bootstrap icons bundle (%s) from registry.", BOOTSTRAP_ICONS_BUNDLE)
+        logger.info(
+            "Removed bootstrap icons bundle (%s) from registry.", BOOTSTRAP_ICONS_BUNDLE
+        )
     else:
         logger.info("Bootstrap icons bundle not found in registry, skipping.")
