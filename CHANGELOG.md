@@ -9,6 +9,13 @@
 
 <!-- towncrier release notes start -->
 
+## 2.0.0a5 (2026-06-23)
+
+
+### Bug fixes:
+
+- replace inline JSON rendering with reusable macro and fix styling [#59a3840](https://github.com/educorvi/edi.jsonforms/issues/59a3840)
+
 ## 2.0.0a4 (2026-06-23)
 
 
