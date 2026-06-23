@@ -47,14 +47,6 @@
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/bi-css"
-  >
-    <value key="enabled">True</value>
-    <value key="csscompilation">++resource++edi.jsonforms/css/bootstrap/bootstrap-icons.min.css</value>
-    <value key="depends">plone</value>
-  </records>
-
-  <records interface="plone.base.interfaces.resources.IBundleRegistry"
            prefix="plone.bundles/vjf-jscript"
   >
     <value key="enabled">True</value>
