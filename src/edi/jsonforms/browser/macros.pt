@@ -1,0 +1,4 @@
+<tal:json_code_block metal:define-macro="json_code_block">
+  <pre class="rounded nexus-exclude"><code class="language-json theme-atom-one-dark"
+                                           tal:content="json_content"></code></pre>
+</tal:json_code_block>
