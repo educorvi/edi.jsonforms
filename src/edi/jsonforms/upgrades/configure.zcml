@@ -1,0 +1,17 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="edi.jsonforms"
+    >
+
+  <!-- 1000 -> 2000 -->
+  <genericsetup:upgradeStep
+      title="Remove bootstrap icons bundle from resource registry"
+      description=""
+      profile="edi.jsonforms:default"
+      source="1000"
+      destination="2000"
+      handler="edi.jsonforms.upgrades.to2000.remove_bootstrap_icons_bundle"
+      />
+
+</configure>
