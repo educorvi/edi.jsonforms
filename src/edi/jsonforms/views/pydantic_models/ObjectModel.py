@@ -198,6 +198,7 @@ class ObjectModel(BaseFormElementModel):
                     generatorArguments.formProperties,
                     model,
                     generatorArguments.is_extended_schema,
+                    generatorArguments.reference,
                 )  # adds child to dependentRequired or allOf of the outer form
             else:
                 self.required.append(model.get_id())
@@ -375,6 +376,15 @@ class ReferenceModel(BaseFormElementModel):
                 reference_object, parent_model, generatorArguments, False
             )
 
+            if model is None:
+                logger.error(
+                    f"Could not create model for reference {self.id} with target {reference_object.absolute_url()}"
+                )
+                self.target = BaseFormElementModel(
+                    form_element, parent_model, generatorArguments.request
+                )  # create empty model to avoid errors in the rest of the code
+                return
+
             # set id of referenced object to the id of the reference, so it can be found in the properties of the parent model
             model.set_id(self.id)
 
@@ -383,10 +393,27 @@ class ReferenceModel(BaseFormElementModel):
             model.set_dependencies(dependencies)
 
             self.target = model
+        else:
+            logger.error(
+                f"Reference {self.id} has no target, setting empty model as target to avoid errors in the rest of the code"
+            )
+            self.target = BaseFormElementModel(
+                form_element, parent_model, generatorArguments.request
+            )  # create empty model to avoid errors in the rest of the code
+            return
 
     def set_children(self, generatorArguments: GeneratorArguments):
-        if safe_hasattr(self.target, "set_children"):
-            self.target.set_children(generatorArguments)
+        save_ref = generatorArguments.reference
+        generatorArguments.reference = self.form_element
+        try:
+            if safe_hasattr(self.target, "set_children"):
+                self.target.set_children(generatorArguments)
+        except Exception as e:
+            logger.error(
+                f"Error while setting children for reference {self.id} with target {self.form_element.reference.to_object.absolute_url()}: {e}"
+            )
+        finally:
+            generatorArguments.reference = save_ref
 
     # method to get json schema, overwrites standard method
     def get_json_schema(self) -> dict:

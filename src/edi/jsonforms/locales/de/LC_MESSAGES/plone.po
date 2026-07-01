@@ -1,0 +1,26 @@
+msgid "Form"
+msgstr "Fragebogen"
+
+msgid "Complex"
+msgstr "Objekt"
+
+msgid "Field"
+msgstr "Feld"
+
+msgid "Fieldset"
+msgstr "Feldgruppe"
+
+msgid "Helptext"
+msgstr "Hinweistext"
+
+msgid "OptionList"
+msgstr "Optionenliste"
+
+msgid "Reference"
+msgstr "Referenz"
+
+msgid "SelectionField"
+msgstr "Auswahlfeld"
+
+msgid "UploadField"
+msgstr "Upload-Feld"

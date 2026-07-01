@@ -74,6 +74,9 @@ possible_file_types = [
     SimpleTerm(
         "application/vnd.apple.keynote", "application/vnd.apple.keynote", ".key"
     ),
+    # other common file types
+    SimpleTerm("application/zip", "application/zip", ".zip"),
+    SimpleTerm("application/xml", "application/xml", ".xml"),
 ]
 Possible_file_types = SimpleVocabulary(possible_file_types)
 

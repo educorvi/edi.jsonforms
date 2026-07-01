@@ -55,6 +55,7 @@ def add_dependent_required(
     formProperties: FormProperties,
     child: BaseFormElementModel,
     is_extended_schema: bool = False,
+    reference=None,
 ):
     """
     this method changes dependentRequired or/and allOf of the parent based on the dependencies of the child model
@@ -81,9 +82,9 @@ def add_dependent_required(
             continue
 
         if dep.portal_type == "Option":
-            dep_path = get_path(dep.aq_parent)
+            dep_path = get_path(dep.aq_parent, reference=reference)
         else:
-            dep_path = get_path(dep)
+            dep_path = get_path(dep, reference=reference)
 
         def create_statement(obj, obj_path) -> dict:
             """
@@ -140,7 +141,9 @@ def add_dependent_required(
 
         if_statement = {"if": create_statement(dep, dep_path)}
         then_statement = {
-            "then": create_statement(child.form_element, get_path(child.form_element))
+            "then": create_statement(
+                child.form_element, get_path(child.form_element, reference=reference)
+            )
         }
         if is_extended_schema:
             else_statement = create_else_statement(child.form_element)
