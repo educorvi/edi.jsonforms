@@ -416,6 +416,9 @@ class UiSchemaView(BrowserView):
                                 endpoint = endpoint.getObject()
                                 if endpoint.portal_type == "Endpoint":
                                     headers[f"endpoint-{i}-url"] = endpoint.url
+                                    headers[f"endpoint-{i}-uid"] = (
+                                        endpoint.UID()  # needed to retrieve the api key and/or timeout in the backend
+                                    )
                                     if (
                                         endpoint.api_key_header_name
                                         and endpoint.api_key
@@ -423,9 +426,7 @@ class UiSchemaView(BrowserView):
                                         headers[f"endpoint-{i}-api-key-header-name"] = (
                                             endpoint.api_key_header_name
                                         )
-                                        headers[f"endpoint-{i}-uid"] = (
-                                            endpoint.UID()
-                                        )  # don't save api key in the ui-schema for security reasons
+                                        # don't save api key in the ui-schema for security reasons
                                         # the api key is retrieved in the backend using the endpoint's UID and added to the request headers there
                                 i += 1
 
