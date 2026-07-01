@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-06-08 13:22+0000\n"
+"POT-Creation-Date: 2026-03-12 15:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,7 +57,7 @@ msgstr ""
 msgid "API Key Name"
 msgstr ""
 
-#: ./content/upload_field.py:102
+#: ./content/upload_field.py:94
 msgid "Accepted file types for file upload"
 msgstr ""
 
@@ -71,7 +71,7 @@ msgstr ""
 
 #: ./content/common.py:246
 #: ./content/field.py:53
-#: ./content/upload_field.py:91
+#: ./content/upload_field.py:90
 msgid "Advanced Options"
 msgstr ""
 
@@ -89,10 +89,6 @@ msgstr ""
 
 #: ./profiles/default/types/Array.xml
 msgid "Array"
-msgstr ""
-
-#: ./content/helptext_modal.py:42
-msgid "Button Label"
 msgstr ""
 
 #: ./content/common.py:200
@@ -116,14 +112,6 @@ msgstr ""
 msgid "Choose the answer type"
 msgstr ""
 
-#: ./content/helptext_modal.py:49
-msgid "Choose the variant of the button that opens the Modal."
-msgstr ""
-
-#: ./content/helptext_modal.py:48
-msgid "Color variant of the button"
-msgstr ""
-
 #: ./profiles/default/types/Complex.xml
 msgid "Complex"
 msgstr ""
@@ -132,7 +120,7 @@ msgstr ""
 msgid "Condition for showing this field"
 msgstr ""
 
-#: ./views/ui_schema_view.py:761
+#: ./views/ui_schema_view.py:670
 msgid "Content"
 msgstr ""
 
@@ -149,7 +137,7 @@ msgid "Could not determine parent SelectionField."
 msgstr ""
 
 #: ./content/option.py:88
-#: ./content/reference.py:79
+#: ./content/reference.py:63
 msgid "Could not determine the parent Form."
 msgstr ""
 
@@ -165,11 +153,11 @@ msgstr ""
 msgid "Decimal number"
 msgstr ""
 
-#: ./views/ui_schema_view.py:766
+#: ./views/ui_schema_view.py:675
 msgid "Delete"
 msgstr ""
 
-#: ./views/ui_schema_view.py:740
+#: ./views/ui_schema_view.py:649
 msgid "Delete element"
 msgstr ""
 
@@ -198,7 +186,7 @@ msgstr ""
 msgid "Developer Fields"
 msgstr ""
 
-#: ./content/upload_field.py:135
+#: ./content/upload_field.py:127
 msgid "Display upload field as array"
 msgstr ""
 
@@ -208,7 +196,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: ./views/ui_schema_view.py:738
+#: ./views/ui_schema_view.py:647
 msgid "Edit element"
 msgstr ""
 
@@ -218,10 +206,6 @@ msgstr ""
 
 #: ./content/option_list.py:35
 msgid "External Options"
-msgstr ""
-
-#: ./content/helptext_modal.py:14
-msgid "Extra Large"
 msgstr ""
 
 #: ./profiles/default/types/Field.xml
@@ -272,7 +256,7 @@ msgstr ""
 msgid "Form View with tools"
 msgstr ""
 
-#: ./views/ui_schema_view.py:477
+#: ./views/ui_schema_view.py:439
 msgid "Form submission"
 msgstr ""
 
@@ -297,10 +281,6 @@ msgstr ""
 msgid "Helptext"
 msgstr ""
 
-#: ./profiles/default/types/Helptext_Modal.xml
-msgid "Helptext Modal"
-msgstr ""
-
 #: ./content/common.py:122
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
 msgstr ""
@@ -313,7 +293,7 @@ msgstr ""
 msgid "ID Mapping"
 msgstr ""
 
-#: ./content/upload_field.py:103
+#: ./content/upload_field.py:95
 msgid "If no file type is selected, the default is * (all file types are accepted)."
 msgstr ""
 
@@ -350,10 +330,6 @@ msgstr ""
 msgid "Label of the button to add new elements. Default: +"
 msgstr ""
 
-#: ./content/helptext_modal.py:13
-msgid "Large"
-msgstr ""
-
 #: ./content/option_list.py:25
 msgid "List of options. Every line contains one option. Options can either be values only or have an id in the format \"id:value\". IDs are only used if \"Use id of options in schema\" is checked in the parent field."
 msgstr ""
@@ -367,52 +343,40 @@ msgid "Maximum cannot be smaller or equal to zero."
 msgstr ""
 
 #: ./content/field.py:133
-#: ./content/upload_field.py:145
+#: ./content/upload_field.py:137
 msgid "Maximum cannot be smaller than Minimum."
 msgstr ""
 
-#: ./content/upload_field.py:111
+#: ./content/upload_field.py:103
 msgid "Maximum file size (in MB)"
 msgstr ""
 
-#: ./content/upload_field.py:112
+#: ./content/upload_field.py:104
 msgid "Maximum file size for each uploaded file. If empty, there is no limit."
 msgstr ""
 
-#: ./content/upload_field.py:119
+#: ./content/upload_field.py:111
 msgid "Maximum number of files"
 msgstr ""
 
-#: ./content/upload_field.py:120
+#: ./content/upload_field.py:112
 msgid "Maximum number of files that can be uploaded. If empty, there is no limit."
-msgstr ""
-
-#: ./content/helptext_modal.py:12
-msgid "Medium"
 msgstr ""
 
 #: ./content/field.py:65
 msgid "Minimum"
 msgstr ""
 
-#: ./content/upload_field.py:128
+#: ./content/upload_field.py:120
 msgid "Minimum number of files"
 msgstr ""
 
-#: ./content/upload_field.py:129
+#: ./content/upload_field.py:121
 msgid "Minimum number of files that must be uploaded."
 msgstr ""
 
 #: ./content/field.py:127
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
-msgstr ""
-
-#: ./content/helptext_modal.py:29
-msgid "Modal Content"
-msgstr ""
-
-#: ./content/helptext_modal.py:23
-msgid "Modal Title"
 msgstr ""
 
 #: ./content/common.py:138
@@ -480,12 +444,12 @@ msgstr ""
 msgid "Radiobuttons (single selection)"
 msgstr ""
 
-#: ./content/reference.py:31
+#: ./content/reference.py:24
 #: ./profiles/default/types/Reference.xml
 msgid "Reference"
 msgstr ""
 
-#: ./content/reference.py:33
+#: ./content/reference.py:26
 msgid "Reference to another Form Element (e.g. Field or Array)"
 msgstr ""
 
@@ -514,17 +478,13 @@ msgstr ""
 msgid "Selectionfields of the option and the dependent option must be in the same container."
 msgstr ""
 
-#: ./views/ui_schema_view.py:739
+#: ./views/ui_schema_view.py:648
 msgid "Show element content"
 msgstr ""
 
 #: ./content/array.py:34
 #: ./content/fieldset.py:26
 msgid "Show title in form"
-msgstr ""
-
-#: ./content/helptext_modal.py:11
-msgid "Small"
 msgstr ""
 
 #: ./content/field.py:17
@@ -576,19 +536,19 @@ msgstr ""
 msgid "The provided regular expression isn't valid."
 msgstr ""
 
-#: ./content/reference.py:45
+#: ./content/reference.py:37
 msgid "The referenced object is either empty or deleted/invalid."
 msgstr ""
 
-#: ./content/reference.py:86
+#: ./content/reference.py:69
 msgid "The referenced object is not within a Form."
 msgstr ""
 
-#: ./content/reference.py:94
+#: ./content/reference.py:76
 msgid "The referenced object is not within the same Form."
 msgstr ""
 
-#: ./content/upload_field.py:136
+#: ./content/upload_field.py:128
 msgid "The user will be forced to upload files individually."
 msgstr ""
 
@@ -596,28 +556,12 @@ msgstr ""
 msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr ""
 
-#: ./content/helptext_modal.py:30
-msgid "This content is displayed inside the Modal."
-msgstr ""
-
 #: ./profiles/default/types/Helptext.xml
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr ""
 
-#: ./profiles/default/types/Helptext_Modal.xml
-msgid "This helptext is displayed as a modal element and can be added between two Fields/Fieldsets. It can be used as a helptext for the user to fill out the form."
-msgstr ""
-
-#: ./views/ui_schema_view.py:297
+#: ./views/ui_schema_view.py:286
 msgid "This is a reference."
-msgstr ""
-
-#: ./content/helptext_modal.py:43
-msgid "This label is displayed on the button that opens the Modal."
-msgstr ""
-
-#: ./content/helptext_modal.py:24
-msgid "This title is displayed inside the Modal."
 msgstr ""
 
 #: ./content/field.py:22
@@ -680,7 +624,7 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: ./views/ui_schema_view.py:737
+#: ./views/ui_schema_view.py:646
 msgid "View element"
 msgstr ""
 
@@ -692,31 +636,27 @@ msgstr ""
 msgid "Whole number"
 msgstr ""
 
-#: ./content/helptext_modal.py:35
-msgid "Width of the Modal"
-msgstr ""
-
 #: ./profiles/default/types/Wizard.xml
 msgid "Wizard"
 msgstr ""
 
-#: ./content/reference.py:61
+#: ./content/reference.py:51
 msgid "You cannot depend on the object that is referenced."
 msgstr ""
 
-#: ./content/reference.py:49
+#: ./content/reference.py:40
 msgid "You cannot reference a Fieldset."
 msgstr ""
 
-#: ./content/reference.py:53
+#: ./content/reference.py:44
 msgid "You cannot reference a Form."
 msgstr ""
 
-#: ./content/reference.py:51
+#: ./content/reference.py:42
 msgid "You cannot reference a Reference."
 msgstr ""
 
-#: ./content/reference.py:55
+#: ./content/reference.py:46
 msgid "You cannot reference the object itself."
 msgstr ""
 
