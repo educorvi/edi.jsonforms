@@ -78,8 +78,6 @@ def create_model_recursively(
     elif form_element.portal_type == "Helptext":
         # model = HelptextModel(form_element, parent_model)  # has no json schema
         return None
-    elif form_element.portal_type == "Helptext Modal":
-        return None  # has no json schema
     elif form_element.portal_type == "Button Group":
         # model = ButtonGroupModel(form_element, parent_model)  # has no json schema
         return None

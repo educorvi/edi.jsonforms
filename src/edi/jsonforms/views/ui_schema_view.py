@@ -113,8 +113,6 @@ class UiSchemaView(BrowserView):
             child_schema = self.get_schema_for_reference(child, scope)
         elif type == "Helptext":
             child_schema = self.get_schema_for_helptext(child)
-        elif type == "Helptext Modal":
-            child_schema = self.get_schema_for_helptext_modal(child)
         elif type == "Button Group":
             child_schema = self.get_schema_for_buttons(child)
         elif type == "Array":
@@ -320,37 +318,35 @@ class UiSchemaView(BrowserView):
         return helptext_schema
 
     def get_schema_for_helptext(self, helptext):
-        # helptext as html-element
-        text = ""
-        if self.tools_on:
-            text += f"{self.get_tools_html(helptext)}\n"
+        content = ""
         if safe_hasattr(helptext.helptext, "output"):
-            text += str(helptext.helptext.output)
+            content = str(helptext.helptext.output)
 
-        helptext_schema = self.helptext_schema(text)
-        helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
+        if not safe_hasattr(helptext, "modal_enabled"):
+            # helptext as html-element
+            text = ""
+            if self.tools_on:
+                text += f"{self.get_tools_html(helptext)}\n"
+            text += content
+            helptext_schema = self.helptext_schema(text)
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
+        else:
+            helptext_schema = {
+                "type": "Modal",
+                "button": {
+                    "text": helptext.modal_button_label,
+                    "variant": "info",
+                    "asLink": True,
+                },
+                "modal": {
+                    "title": helptext.modal_title,
+                    "content": content,
+                    "size": "x-large",
+                },
+            }
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
+            helptext_schema = self.add_tools_to_schema(helptext_schema, helptext)
         return helptext_schema
-
-    def get_schema_for_helptext_modal(self, helptext_modal):
-        helptext_modal_schema = {
-            "type": "Modal",
-            "button": {
-                "text": helptext_modal.button_label,
-                "variant": helptext_modal.button_variant,
-            },
-            "modal": {
-                "title": helptext_modal.title,
-                "content": helptext_modal.content,
-                "size": helptext_modal.size,
-            },
-        }
-        helptext_modal_schema = self.add_dependencies_to_schema(
-            helptext_modal_schema, helptext_modal
-        )
-        helptext_modal_schema = self.add_tools_to_schema(
-            helptext_modal_schema, helptext_modal
-        )
-        return helptext_modal_schema
 
     def get_schema_for_buttons(self, button_group):
         buttons = button_group.getFolderContents()

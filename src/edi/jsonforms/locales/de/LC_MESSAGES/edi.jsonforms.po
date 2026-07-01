@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-06-08 13:22+0000\n"
+"POT-Creation-Date: 2026-06-30 12:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,7 +57,7 @@ msgstr ""
 msgid "API Key Name"
 msgstr ""
 
-#: ./content/upload_field.py:102
+#: ./content/upload_field.py:105
 msgid "Accepted file types for file upload"
 msgstr "Akzeptierte Dateitypen auswählen"
 
@@ -71,7 +71,7 @@ msgstr "Zusatzinformationen"
 
 #: ./content/common.py:246
 #: ./content/field.py:53
-#: ./content/upload_field.py:91
+#: ./content/upload_field.py:94
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
 
@@ -91,7 +91,7 @@ msgstr "Eine Optionenliste stellt eine Sammlung vordefinierter Auswahlmöglichke
 msgid "Array"
 msgstr "Array"
 
-#: ./content/helptext_modal.py:42
+#: ./content/helptext.py:56
 msgid "Button Label"
 msgstr ""
 
@@ -116,14 +116,6 @@ msgstr "Checkboxen (Mehrfachauswahl)"
 msgid "Choose the answer type"
 msgstr "Auswahl des Antworttyps"
 
-#: ./content/helptext_modal.py:49
-msgid "Choose the variant of the button that opens the Modal."
-msgstr "Variante des Buttons, der das Modal öffnet."
-
-#: ./content/helptext_modal.py:48
-msgid "Color variant of the button"
-msgstr "Farbvariante des Buttons"
-
 #: ./profiles/default/types/Complex.xml
 msgid "Complex"
 msgstr "Objekt"
@@ -132,7 +124,7 @@ msgstr "Objekt"
 msgid "Condition for showing this field"
 msgstr "Bedingung, um dieses Feld anzuzeigen"
 
-#: ./views/ui_schema_view.py:761
+#: ./views/ui_schema_view.py:788
 msgid "Content"
 msgstr "Inhalt"
 
@@ -165,11 +157,11 @@ msgstr "Datum und Uhrzeit"
 msgid "Decimal number"
 msgstr "Dezimalzahl"
 
-#: ./views/ui_schema_view.py:766
+#: ./views/ui_schema_view.py:793
 msgid "Delete"
 msgstr "Löschen"
 
-#: ./views/ui_schema_view.py:740
+#: ./views/ui_schema_view.py:767
 msgid "Delete element"
 msgstr "Element löschen"
 
@@ -198,7 +190,11 @@ msgstr "Beschreibung des Feldes bzw. der Frage"
 msgid "Developer Fields"
 msgstr "Entwicklerfelder"
 
-#: ./content/upload_field.py:135
+#: ./content/helptext.py:40
+msgid "Display the helptext in a modal instead of inline."
+msgstr "Den Hilfetext als Modal anzeigen."
+
+#: ./content/upload_field.py:138
 msgid "Display upload field as array"
 msgstr "Upload-Feld als Array darstellen"
 
@@ -208,7 +204,7 @@ msgstr "Upload-Feld als Array darstellen"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: ./views/ui_schema_view.py:738
+#: ./views/ui_schema_view.py:765
 msgid "Edit element"
 msgstr "Element bearbeiten"
 
@@ -216,13 +212,13 @@ msgstr "Element bearbeiten"
 msgid "Email"
 msgstr "Email"
 
+#: ./content/helptext.py:39
+msgid "Enable Modal"
+msgstr "Modalansicht aktivieren"
+
 #: ./content/option_list.py:35
 msgid "External Options"
 msgstr "Externe Optionen"
-
-#: ./content/helptext_modal.py:14
-msgid "Extra Large"
-msgstr "Extra groß"
 
 #: ./profiles/default/types/Field.xml
 msgid "Field"
@@ -272,7 +268,7 @@ msgstr "Web-Ansicht"
 msgid "Form View with tools"
 msgstr "Werkzeug-Ansicht"
 
-#: ./views/ui_schema_view.py:477
+#: ./views/ui_schema_view.py:480
 msgid "Form submission"
 msgstr "Formularübermittlung"
 
@@ -292,14 +288,10 @@ msgstr "HTML, das nach dem Feld eingefügt wird."
 msgid "HTML that will be inserted before the field."
 msgstr "HTML, das vor dem Feld eingefügt wird."
 
-#: ./content/helptext.py:23
+#: ./content/helptext.py:24
 #: ./profiles/default/types/Helptext.xml
 msgid "Helptext"
 msgstr "Hinweistext"
-
-#: ./profiles/default/types/Helptext_Modal.xml
-msgid "Helptext Modal"
-msgstr "Hinweistext Modal"
 
 #: ./content/common.py:122
 msgid "Here you can provide additional information that the Software-Team should to take into account while creating the Form."
@@ -313,7 +305,11 @@ msgstr "Tooltip (Icon mit Popup-Fenster für Benutzerhinweise)"
 msgid "ID Mapping"
 msgstr ""
 
-#: ./content/upload_field.py:103
+#: ./content/helptext.py:81
+msgid "If modal is enabled, you must provide a title and button label."
+msgstr "Wenn die Modalansicht aktiviert ist, müssen Titel und Button Label angegeben werden."
+
+#: ./content/upload_field.py:106
 msgid "If no file type is selected, the default is * (all file types are accepted)."
 msgstr "Die ausgewählten Dateitypen müssen nach rechts verschoben werden. Wenn keine Dateitypen ausgewählt werden, ist der Default * (alle Dateitypen werden akzeptiert)."
 
@@ -350,10 +346,6 @@ msgstr "Label der Antwortoption"
 msgid "Label of the button to add new elements. Default: +"
 msgstr "Label des Knopfes, um neue Elemente hinzuzufügen. Default: +"
 
-#: ./content/helptext_modal.py:13
-msgid "Large"
-msgstr "Groß"
-
 #: ./content/option_list.py:25
 msgid "List of options. Every line contains one option. Options can either be values only or have an id in the format \"id:value\". IDs are only used if \"Use id of options in schema\" is checked in the parent field."
 msgstr "Liste der Optionen. Jede Zeile enthält eine Option. Optionen können entweder nur Werte sein oder eine ID im Format „id:wert“ haben. IDs werden nur verwendet, wenn „Nutze die ID der Optionen im Schema“ im übergeordneten Feld aktiviert ist."
@@ -367,39 +359,35 @@ msgid "Maximum cannot be smaller or equal to zero."
 msgstr "Das Maximum kann nicht kleiner oder gleich 0 sein."
 
 #: ./content/field.py:133
-#: ./content/upload_field.py:145
+#: ./content/upload_field.py:148
 msgid "Maximum cannot be smaller than Minimum."
 msgstr "Das Maximum kann nicht kleiner als das Minimum sein."
 
-#: ./content/upload_field.py:111
+#: ./content/upload_field.py:114
 msgid "Maximum file size (in MB)"
 msgstr "Maximale Dateigröße (in MB)"
 
-#: ./content/upload_field.py:112
+#: ./content/upload_field.py:115
 msgid "Maximum file size for each uploaded file. If empty, there is no limit."
 msgstr "Maximale Dateigröße für jede hochgeladene Datei. Wenn keine angegeben ist, gibt es kein Limit."
 
-#: ./content/upload_field.py:119
+#: ./content/upload_field.py:122
 msgid "Maximum number of files"
 msgstr "Maximale Anzahl an Dateien"
 
-#: ./content/upload_field.py:120
+#: ./content/upload_field.py:123
 msgid "Maximum number of files that can be uploaded. If empty, there is no limit."
 msgstr "Maximale Anzahl an Dateien, die hochgeladen werden können. Wenn keine angegeben ist, gibt es kein Limit."
-
-#: ./content/helptext_modal.py:12
-msgid "Medium"
-msgstr "Mittel"
 
 #: ./content/field.py:65
 msgid "Minimum"
 msgstr "Minimum"
 
-#: ./content/upload_field.py:128
+#: ./content/upload_field.py:131
 msgid "Minimum number of files"
 msgstr "Minimale Anzahl an Dateien"
 
-#: ./content/upload_field.py:129
+#: ./content/upload_field.py:132
 msgid "Minimum number of files that must be uploaded."
 msgstr "Minimale Anzahl an Dateien, die hochgeladen werden müssen."
 
@@ -407,11 +395,15 @@ msgstr "Minimale Anzahl an Dateien, die hochgeladen werden müssen."
 msgid "Minimum/Maximum are only valid options for the following answer types: Textline, Textarea, Password, Decimal number, Whole number."
 msgstr "Minimum/Maximum sind nur gültige Optionen für die folgenden Antworttypen: Textzeile, Textfeld, Passwort, Dezimalzahl, Ganzzahl."
 
-#: ./content/helptext_modal.py:29
+#: ./content/helptext.py:50
 msgid "Modal Content"
 msgstr "Modal Inhalt"
 
-#: ./content/helptext_modal.py:23
+#: ./content/helptext.py:28
+msgid "Modal Settings"
+msgstr "Modal Einstellungen"
+
+#: ./content/helptext.py:44
 msgid "Modal Title"
 msgstr "Modal Titel"
 
@@ -514,7 +506,7 @@ msgstr "Auswahlfeld"
 msgid "Selectionfields of the option and the dependent option must be in the same container."
 msgstr "Das Auswahlfeld der Option und das der abhängigen Option müssen sich im selben Container (Fragebogen, Array, ...) befinden."
 
-#: ./views/ui_schema_view.py:739
+#: ./views/ui_schema_view.py:766
 msgid "Show element content"
 msgstr "Elementinhalt anzeigen"
 
@@ -522,10 +514,6 @@ msgstr "Elementinhalt anzeigen"
 #: ./content/fieldset.py:26
 msgid "Show title in form"
 msgstr "Titel im Fragebogen anzeigen"
-
-#: ./content/helptext_modal.py:11
-msgid "Small"
-msgstr "Klein"
 
 #: ./content/field.py:17
 msgid "Telephone"
@@ -588,7 +576,7 @@ msgstr "Das referenzierte Objekt befindet sich nicht in einem Fragebogen."
 msgid "The referenced object is not within the same Form."
 msgstr "Das referenzierte Objekt befindet sich nicht im gleichen Fragebogen."
 
-#: ./content/upload_field.py:136
+#: ./content/upload_field.py:139
 msgid "The user will be forced to upload files individually."
 msgstr "Der Formularbenutzer wird gezwungen, Dateien einzeln hochzuladen."
 
@@ -596,7 +584,7 @@ msgstr "Der Formularbenutzer wird gezwungen, Dateien einzeln hochzuladen."
 msgid "This condition is used to determine whether this field should be displayed. If left empty, the field will always be shown. If \"condition\" is given, the field will only be displayed if the condition is met. The condition is checked using the query parameter \"fork\" of the request URL. Multiple conditions can be separated by commas. Example: \"condition1, condition2, condition3\". If any of the conditions is met, the field will be displayed; otherwise it will not."
 msgstr "Diese Bedingung wird verwendet, um zu entscheiden, ob das Feld angezeigt werden soll. Wenn keine Bedingung angegeben ist, wird das Feld immer angegeben. Wenn \"bedingung\" angegeben ist, wird das Feld nur angezeigt, wenn die Bedingung erfüllt ist. Die Bedingung wird mit dem Query-Parameter \"fork\" der URL überprüft. Mehrere Bedingungen können durch ein Komma getrennt werden. Beispiel: \"bedingung1, bedingung2, bedingung3\". Wenn eine der Bedingungen erfüllt ist, wird das Feld angezeigt, ansonsten nicht."
 
-#: ./content/helptext_modal.py:30
+#: ./content/helptext.py:51
 msgid "This content is displayed inside the Modal."
 msgstr "Der Inhalt wird als Modal dargestellt."
 
@@ -604,19 +592,15 @@ msgstr "Der Inhalt wird als Modal dargestellt."
 msgid "This helptext can be added between two Fields/Fieldsets and can be used as a helptext for the user to fill out the form."
 msgstr "Dieser Hinweistext kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden und als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
 
-#: ./profiles/default/types/Helptext_Modal.xml
-msgid "This helptext is displayed as a modal element and can be added between two Fields/Fieldsets. It can be used as a helptext for the user to fill out the form."
-msgstr "Dieser Hinweistext wird als Modal angezeigt und kann zwischen zwei Feldern/Feldgruppen hinzugefügt werden. Er kann als Hilfestellung für den Nutzer, wie der Fragebogen auszufüllen ist, verwendet werden."
-
-#: ./views/ui_schema_view.py:297
+#: ./views/ui_schema_view.py:303
 msgid "This is a reference."
 msgstr "Dies ist eine Referenz."
 
-#: ./content/helptext_modal.py:43
+#: ./content/helptext.py:57
 msgid "This label is displayed on the button that opens the Modal."
 msgstr "Das Label wird im Button angezeigt, der das Modal öffnet."
 
-#: ./content/helptext_modal.py:24
+#: ./content/helptext.py:45
 msgid "This title is displayed inside the Modal."
 msgstr "Der Titel wird im Modal dargestellt."
 
@@ -680,7 +664,7 @@ msgstr ""
 msgid "View"
 msgstr "View"
 
-#: ./views/ui_schema_view.py:737
+#: ./views/ui_schema_view.py:764
 msgid "View element"
 msgstr "Element anzeigen"
 
@@ -691,10 +675,6 @@ msgstr "Warnung: Diese Aktion konvertiert die Optionsliste zu einzelnen Optionen
 #: ./content/field.py:24
 msgid "Whole number"
 msgstr "Ganzzahl"
-
-#: ./content/helptext_modal.py:35
-msgid "Width of the Modal"
-msgstr "Breite des Modals"
 
 #: ./profiles/default/types/Wizard.xml
 msgid "Wizard"

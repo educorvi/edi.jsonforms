@@ -6,11 +6,6 @@
   <configure zcml:condition="installed AccessControl.security">
   <!-- -*- extra stuff goes here -*- -->
 
-    <permission
-        id="edi.jsonforms.AddHelptextModal"
-        title="edi.jsonforms: Add HelptextModal"
-    />
-
 
     <permission
         id="edi.jsonforms.AddWizard"
