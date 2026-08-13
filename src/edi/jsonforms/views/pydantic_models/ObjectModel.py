@@ -42,7 +42,7 @@ def create_model_recursively(
     parent_model: BaseFormElementModel,
     generatorArguments: GeneratorArguments,
     recursively: bool = True,
-) -> BaseFormElementModel:
+) -> BaseFormElementModel | None:
     """
     returns an object of the model class based on the portal_type of the input content object
     it recursively creates child models for complex fields and arrays and adds them to the properties of the created model
