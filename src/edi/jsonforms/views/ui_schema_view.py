@@ -322,15 +322,7 @@ class UiSchemaView(BrowserView):
         if safe_hasattr(helptext.helptext, "output"):
             content = str(helptext.helptext.output)
 
-        if not safe_hasattr(helptext, "modal_enabled"):
-            # helptext as html-element
-            text = ""
-            if self.tools_on:
-                text += f"{self.get_tools_html(helptext)}\n"
-            text += content
-            helptext_schema = self.helptext_schema(text)
-            helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
-        else:
+        if safe_hasattr(helptext, "modal_enabled") and helptext.modal_enabled:
             helptext_schema = {
                 "type": "Modal",
                 "button": {
@@ -346,6 +338,14 @@ class UiSchemaView(BrowserView):
             }
             helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
             helptext_schema = self.add_tools_to_schema(helptext_schema, helptext)
+        else:
+            # helptext as html-element
+            text = ""
+            if self.tools_on:
+                text += f"{self.get_tools_html(helptext)}\n"
+            text += content
+            helptext_schema = self.helptext_schema(text)
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
         return helptext_schema
 
     def get_schema_for_buttons(self, button_group):
