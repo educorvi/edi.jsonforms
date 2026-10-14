@@ -58,6 +58,7 @@ def add_dependent_required(  # noqa: C901
     formProperties: FormProperties,
     child: BaseFormElementModel,
     is_extended_schema: bool = False,
+    reference=None,
 ):
     """
     this method changes dependentRequired or/and allOf of the parent based on the
@@ -94,9 +95,9 @@ def add_dependent_required(  # noqa: C901
             continue
 
         if dep.portal_type == "Option":
-            dep_path = get_path(dep.aq_parent)
+            dep_path = get_path(dep.aq_parent, reference=reference)
         else:
-            dep_path = get_path(dep)
+            dep_path = get_path(dep, reference=reference)
 
         def create_statement(obj, obj_path) -> dict:  # noqa: C901
             """
@@ -152,7 +153,9 @@ def add_dependent_required(  # noqa: C901
 
         if_statement = {"if": create_statement(dep, dep_path)}
         then_statement = {
-            "then": create_statement(child.form_element, get_path(child.form_element))
+            "then": create_statement(
+                child.form_element, get_path(child.form_element, reference=reference)
+            )
         }
         if is_extended_schema:
             else_statement = create_else_statement(child.form_element)

@@ -36,6 +36,9 @@ class UiSchemaView(BrowserView):
     is_single_view = False
     scope = "/properties/"
 
+    reference_parent = None  # to check if current child has reference as a parent
+    # TODO this is a temporary ugly fix
+
     def __init__(self, context, request, scope="/properties/"):
         super().__init__(context, request)
         self.uischema = {}
@@ -43,6 +46,7 @@ class UiSchemaView(BrowserView):
         # needed to put scopes in showOn-properties without having to compute them
         self.lookup_scopes = {}
         self.scope = scope
+        self.reference_parent = None
 
         self.rita_dependent_options = {}
 
@@ -266,6 +270,8 @@ class UiSchemaView(BrowserView):
         return uploadfield_schema
 
     def get_schema_for_reference(self, reference, scope):
+        save_ref = self.reference_parent
+        self.reference_parent = reference
         try:
             target = api.relation.get(source=reference, relationship="reference")
             obj = target[0].to_object if target else None
@@ -302,6 +308,8 @@ class UiSchemaView(BrowserView):
                 return obj_schema
         except Exception:
             return {}  # referenced object got deleted, ignore
+        finally:
+            self.reference_parent = save_ref  # reset
 
     def helptext_schema(self, htmlData):
         # helptext as html-element
@@ -312,15 +320,34 @@ class UiSchemaView(BrowserView):
         return helptext_schema
 
     def get_schema_for_helptext(self, helptext):
-        # helptext as html-element
-        text = ""
-        if self.tools_on:
-            text += f"{self.get_tools_html(helptext)}\n"
+        content = ""
         if safe_hasattr(helptext.helptext, "output"):
-            text += str(helptext.helptext.output)
+            content = str(helptext.helptext.output)
 
-        helptext_schema = self.helptext_schema(text)
-        helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
+        if safe_hasattr(helptext, "modal_enabled") and helptext.modal_enabled:
+            helptext_schema = {
+                "type": "Modal",
+                "button": {
+                    "text": helptext.modal_button_label,
+                    "variant": "info",
+                    "asLink": True,
+                },
+                "modal": {
+                    "title": helptext.modal_title,
+                    "content": content,
+                    "size": "x-large",
+                },
+            }
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
+            helptext_schema = self.add_tools_to_schema(helptext_schema, helptext)
+        else:
+            # helptext as html-element
+            text = ""
+            if self.tools_on:
+                text += f"{self.get_tools_html(helptext)}\n"
+            text += content
+            helptext_schema = self.helptext_schema(text)
+            helptext_schema = self.add_dependencies_to_schema(helptext_schema, helptext)
         return helptext_schema
 
     def get_schema_for_buttons(self, button_group):  # noqa: C901
@@ -614,6 +641,7 @@ class UiSchemaView(BrowserView):
             "UploadField",
             "Complex",
             "Array",
+            "Reference",
         ]:
             child_tmp_schema = self.get_schema_for_child(
                 child_object, base_scope, False
@@ -659,6 +687,26 @@ class UiSchemaView(BrowserView):
         else:  # ignore this type
             pass
 
+        is_reference = False
+        save_tools_on = self.tools_on
+        if child_object.portal_type == "Reference":
+            try:
+                child_object = child_object.reference.to_object
+                is_reference = True
+                self.set_tools(
+                    False
+                )  # to deactivate tools for children of referenced object
+            except Exception:  # referenced object got deleted, ignore
+                logger.warning(
+                    f"Could not get referenced object for {child_object.id}, it might have been deleted"
+                )
+                return descendantControlOverrides
+            if not child_object:
+                logger.warning(
+                    f"Referenced object for {child_object.id} not found, it might have been deleted"
+                )
+                return descendantControlOverrides
+
         # add it recursively if child_object is a container type
         if child_object.portal_type in ["Complex", "Array"]:
             container_base_scope = child_tmp_schema["scope"]
@@ -677,6 +725,9 @@ class UiSchemaView(BrowserView):
                         descendantControlOverrides, c_object, container_base_scope
                     )
                 )
+
+        if is_reference:
+            self.set_tools(save_tools_on)  # reactivate tools
 
         return descendantControlOverrides
 
@@ -750,7 +801,9 @@ class UiSchemaView(BrowserView):
             return child_schema
         # add showOn dependencies
         if api.relation.get(source=child_object, relationship="dependencies"):
-            showOn = create_showon_properties(child_object, self.lookup_scopes)
+            showOn = create_showon_properties(
+                child_object, self.lookup_scopes, self.reference_parent
+            )
             if showOn != {}:
                 child_schema["showOn"] = showOn
         return child_schema

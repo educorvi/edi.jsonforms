@@ -1,5 +1,7 @@
+from edi.jsonforms import logger
 from edi.jsonforms.content.common import IFormElement
 from edi.jsonforms.content.option import IOption
+from edi.jsonforms.content.reference import IReference
 from urllib.parse import quote_plus
 
 import re
@@ -179,7 +181,7 @@ def check_show_condition_in_request(request, show_condition, negate_condition=Fa
         return fork not in conditions
 
 
-def get_path(obj: IFormElement, without_root=False):
+def get_path(obj: IFormElement, reference: IReference | None = None) -> str:
     """
     get the path of an object in the json schema (leaves out fieldsets)
     e.g. /properties/object1/properties/selectionfield1/properties/option1
@@ -191,4 +193,17 @@ def get_path(obj: IFormElement, without_root=False):
             path = create_id(obj) + "/items/properties/" + path
         elif obj.portal_type != "Fieldset":
             path = create_id(obj) + "/properties/" + path
-    return "/properties/" + path
+    path = "/properties/" + path
+
+    if reference:
+        try:
+            referenced_obj = reference.reference.to_object
+        except Exception as e:
+            logger.error(
+                f"Error while getting referenced object for reference {reference.id}: {e}"
+            )
+            return path
+        path_of_reference = get_path(reference)
+        path_of_referenced_object = get_path(referenced_obj)
+        path = path.replace(path_of_referenced_object, path_of_reference, 1)
+    return path
