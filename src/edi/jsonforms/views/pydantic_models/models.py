@@ -1,6 +1,4 @@
-from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
-    BaseFormElementModel,
-)
+from edi.jsonforms.views.pydantic_models.BaseFormElementModel import BaseFormElementModel
 
 import logging
 

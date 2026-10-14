@@ -33,9 +33,7 @@ class JsonSchemaView(BrowserView):
         form = self.context
 
         form_model = ObjectModel(form, None, self.request)
-        generatorArguments = GeneratorArguments(
-            self.request, self.is_single_view, self.is_extended_schema
-        )
+        generatorArguments = GeneratorArguments(self.request, self.is_single_view, self.is_extended_schema)
         form_model.set_children(generatorArguments)
         self.jsonschema = form_model.get_json_schema()
 

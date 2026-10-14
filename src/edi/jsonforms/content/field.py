@@ -24,9 +24,7 @@ answer_types = [
     SimpleTerm("time", "time", _("Time")),
     SimpleTerm("number", "number", _("Decimal number")),  # input
     SimpleTerm("integer", "integer", _("Whole number")),
-    SimpleTerm(
-        "boolean", "boolean", _("Checkbox (yes/no)")
-    ),  # input (checkbox with one option)
+    SimpleTerm("boolean", "boolean", _("Checkbox (yes/no)")),  # input (checkbox with one option)
 ]
 Answer_types = SimpleVocabulary(answer_types)
 
@@ -90,17 +88,13 @@ class IField(IDependentExtended):
 
     unit = schema.TextLine(
         title=_("Unit of the answer"),
-        description=_(
-            "Only use this for the answer types Decimal and Whole number (e.g. km, kg)."
-        ),
+        description=_("Only use this for the answer types Decimal and Whole number (e.g. km, kg)."),
         required=False,
     )
 
     placeholder = schema.TextLine(
         title=_("Placeholder"),
-        description=_(
-            "Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."  # noqa: E501
-        ),
+        description=_("Only use this for the answer types Textline/-area, Password, Telephone, URL, Email."),
         required=False,
     )
 
@@ -135,12 +129,7 @@ class IField(IDependentExtended):
     @invariant
     def number_of_decimal_digits_invariant(data):
         if data.number_of_decimal_digits and data.answer_type != "number":
-            raise Invalid(
-                _(
-                    "Number of decimal digits is only a valid option for the "
-                    + "answer type Decimal number."
-                )
-            )
+            raise Invalid(_("Number of decimal digits is only a valid option for the " + "answer type Decimal number."))
 
     @invariant
     def placeholder_invariant(data):
@@ -164,10 +153,7 @@ class IField(IDependentExtended):
     def unit_invariant(data):
         if data.unit and data.answer_type not in ["number", "integer"]:
             raise Invalid(
-                _(
-                    "Unit is only a valid option for the following answer types: "
-                    + "Decimal Number, Whole Number."
-                )
+                _("Unit is only a valid option for the following answer types: " + "Decimal Number, Whole Number.")
             )
 
     @invariant

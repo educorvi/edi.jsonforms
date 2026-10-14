@@ -65,9 +65,7 @@ class IOption(IDependent):
                 while current.portal_type == "Fieldset":
                     i += 1
                     if i > 100:
-                        raise Invalid(
-                            _("Could not determine parent SelectionField.")
-                        )  # avoid infinite loop]:
+                        raise Invalid(_("Could not determine parent SelectionField."))  # avoid infinite loop]:
                     current = current.aq_parent
             except Exception:
                 return None
@@ -89,19 +87,12 @@ class IOption(IDependent):
                 dep_parent = dep.aq_parent
                 if dep.portal_type != "Option":
                     raise Invalid(_("Dependency must be an option."))
-                if get_parent(dep.aq_parent) != get_parent(
-                    option_parent
-                ):  # get parents of the SelectionFields
+                if get_parent(dep.aq_parent) != get_parent(option_parent):  # get parents of the SelectionFields
                     raise Invalid(
-                        _(
-                            "Selectionfields of the option and the dependent option"
-                            + "must be in the same container."
-                        )
+                        _("Selectionfields of the option and the dependent option" + "must be in the same container.")
                     )
                 if dep_parent == option_parent:
-                    raise Invalid(
-                        _("Dependency must not be in the same SelectionField.")
-                    )
+                    raise Invalid(_("Dependency must not be in the same SelectionField."))
                 # if context == dep:
                 #     raise Invalid(_("Cannot be dependent from itself."))
                 # already covered by "not in the same SelectionField" check

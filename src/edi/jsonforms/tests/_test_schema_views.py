@@ -16,19 +16,13 @@ def setUp_integration_test(self):
     api.content.create(self.portal, "Document", "front-page")
     form = api.content.create(self.portal, "Form", "Fragebogen")
 
-    fragestellung = api.content.create(
-        type="Field", title="Fragestellung", container=form
-    )
+    fragestellung = api.content.create(type="Field", title="Fragestellung", container=form)
     self.ids[fragestellung.title] = fragestellung.id
 
-    auswahlfeld = api.content.create(
-        type="SelectionField", title="Auswahlfeld", container=form
-    )
+    auswahlfeld = api.content.create(type="SelectionField", title="Auswahlfeld", container=form)
     self.ids[auswahlfeld.title] = auswahlfeld.id
 
-    uploadfeld = api.content.create(
-        type="UploadField", title="Uploadfeld", container=form
-    )
+    uploadfeld = api.content.create(type="UploadField", title="Uploadfeld", container=form)
     self.ids[uploadfeld.title] = uploadfeld.id
 
     array = api.content.create(type="Array", title="Array", container=form)
@@ -43,28 +37,20 @@ def setUp_integration_test(self):
 
 def test_json_schema_view_is_registered(self, view_name):
     try:
-        view = getMultiAdapter(
-            (self.portal["Fragebogen"], self.portal.REQUEST), name=view_name
-        )
+        view = getMultiAdapter((self.portal["Fragebogen"], self.portal.REQUEST), name=view_name)
         self.assertTrue(view.__name__ == view_name)
     except ComponentLookupError:
         self.assertTrue(
             1 == 0,
-            msg="ComponentLookUpError should not happen when trying to apply the "
-            + str(view_name)
-            + " to a Form.",
+            msg="ComponentLookUpError should not happen when trying to apply the " + str(view_name) + " to a Form.",
         )
 
 
 def test_json_schema_view_not_matching_interface(self, view_name):
     with self.assertRaises(ComponentLookupError):
-        getMultiAdapter(
-            (self.portal["front-page"], self.portal.REQUEST), name=view_name
-        )
+        getMultiAdapter((self.portal["front-page"], self.portal.REQUEST), name=view_name)
     with self.assertRaises(ComponentLookupError):
-        getMultiAdapter(
-            (self.portal["other-folder"], self.portal.REQUEST), name=view_name
-        )
+        getMultiAdapter((self.portal["other-folder"], self.portal.REQUEST), name=view_name)
     with self.assertRaises(ComponentLookupError):
         getMultiAdapter(
             (self.portal["Fragebogen"][self.ids["Fragestellung"]], self.portal.REQUEST),

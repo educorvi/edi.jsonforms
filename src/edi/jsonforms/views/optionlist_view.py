@@ -33,8 +33,6 @@ class ConvertOptionListView(BrowserView):
         parent_selectionfield = optionlist.aq_parent
         options = get_keys_and_values_for_options_list(optionlist)
         for _key, value in zip(options[0], options[1], strict=False):
-            api.content.create(
-                container=parent_selectionfield, type="Option", title=value
-            )
+            api.content.create(container=parent_selectionfield, type="Option", title=value)
         api.content.delete(optionlist)
         self.request.response.redirect(self.context.aq_parent.absolute_url())

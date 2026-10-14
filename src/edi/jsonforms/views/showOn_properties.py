@@ -48,9 +48,7 @@ def transform_scope_to_object_writing_form(scope):
     path = re.sub(r"properties/", "", scope)
     # items stays in the path, to check
     # if array exists in path to adapt all rules accordingly
-    path = re.sub(
-        r"/items/", ".", path
-    )  # TODO temporary until feature for "self" exists
+    path = re.sub(r"/items/", ".", path)  # TODO temporary until feature for "self" exists
 
     # replace remaining slashes with dots, but the first / is removed
     # leave /items/ unchanged
@@ -177,9 +175,7 @@ def create_rule_within_array(full_path: str, obj) -> dict:
         # get path of object beginning at the previous array (or form if parent array)
         if current_object_path != "":
             index = path.rfind("/properties/")
-            current_object_path = (
-                f"$array_item{counter - 1!s}.{path[index + len('/properties/') :]}"
-            )
+            current_object_path = f"$array_item{counter - 1!s}.{path[index + len('/properties/') :]}"
         else:
             current_object_path = transform_scope_to_object_writing_form(current_path)
 

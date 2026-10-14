@@ -5,9 +5,7 @@ from edi.jsonforms.content.selection_field import ISelectionField
 from edi.jsonforms.views.common import check_show_condition_in_request
 from edi.jsonforms.views.common import create_id
 from edi.jsonforms.views.common import single_answer_types
-from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
-    BaseFormElementModel,
-)
+from edi.jsonforms.views.pydantic_models.BaseFormElementModel import BaseFormElementModel
 from edi.jsonforms.views.pydantic_models.dependency_handler import add_dependent_options
 from edi.jsonforms.views.pydantic_models.GeneratorArguments import GeneratorArguments
 from plone import api
@@ -47,15 +45,11 @@ class OptionModel(BaseModel):
             parent=option.aq_parent,
         )
         if safe_hasattr(option, "dependencies"):
-            option_model.dependencies = api.relation.get(
-                source=option, relationship="dependencies"
-            )
+            option_model.dependencies = api.relation.get(source=option, relationship="dependencies")
         return option_model
 
     @classmethod
-    def from_id_and_title(
-        cls, option_id: str, option_title: str, parent: ISelectionField
-    ):
+    def from_id_and_title(cls, option_id: str, option_title: str, parent: ISelectionField):
         """
         constructor for OptionModel, sets id, title and parent of the option
         dependencies stay empty
@@ -83,9 +77,7 @@ class OptionListModel(BaseModel):
         super().__init__(options=[])
         o_keys, o_values = get_keys_and_values_for_options_list(option_list)
         for key, value in zip(o_keys, o_values, strict=False):
-            option_model = OptionModel.from_id_and_title(
-                key, value, option_list.aq_parent
-            )
+            option_model = OptionModel.from_id_and_title(key, value, option_list.aq_parent)
             self.options.append(option_model)
 
     def get_option_names(self) -> list[str]:
@@ -148,9 +140,7 @@ class SelectionFieldModel(BaseFormElementModel):
             if o.portal_type == "Option":
                 if show:
                     option_model = OptionModel.from_option(o)
-                    if not option_model.check_dependencies(
-                        generatorArguments.is_single_view
-                    ):
+                    if not option_model.check_dependencies(generatorArguments.is_single_view):
                         options_list.append(option_model.get_option_name())
             elif o.portal_type == "OptionList" and show:
                 keys, vals = get_keys_and_values_for_options_list(o)

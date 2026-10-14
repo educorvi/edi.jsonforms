@@ -199,9 +199,7 @@ def get_path(obj: IFormElement, reference: IReference | None = None) -> str:
         try:
             referenced_obj = reference.reference.to_object
         except Exception as e:
-            logger.error(
-                f"Error while getting referenced object for reference {reference.id}: {e}"
-            )
+            logger.error(f"Error while getting referenced object for reference {reference.id}: {e}")
             return path
         path_of_reference = get_path(reference)
         path_of_referenced_object = get_path(referenced_obj)

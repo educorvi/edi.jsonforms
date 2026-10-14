@@ -42,18 +42,13 @@ def locale_folder_setup(domain: str):
 
 def _rebuild(domain: str):
     cmd = (
-        f"{i18ndude} rebuild-pot --pot {locale_path}/{domain}.pot "
-        f"--exclude {excludes} "
-        f"--create {domain} {target_path}"
+        f"{i18ndude} rebuild-pot --pot {locale_path}/{domain}.pot --exclude {excludes} --create {domain} {target_path}"
     )
     subprocess.call(cmd, shell=True)  # noQA: S602
 
 
 def _sync(domain: str):
-    cmd = (
-        f"{i18ndude} sync --pot {locale_path}/{domain}.pot "
-        f"{locale_path}/*/LC_MESSAGES/{domain}.po"
-    )
+    cmd = f"{i18ndude} sync --pot {locale_path}/{domain}.pot {locale_path}/*/LC_MESSAGES/{domain}.po"
     subprocess.call(cmd, shell=True)  # noQA: S602
 
 

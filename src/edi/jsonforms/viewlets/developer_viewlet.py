@@ -66,18 +66,9 @@ class DeveloperViewlet(ViewletBase):
             if release.get("version_id"):
                 version = release.get("version_id")
                 obj = repo_tool.retrieve(self.context, int(version)).object
-                json_schema_url = (
-                    self.context.absolute_url()
-                    + f"/@@version-view?version={version}&schema=json"
-                )
-                ui_schema_url = (
-                    self.context.absolute_url()
-                    + f"/@@version-view?version={version}&schema=ui"
-                )
-                forks_schema_url = (
-                    self.context.absolute_url()
-                    + f"/@@version-view?version={version}&schema=forks"
-                )
+                json_schema_url = self.context.absolute_url() + f"/@@version-view?version={version}&schema=json"
+                ui_schema_url = self.context.absolute_url() + f"/@@version-view?version={version}&schema=ui"
+                forks_schema_url = self.context.absolute_url() + f"/@@version-view?version={version}&schema=forks"
 
                 forked_json_schemata = getattr(obj, "forked_json_schema_rev", {}) or {}
                 forked_ui_schemata = getattr(obj, "forked_ui_schema_rev", {}) or {}

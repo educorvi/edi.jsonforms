@@ -29,9 +29,7 @@ class ISelectionField(IDependentExtended):
 
     use_id_in_schema = schema.Bool(
         title=_("Use id of options in schema"),
-        description=_(
-            "Check if you want to use the id of the options instead of the label/title in the schema"  # noqa: E501
-        ),
+        description=_("Check if you want to use the id of the options instead of the label/title in the schema"),
         default=False,
         required=False,
     )

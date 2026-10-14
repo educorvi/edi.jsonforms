@@ -38,9 +38,7 @@ def get_available_forks(
             child_path = get_path(child)
             if child_path not in forks[show_condition]:
                 forks[show_condition][child_path] = {}
-            forks[show_condition][child_path]["show_condition"] = bool(
-                not child.negate_condition
-            )
+            forks[show_condition][child_path]["show_condition"] = bool(not child.negate_condition)
 
         # test all possible overwritten attributes
         for attr in [

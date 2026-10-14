@@ -41,12 +41,8 @@ def schema_handler(context, event):
     """
     request = getRequest()
     try:
-        schema_view = api.content.get_view(
-            name="json-schema-view", context=context, request=request
-        )
-        ui_schema_view = api.content.get_view(
-            name="ui-schema-view", context=context, request=request
-        )
+        schema_view = api.content.get_view(name="json-schema-view", context=context, request=request)
+        ui_schema_view = api.content.get_view(name="ui-schema-view", context=context, request=request)
     except api.exc.InvalidParameterError:
         # Views are not available yet (e.g., during site creation before browser
         #     layer is active)
@@ -64,12 +60,8 @@ def wizard_schema_handler(context, event):
     """
     request = getRequest()
     try:
-        wizard_json_schema_view = api.content.get_view(
-            name="wizard-json-schema", context=context, request=request
-        )
-        wizard_ui_schema_view = api.content.get_view(
-            name="wizard-ui-schema", context=context, request=request
-        )
+        wizard_json_schema_view = api.content.get_view(name="wizard-json-schema", context=context, request=request)
+        wizard_ui_schema_view = api.content.get_view(name="wizard-ui-schema", context=context, request=request)
     except api.exc.InvalidParameterError:
         # Views not available yet (e.g., during site creation before browser
         #     layer is active)

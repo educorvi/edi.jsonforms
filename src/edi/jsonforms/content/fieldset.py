@@ -14,9 +14,7 @@ from zope.interface import implementer
 class IFieldset(IDependent):
     """Marker interface and Dexterity Python Schema for Fieldset"""
 
-    show_title = schema.Bool(
-        title=_("Show title in form"), default=True, required=False
-    )
+    show_title = schema.Bool(title=_("Show title in form"), default=True, required=False)
 
 
 @implementer(IFieldset)

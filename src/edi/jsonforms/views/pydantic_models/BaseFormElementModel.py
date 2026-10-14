@@ -30,9 +30,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     description: str | None = None
     comment: str | None = None
     type: str | None = None
-    parent: Optional[
-        "BaseFormElementModel"
-    ]  # actually it can only be an ObjectModel or a model that extends it (Form)
+    parent: Optional["BaseFormElementModel"]  # actually it can only be an ObjectModel or a model that extends it (Form)
     required_choice: bool | None = False
     dependencies: list[IFormElement] | None = Field(default_factory=list)
 
@@ -42,27 +40,18 @@ class BaseFormElementModel(BaseModel, abc.ABC):
     def __init__(
         self,
         form_element: IFormElement | IForm,
-        parent_model: Optional[
-            "BaseFormElementModel"
-        ],  # only None if form_element is the outer form
+        parent_model: Optional["BaseFormElementModel"],  # only None if form_element is the outer form
         request: WSGIRequest | HTTPRequest,
     ):
         description = get_description(form_element, request)
-        comment = (
-            form_element.intern_information
-            if safe_hasattr(form_element, "intern_information")
-            else None
-        )
+        comment = form_element.intern_information if safe_hasattr(form_element, "intern_information") else None
         required_choice = bool(
-            safe_hasattr(form_element, "required_choice")
-            and form_element.required_choice == "required"
+            safe_hasattr(form_element, "required_choice") and form_element.required_choice == "required"
         )
         dependencies = (
             # get a mutable copy (changes to this list do not affect the form
             #     element's dependencies)
-            copy.copy(
-                api.relation.get(source=form_element, relationship="dependencies")
-            )
+            copy.copy(api.relation.get(source=form_element, relationship="dependencies"))
             if safe_hasattr(form_element, "dependencies")
             else []
         )
@@ -118,9 +107,7 @@ class BaseFormElementModel(BaseModel, abc.ABC):
         }
 
     def get_json_schema(self) -> dict:
-        return self.model_dump(
-            exclude=self.get_json_dump_exclude_list(), exclude_none=True
-        )
+        return self.model_dump(exclude=self.get_json_dump_exclude_list(), exclude_none=True)
 
     # def set_children(
     #     self, json_schema_generator: JsonSchemaGenerator, form: ObjectModel

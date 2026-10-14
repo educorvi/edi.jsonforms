@@ -29,9 +29,7 @@ class VersionView(BrowserView):
         if version and schema and fork:
             obj = repo_tool.retrieve(self.context, int(version)).object
             if schema == "json":
-                forked_json_schemata = (
-                    getattr(obj, "forked_json_schema_rev", None) or {}
-                )
+                forked_json_schemata = getattr(obj, "forked_json_schema_rev", None) or {}
                 if fork in forked_json_schemata:
                     objschema = forked_json_schemata[fork]
 

@@ -5,9 +5,7 @@ from edi.jsonforms.views.common import get_option_name
 from edi.jsonforms.views.common import get_path
 from edi.jsonforms.views.common import single_answer_types
 from edi.jsonforms.views.common import string_type_fields
-from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
-    BaseFormElementModel,
-)
+from edi.jsonforms.views.pydantic_models.BaseFormElementModel import BaseFormElementModel
 from edi.jsonforms.views.pydantic_models.FormProperties import FormProperties
 from plone import api
 from plone.base.utils import safe_hasattr
@@ -30,11 +28,7 @@ def check_for_dependencies(model: IFormElement, is_single_view: bool) -> bool:
     """
     if is_single_view:  # if form-element-view, ignore all dependencies
         return False
-    return (
-        api.relation.get(source=model, relationship="dependencies")
-        if safe_hasattr(model, "dependencies")
-        else []
-    )
+    return api.relation.get(source=model, relationship="dependencies") if safe_hasattr(model, "dependencies") else []
 
 
 def get_dependencies_of_closest_ancestor_with_dependencies(
@@ -89,8 +83,7 @@ def add_dependent_required(  # noqa: C901
         except Exception:
             # dependency got deleted, plone error, ignore this dependency
             logging.warning(
-                f"Dependency of {child.get_id()} could not be accessed, "
-                + "probably because it got deleted."
+                f"Dependency of {child.get_id()} could not be accessed, " + "probably because it got deleted."
             )
             continue
 
@@ -128,9 +121,7 @@ def add_dependent_required(  # noqa: C901
                         if obj.aq_parent.answer_type in single_answer_types:
                             cur_statement[p] = {"const": get_option_name(obj)}
                         else:
-                            cur_statement[p] = {
-                                "contains": {"const": get_option_name(obj)}
-                            }
+                            cur_statement[p] = {"contains": {"const": get_option_name(obj)}}
                     elif obj.portal_type == "Field":
                         if obj.answer_type == "boolean":
                             cur_statement[p] = {props[-1]: {"const": True}}
@@ -138,10 +129,7 @@ def add_dependent_required(  # noqa: C901
                             if obj.answer_type in string_type_fields:
                                 cur_statement[p] = {props[-1]: {"minLength": 1}}
                         cur_statement["required"] = [props[-1]]
-                    elif (
-                        obj.portal_type == "SelectionField"
-                        and obj.answer_type in single_answer_types
-                    ):
+                    elif obj.portal_type == "SelectionField" and obj.answer_type in single_answer_types:
                         cur_statement["required"] = [props[-1]]
                     elif obj.portal_type in ["SelectionField", "Array"]:
                         cur_statement["required"] = [props[-1]]
@@ -153,9 +141,7 @@ def add_dependent_required(  # noqa: C901
 
         if_statement = {"if": create_statement(dep, dep_path)}
         then_statement = {
-            "then": create_statement(
-                child.form_element, get_path(child.form_element, reference=reference)
-            )
+            "then": create_statement(child.form_element, get_path(child.form_element, reference=reference))
         }
         if is_extended_schema:
             else_statement = create_else_statement(child.form_element)
@@ -167,10 +153,7 @@ def add_dependent_required(  # noqa: C901
     #     'dependentRequired' changed.
     # Otherwise add child_object to required-list of the schema, because it is
     #     required and not dependent required, if it has no valid dependencies anymore
-    if (
-        allof_copy == formProperties.allOf
-        and dependentrequired_copy == formProperties.dependentRequired
-    ):
+    if allof_copy == formProperties.allOf and dependentrequired_copy == formProperties.dependentRequired:
         formProperties.update_required([child.get_id()])
     return
 
@@ -203,10 +186,7 @@ def _order_values(values, order_map):
 
 
 def create_else_statement(child_object: IFormElement) -> dict:
-    if (
-        child_object.portal_type == "Field"
-        and child_object.answer_type in string_type_fields
-    ):
+    if child_object.portal_type == "Field" and child_object.answer_type in string_type_fields:
         return {"properties": {create_id(child_object): {"maxLength": 0}}}
     return {}
 
@@ -239,17 +219,11 @@ def get_dependent_options(  # noqa: C901
             option_value = get_option_name(option)
 
             # todo: refactor isMultiField into seperat method and call here and below
-            answer_type = (
-                "multi"
-                if dependency.aq_parent.answer_type in ["checkbox", "selectmultiple"]
-                else "single"
-            )
+            answer_type = "multi" if dependency.aq_parent.answer_type in ["checkbox", "selectmultiple"] else "single"
 
             parent_key = f"{answer_type}_{parent_key}"
             if parent_key not in dependency_option_order:
-                dependency_option_order[parent_key] = _get_option_order_map(
-                    dependency.aq_parent
-                )
+                dependency_option_order[parent_key] = _get_option_order_map(dependency.aq_parent)
             if parent_key in target_dict:
                 if dependency_key in target_dict[parent_key]:
                     target_dict[parent_key][dependency_key].append(option_value)
@@ -271,9 +245,7 @@ def get_dependent_options(  # noqa: C901
         if option.portal_type == "Option":
             option = option.getObject()
             if check_for_dependencies(option, is_single_view):
-                dependencies = api.relation.get(
-                    source=option, relationship="dependencies"
-                )
+                dependencies = api.relation.get(source=option, relationship="dependencies")
                 for dep in dependencies:
                     try:
                         add_to_dict(option, dep.to_object, dependency_dict)
@@ -303,17 +275,12 @@ def get_dependent_options(  # noqa: C901
             # selectionfield_options = []
             subsets = []
             for r in range(len(dependency_dict[selectionfield_id]) + 1):
-                subsets.extend(
-                    itertools.combinations(dependency_dict[selectionfield_id], r)
-                )
+                subsets.extend(itertools.combinations(dependency_dict[selectionfield_id], r))
             possibilities.append([[selectionfield_id, sub] for sub in subsets])
         else:
             possibilities.append(
                 [[selectionfield_id, None]]
-                + [
-                    [selectionfield_id, option_id]
-                    for option_id in dependency_dict[selectionfield_id]
-                ]
+                + [[selectionfield_id, option_id] for option_id in dependency_dict[selectionfield_id]]
             )
 
     if possibilities:
@@ -334,9 +301,7 @@ def get_dependent_options(  # noqa: C901
                 const_values = list(sublist[1])
                 order_map = dependency_option_order.get(selectionfield_id)
                 if order_map:
-                    const_values.sort(
-                        key=lambda value: order_map.get(value, len(order_map))
-                    )
+                    const_values.sort(key=lambda value: order_map.get(value, len(order_map)))
                 if_dict["properties"][selectionfield_id_clean] = {
                     "const": const_values
                     # "contains": {"enum": const_values}

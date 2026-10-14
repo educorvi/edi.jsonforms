@@ -6,9 +6,7 @@ from edi.jsonforms.tests._test_required_choice import test_required_choices
 from edi.jsonforms.tests._test_schema_views import setUp_integration_test
 from edi.jsonforms.tests._test_schema_views import setUp_json_schema_test
 from edi.jsonforms.tests._test_schema_views import test_json_schema_view_is_registered
-from edi.jsonforms.tests._test_schema_views import (
-    test_json_schema_view_not_matching_interface,
-)
+from edi.jsonforms.tests._test_schema_views import test_json_schema_view_not_matching_interface
 from edi.jsonforms.views.common import create_id
 from plone import api
 
@@ -47,7 +45,7 @@ class ViewsJsonSchemaPlainFormTest(unittest.TestCase):
 
     def test_plain_form(self):
         self.assertEqual(
-            '{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}}',  # noqa: E501
+            '{"type": "object", "title": "", "properties": {}, "required": [], "dependentRequired": {}}',
             self.view(),
         )
 
@@ -156,9 +154,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     def setUp(self):
         setUp_json_schema_test(self)
-        self.field = api.content.create(
-            type="Field", title="a field", container=self.form
-        )
+        self.field = api.content.create(type="Field", title="a field", container=self.form)
 
     def test_text_field(self):
         self.field.answer_type = "text"
@@ -174,9 +170,7 @@ class ViewsJsonSchemaFormWithFieldTest(unittest.TestCase):
 
     def test_tel_field(self):
         self.field.answer_type = "tel"
-        self.field.placeholder = (
-            "a placeholder phone number"  # should not change the schema
-        )
+        self.field.placeholder = "a placeholder phone number"  # should not change the schema
 
         ref_schema = {
             create_id(self.field): {
@@ -439,9 +433,7 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
 
     def setUp(self):
         setUp_json_schema_test(self)
-        self.selectionfield = api.content.create(
-            type="SelectionField", title="a selectionfield", container=self.form
-        )
+        self.selectionfield = api.content.create(type="SelectionField", title="a selectionfield", container=self.form)
 
     def test_radio_selectionfield(self):
         self.selectionfield.answer_type = "radio"
@@ -493,13 +485,9 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
         if answer_type in ["radio", "select"]:
             computed_list = json.loads(self.view())["properties"][option_id]["enum"]
         elif answer_type in ["checkbox", "selectmultiple"]:
-            computed_list = json.loads(self.view())["properties"][option_id]["items"][
-                "enum"
-            ]
+            computed_list = json.loads(self.view())["properties"][option_id]["items"]["enum"]
         else:
-            self.assertNotIn(
-                answer_type, ["radio", "select", "checkbox", "selectmultiple"]
-            )
+            self.assertNotIn(answer_type, ["radio", "select", "checkbox", "selectmultiple"])
         self.assertEqual(computed_list, ref_enum_list)
 
     def test_options_selectionfield(self):
@@ -512,19 +500,13 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
 
         test_options_for_answer_types([])
 
-        api.content.create(
-            type="Option", title="option 1", container=self.selectionfield
-        )
+        api.content.create(type="Option", title="option 1", container=self.selectionfield)
         test_options_for_answer_types(["option 1"])
 
-        api.content.create(
-            type="Option", title="option 2", container=self.selectionfield
-        )
+        api.content.create(type="Option", title="option 2", container=self.selectionfield)
         test_options_for_answer_types(["option 1", "option 2"])
 
-        api.content.create(
-            type="Option", title="option 3", container=self.selectionfield
-        )
+        api.content.create(type="Option", title="option 3", container=self.selectionfield)
         test_options_for_answer_types(["option 1", "option 2", "option 3"])
 
     def test_additional_information(self):
@@ -544,9 +526,7 @@ class ViewsJsonSchemaFormWithSelectionFieldTest(unittest.TestCase):
                 ref_schema["type"] = "array"
                 ref_schema["items"] = {"enum": [], "type": "string"}
             else:
-                self.assertIn(
-                    answer_type, ["radio", "checkbox", "select", "selectmultiple"]
-                )
+                self.assertIn(answer_type, ["radio", "checkbox", "select", "selectmultiple"])
 
             ref_schema = {field_id: ref_schema}
 
@@ -591,9 +571,7 @@ class ViewsJsonSchemaFormWithUploadFieldTest(unittest.TestCase):
 
     def setUp(self):
         setUp_json_schema_test(self)
-        self.uploadfield = api.content.create(
-            type="UploadField", title="an uploadfield", container=self.form
-        )
+        self.uploadfield = api.content.create(type="UploadField", title="an uploadfield", container=self.form)
 
     def test_file_uploadfield(self):
         self.uploadfield.answer_type = "file"
@@ -655,11 +633,7 @@ class ViewsJsonSchemaFieldsRequiredTest(unittest.TestCase):
         answer_type = ["text", "number", "boolean"]
         self.field = []
         for i in range(3):
-            self.field.append(
-                api.content.create(
-                    type="Field", title="field" + str(i), container=self.form
-                )
-            )
+            self.field.append(api.content.create(type="Field", title="field" + str(i), container=self.form))
             self.field[i].answer_type = answer_type[i]
 
     def test_schema(self):

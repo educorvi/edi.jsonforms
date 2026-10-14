@@ -15,9 +15,7 @@ class GeneratorArguments(BaseModel):
     is_single_view: bool
     is_extended_schema: bool
     formProperties: FormProperties
-    reference: IReference | None = (
-        None  # to check if current child is somewhere nested in a referenced object
-    )
+    reference: IReference | None = None  # to check if current child is somewhere nested in a referenced object
 
     class Config:
         arbitrary_types_allowed = True

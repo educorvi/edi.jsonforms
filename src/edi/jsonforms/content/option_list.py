@@ -44,9 +44,7 @@ class IOptionList(IAdditionalInformation):
 
     url = schema.URI(
         title=_("URL"),
-        description=_(
-            "The URL to fetch options from. If set, options will be overridden by the fetched options."  # noqa: E501
-        ),
+        description=_("The URL to fetch options from. If set, options will be overridden by the fetched options."),
         required=False,
     )
 
@@ -59,9 +57,7 @@ class IOptionList(IAdditionalInformation):
 
     api_key_name = schema.TextLine(
         title=_("API Key Name"),
-        description=_(
-            "The name of the API key header, i.e. 'Authorization' or 'x-api-key'."
-        ),
+        description=_("The name of the API key header, i.e. 'Authorization' or 'x-api-key'."),
         required=False,
     )
 
@@ -128,21 +124,14 @@ class OptionList(Item):
         try:
             response = requests.get(
                 self.url,
-                headers={self.api_key_name: self.api_key}
-                if self.api_key and self.api_key_name
-                else {},
+                headers={self.api_key_name: self.api_key} if self.api_key and self.api_key_name else {},
                 timeout=self.timeout,
             )
         except requests.RequestException as e:
-            logger.error(
-                f"Failed to fetch external options from {self.url}. Error: {e}"
-            )
+            logger.error(f"Failed to fetch external options from {self.url}. Error: {e}")
             return []
         if response.status_code != 200:
-            logger.error(
-                "Failed to fetch external options from "
-                + f"{self.url}. Status code: {response.status_code}"
-            )
+            logger.error("Failed to fetch external options from " + f"{self.url}. Status code: {response.status_code}")
             return []
 
         # Try to parse the response as JSON
@@ -152,10 +141,7 @@ class OptionList(Item):
                 logger.error(f"External options from {self.url} are not a list.")
                 return []
         except json.JSONDecodeError as e:
-            logger.error(
-                "Failed to decode JSON from external options API at "
-                + f"{self.url}. Error: {e}"
-            )
+            logger.error("Failed to decode JSON from external options API at " + f"{self.url}. Error: {e}")
             return []
 
         # Process the external options based on the mappings
@@ -166,10 +152,7 @@ class OptionList(Item):
 
             for item in response_options:
                 if not isinstance(item, dict):
-                    logger.error(
-                        f"External option item is not a dictionary: {item}. "
-                        + "Skipping this item."
-                    )
+                    logger.error(f"External option item is not a dictionary: {item}. " + "Skipping this item.")
                     continue
 
                 if len(item) == 0:
@@ -177,9 +160,7 @@ class OptionList(Item):
                     continue
 
                 option = ""
-                if (not id_mapping and not value_mapping) or (
-                    id_mapping not in item and value_mapping not in item
-                ):
+                if (not id_mapping and not value_mapping) or (id_mapping not in item and value_mapping not in item):
                     # if id_mapping and value_mapping are not set or both do not exist
                     #      in the item, use all key-value pairs
                     option = " ".join(f"{key} {value}" for key, value in item.items())
@@ -187,8 +168,8 @@ class OptionList(Item):
                     # if id_mapping or value_mapping exist in the item, use them, if
                     #      one is missing, use the other one for both id and value
                     option = (
-                        f"{item[id_mapping] if id_mapping in item else item[value_mapping]}"  # noqa: E501
-                        + f":{item[value_mapping] if value_mapping in item else item[id_mapping]}"  # noqa: E501
+                        f"{item[id_mapping] if id_mapping in item else item[value_mapping]}"
+                        + f":{item[value_mapping] if value_mapping in item else item[id_mapping]}"
                     )
                 external_options.append(option)
 

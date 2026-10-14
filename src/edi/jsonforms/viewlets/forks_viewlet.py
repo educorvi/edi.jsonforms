@@ -51,6 +51,4 @@ class ForksViewlet(ViewletBase):
         return fork_links
 
     def get_available_forks_string(self) -> str:
-        return json.dumps(
-            get_available_forks(self.context), indent=4, ensure_ascii=False
-        )
+        return json.dumps(get_available_forks(self.context), indent=4, ensure_ascii=False)

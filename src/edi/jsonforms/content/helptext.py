@@ -65,9 +65,7 @@ class IHelptext(IDependent):
             data.modal_button_label,
             # data.modal_button_variant,
         ]):
-            raise Invalid(
-                _("If modal is enabled, you must provide a title and button label.")
-            )
+            raise Invalid(_("If modal is enabled, you must provide a title and button label."))
 
 
 @implementer(IHelptext)

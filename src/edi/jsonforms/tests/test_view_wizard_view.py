@@ -20,17 +20,13 @@ class ViewsIntegrationTest(unittest.TestCase):
         api.content.create(self.portal, "Document", "front-page")
 
     def test_wizard_view_is_registered(self):
-        view = getMultiAdapter(
-            (self.portal["other-folder"], self.portal.REQUEST), name="wizard-view"
-        )
+        view = getMultiAdapter((self.portal["other-folder"], self.portal.REQUEST), name="wizard-view")
         self.assertTrue(IWizardView.providedBy(view))
 
     def test_wizard_view_not_matching_interface(self):
         view_found = True
         try:
-            view = getMultiAdapter(
-                (self.portal["front-page"], self.portal.REQUEST), name="wizard-view"
-            )
+            view = getMultiAdapter((self.portal["front-page"], self.portal.REQUEST), name="wizard-view")
         except ComponentLookupError:
             view_found = False
         else:

@@ -1,8 +1,6 @@
 from edi.jsonforms.content.field import IField
 from edi.jsonforms.views.common import string_type_fields
-from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
-    BaseFormElementModel,
-)
+from edi.jsonforms.views.pydantic_models.BaseFormElementModel import BaseFormElementModel
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import WSGIRequest
 
@@ -69,11 +67,7 @@ class FieldModel(BaseFormElementModel):
             if form_element.maximum:
                 self.maximum = form_element.maximum
 
-        if (
-            not self.minLength
-            and self.is_required
-            and answer_type in string_type_fields
-        ):
+        if not self.minLength and self.is_required and answer_type in string_type_fields:
             self.minLength = 1
 
     def get_json_schema(self) -> dict:

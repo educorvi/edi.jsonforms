@@ -43,9 +43,7 @@ class IReference(IDependent):
                 ref_obj = data.reference
             except Exception as e:
                 logger.warning(f"Error accessing reference object: {e}")
-                raise Invalid(
-                    _("The referenced object is either empty or deleted/invalid.")
-                ) from e
+                raise Invalid(_("The referenced object is either empty or deleted/invalid.")) from e
 
             if ref_obj.portal_type == "Fieldset":
                 raise Invalid(_("You cannot reference a Fieldset."))
@@ -59,9 +57,7 @@ class IReference(IDependent):
             elif data.dependencies:
                 for dep in data.dependencies:
                     if ref_obj == dep:
-                        raise Invalid(
-                            _("You cannot depend on the object that is referenced.")
-                        )
+                        raise Invalid(_("You cannot depend on the object that is referenced."))
 
             def get_parent_form(obj):
                 try:
@@ -75,12 +71,8 @@ class IReference(IDependent):
                         try:
                             parent = getRequest().PUBLISHED.context.aq_parent
                         except Exception as e:
-                            logger.warning(
-                                f"Error accessing request parent object: {e}"
-                            )
-                            raise Invalid(
-                                _("Could not determine the parent Form.")
-                            ) from e
+                            logger.warning(f"Error accessing request parent object: {e}")
+                            raise Invalid(_("Could not determine the parent Form.")) from e
 
                 if parent.portal_type in ["Form"]:
                     return parent
@@ -94,9 +86,7 @@ class IReference(IDependent):
                 own_form = get_parent_form(data)
 
                 if ref_form != own_form:
-                    raise Invalid(
-                        _("The referenced object is not within the same Form.")
-                    )
+                    raise Invalid(_("The referenced object is not within the same Form."))
             except Invalid as e:
                 raise e
 

@@ -80,31 +80,21 @@ class WizardUiSchemaView(UiSchemaView):
             if form.portal_type == "Form":
                 page_titles.append(form.title)
                 form_id = create_id(form)
-                uischemaview = UiSchemaView(
-                    form, self.request, scope=f"/properties/{form_id}/properties/"
-                )
+                uischemaview = UiSchemaView(form, self.request, scope=f"/properties/{form_id}/properties/")
                 uischemaview.set_tools(self.tools_on)
                 vertical_layout = uischemaview.get_schema()["layout"]
                 vertical_layout["elements"].append(copy.deepcopy(buttons))
                 self.uischema["layout"]["elements"].append(vertical_layout)
 
-        if self.uischema["layout"][
-            "elements"
-        ]:  # delete "previous" button from first page
+        if self.uischema["layout"]["elements"]:  # delete "previous" button from first page
             del self.uischema["layout"]["elements"][0]["elements"][-1]["buttons"][0]
         if (
             len(self.uischema["layout"]["elements"]) == 1
         ):  # replace "next" button with "submit" button from first page if only
             # one page exists
-            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = (
-                submit_button
-            )
-        elif (
-            len(self.uischema["layout"]["elements"]) > 1
-        ):  # replace "next" button with "submit" button from last page
-            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = (
-                submit_button
-            )
+            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][0] = submit_button
+        elif len(self.uischema["layout"]["elements"]) > 1:  # replace "next" button with "submit" button from last page
+            self.uischema["layout"]["elements"][-1]["elements"][-1]["buttons"][1] = submit_button
 
         self.uischema["layout"]["pages"] = self.uischema["layout"].pop("elements")
         self.uischema["layout"]["options"] = {"pageTitles": page_titles}
@@ -124,9 +114,7 @@ class WizardJsonSchemaView(JsonSchemaView):
 
         obj = self.context
 
-        generatorArguments = GeneratorArguments(
-            self.request, self.is_single_view, self.is_extended_schema
-        )
+        generatorArguments = GeneratorArguments(self.request, self.is_single_view, self.is_extended_schema)
         wizard_model = ObjectModel(obj, None, self.request)
         wizard_model.set_children(generatorArguments)
         self.jsonschema = wizard_model.get_json_schema()

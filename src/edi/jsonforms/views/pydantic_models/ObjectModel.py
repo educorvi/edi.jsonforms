@@ -10,12 +10,8 @@ from edi.jsonforms.views.common import check_show_condition_in_request
 # from edi.jsonforms.views.pydantic_models.ReferenceModel import ReferenceModel
 # from edi.jsonforms.views.pydantic_models.ArrayModel import ArrayModel
 # from edi.jsonforms.views.pydantic_models.FieldsetModel import FieldsetModel
-from edi.jsonforms.views.pydantic_models.BaseFormElementModel import (
-    BaseFormElementModel,
-)
-from edi.jsonforms.views.pydantic_models.dependency_handler import (
-    add_dependent_required,
-)
+from edi.jsonforms.views.pydantic_models.BaseFormElementModel import BaseFormElementModel
+from edi.jsonforms.views.pydantic_models.dependency_handler import add_dependent_required
 from edi.jsonforms.views.pydantic_models.dependency_handler import (
     get_dependencies_of_closest_ancestor_with_dependencies,
 )
@@ -56,9 +52,7 @@ def create_model_recursively(  # noqa: C901
     if form_element.portal_type == "Field":
         model = FieldModel(form_element, parent_model, generatorArguments.request)
     elif form_element.portal_type == "SelectionField":
-        model = SelectionFieldModel(
-            form_element, parent_model, generatorArguments.request
-        )
+        model = SelectionFieldModel(form_element, parent_model, generatorArguments.request)
         if recursively:
             model.set_children(generatorArguments)
     elif form_element.portal_type == "UploadField":
@@ -106,9 +100,7 @@ class ObjectModel(BaseFormElementModel):
 
     def __init__(
         self,
-        form_element: IComplex
-        | IArray
-        | IForm,  # to create the intern object model for array items
+        form_element: IComplex | IArray | IForm,  # to create the intern object model for array items
         parent_model: BaseFormElementModel
         | None,  # is None if form_element is the outer form or if in form-element-view
         request: WSGIRequest | HTTPRequest,
@@ -158,9 +150,7 @@ class ObjectModel(BaseFormElementModel):
 
         if self.form_element and isinstance(self.form_element, Form):
             self.update_allOf(generatorArguments.formProperties.allOf)
-            self.update_dependentRequired(
-                generatorArguments.formProperties.dependentRequired
-            )
+            self.update_dependentRequired(generatorArguments.formProperties.dependentRequired)
             self.update_required(generatorArguments.formProperties.required)
 
         return models
@@ -193,9 +183,7 @@ class ObjectModel(BaseFormElementModel):
         # give the children the same dependencies as the closest ancestor with
         #     dependencies if they have none of their own
         if model.get_dependencies() == []:
-            parent_dependencies = (
-                get_dependencies_of_closest_ancestor_with_dependencies(model)
-            )
+            parent_dependencies = get_dependencies_of_closest_ancestor_with_dependencies(model)
             model.extend_dependencies(parent_dependencies)
 
         # add child model to properties of self
@@ -320,9 +308,7 @@ class ArrayModel(BaseFormElementModel):
         :param compute_children_method: creates instances of the children models and
             returns them as a dict (child_id: child_model)
         """
-        object_model = ObjectModel(
-            self.form_element, self.parent, generatorArguments.request
-        )
+        object_model = ObjectModel(self.form_element, self.parent, generatorArguments.request)
         object_model.set_children(generatorArguments)
 
         # remove fields of object_model that are not needed
@@ -339,9 +325,7 @@ class ArrayModel(BaseFormElementModel):
             exclude_none=True,
         )
         items_schema = self.items.get_json_schema()
-        del items_schema[
-            "title"
-        ]  # title of the items is not needed in the json schema, since it is not a
+        del items_schema["title"]  # title of the items is not needed in the json schema, since it is not a
         #       real form element but just a wrapper for the items of the array
         json_schema["items"] = items_schema
         return json_schema
@@ -372,9 +356,7 @@ class ReferenceModel(BaseFormElementModel):
                 reference_object, "required_choice"
             ) else False
 
-            model = create_model_recursively(
-                reference_object, parent_model, generatorArguments, False
-            )
+            model = create_model_recursively(reference_object, parent_model, generatorArguments, False)
 
             if model is None:
                 logger.error(
@@ -398,7 +380,7 @@ class ReferenceModel(BaseFormElementModel):
             self.target = model
         else:
             logger.error(
-                f"Reference {self.id} has no target, setting empty model as target to avoid errors in the rest of the code"
+                f"Reference {self.id} has no target, setting empty model as target to avoid errors in the rest of the code"  # noqa: E501
             )
             self.target = BaseFormElementModel(
                 form_element, parent_model, generatorArguments.request
@@ -413,7 +395,7 @@ class ReferenceModel(BaseFormElementModel):
                 self.target.set_children(generatorArguments)
         except Exception as e:
             logger.error(
-                f"Error while setting children for reference {self.id} with target {self.form_element.reference.to_object.absolute_url()}: {e}"
+                f"Error while setting children for reference {self.id} with target {self.form_element.reference.to_object.absolute_url()}: {e}"  # noqa: E501
             )
         finally:
             generatorArguments.reference = save_ref

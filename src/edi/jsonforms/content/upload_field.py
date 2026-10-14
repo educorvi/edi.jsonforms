@@ -32,9 +32,7 @@ possible_file_types = [
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ".xlsx",
     ),
-    SimpleTerm(
-        "application/vnd.ms-powerpoint", "application/vnd.ms-powerpoint", ".ppt"
-    ),
+    SimpleTerm("application/vnd.ms-powerpoint", "application/vnd.ms-powerpoint", ".ppt"),
     SimpleTerm(
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -63,12 +61,8 @@ possible_file_types = [
     ),
     # Apple iWork
     SimpleTerm("application/vnd.apple.pages", "application/vnd.apple.pages", ".pages"),
-    SimpleTerm(
-        "application/vnd.apple.numbers", "application/vnd.apple.numbers", ".numbers"
-    ),
-    SimpleTerm(
-        "application/vnd.apple.keynote", "application/vnd.apple.keynote", ".key"
-    ),
+    SimpleTerm("application/vnd.apple.numbers", "application/vnd.apple.numbers", ".numbers"),
+    SimpleTerm("application/vnd.apple.keynote", "application/vnd.apple.keynote", ".key"),
     # other common file types
     SimpleTerm("application/zip", "application/zip", ".zip"),
     SimpleTerm("application/xml", "application/xml", ".xml"),
@@ -98,26 +92,20 @@ class IUploadField(IDependentExtended):
 
     accepted_file_types = schema.List(
         title=_("Accepted file types for file upload"),
-        description=_(
-            "If no file type is selected, the default is * (all file types are accepted)."  # noqa: E501
-        ),
+        description=_("If no file type is selected, the default is * (all file types are accepted)."),
         value_type=schema.Choice(source=Possible_file_types),
         required=False,
     )
 
     max_file_size = schema.Int(
         title=_("Maximum file size (in MB)"),
-        description=_(
-            "Maximum file size for each uploaded file. If empty, there is no limit."
-        ),
+        description=_("Maximum file size for each uploaded file. If empty, there is no limit."),
         required=False,
     )
 
     max_number_of_files = schema.Int(
         title=_("Maximum number of files"),
-        description=_(
-            "Maximum number of files that can be uploaded. If empty, there is no limit."
-        ),
+        description=_("Maximum number of files that can be uploaded. If empty, there is no limit."),
         required=False,
         min=1,
     )

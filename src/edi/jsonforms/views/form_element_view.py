@@ -91,13 +91,9 @@ class FormElementJsonSchema(JsonSchemaView):
             obj = obj.aq_parent
             parent = parent.aq_parent
 
-        generatorArguments = GeneratorArguments(
-            self.request, self.is_single_view, self.is_extended_schema
-        )
+        generatorArguments = GeneratorArguments(self.request, self.is_single_view, self.is_extended_schema)
         form_model = ObjectModel(parent, None, self.request)
-        model = form_model.create_and_add_model_without_dependencies(
-            obj, generatorArguments
-        )
+        model = form_model.create_and_add_model_without_dependencies(obj, generatorArguments)
 
         # form element view of option only shows option itself
         # and not the other options/optionlists in the same selectionfield

@@ -20,9 +20,7 @@ class ViewsIntegrationTest(unittest.TestCase):
         api.content.create(self.portal, "Document", "front-page")
 
     def test_form_element_view_is_registered(self):
-        view = getMultiAdapter(
-            (self.portal["other-folder"], self.portal.REQUEST), name="form-element-view"
-        )
+        view = getMultiAdapter((self.portal["other-folder"], self.portal.REQUEST), name="form-element-view")
         self.assertTrue(IFormElementView.providedBy(view))
 
     def test_form_element_view_not_matching_interface(self):
