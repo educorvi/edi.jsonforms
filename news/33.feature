@@ -1,1 +1,0 @@
-helptext modal (#33)
