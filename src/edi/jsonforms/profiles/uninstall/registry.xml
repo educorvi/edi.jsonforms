@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<registry xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+          i18n:domain="edi.jsonforms"
+>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/highlight-css" remove="True"
+  >
+  </records>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/highlight-copy-css" remove="True"
+  >
+  </records>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/highlight-jscript" remove="True"
+  >
+  </records>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/highlight-copy-jscript" remove="True"
+  >
+  </records>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/vjf-css" remove="True"
+  >
+  </records>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/bi-css" remove="True"
+  >
+  </records>
+
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
+           prefix="plone.bundles/vjf-jscript" remove="True"
+  >
+  </records>
+
+
+</registry>
