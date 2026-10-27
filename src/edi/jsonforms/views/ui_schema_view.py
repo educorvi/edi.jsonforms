@@ -130,13 +130,11 @@ class UiSchemaView(BrowserView):
         if hasattr(child, "pre_html") and child.pre_html is not None:
             existing_pre = child_schema["options"].get("preHtml")
             if existing_pre:
-                child_schema["options"]["preHtml"] = (
-                    f"{existing_pre}<br>{child.pre_html.output}"
-                )
+                self.add_option_to_schema(child_schema, {"preHtml": f"{existing_pre}<br>{child.pre_html.output}"})
             else:
-                child_schema["options"]["preHtml"] = child.pre_html.output
+                self.add_option_to_schema(child_schema, {"preHtml": child.pre_html.output})
         if hasattr(child, "post_html") and child.post_html is not None:
-            child_schema["options"]["postHtml"] = child.post_html.output
+            self.add_option_to_schema(child_schema, {"postHtml": child.post_html.output})
 
         return child_schema
 
