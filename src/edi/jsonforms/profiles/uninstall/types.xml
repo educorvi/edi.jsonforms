@@ -5,39 +5,51 @@
   <property name="title">Controls the available contenttypes in your portal</property>
 
   <object meta_type="Dexterity FTI"
-          name="Form" remove="True"
+          name="Form"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Fieldset" remove="True"
+          name="Fieldset"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Field" remove="True"
+          name="Field"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="SelectionField" remove="True"
+          name="SelectionField"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Option" remove="True"
+          name="Option"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="OptionList" remove="True"
+          name="OptionList"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Array" remove="True"
+          name="Array"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Complex" remove="True"
+          name="Complex"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="UploadField" remove="True"
+          name="UploadField"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Helptext" remove="True"
+          name="Helptext"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Reference" remove="True"
+          name="Reference"
+          remove="True"
   />
   <object meta_type="Dexterity FTI"
-          name="Wizard" remove="True"
+          name="Wizard"
+          remove="True"
   />
 </object>

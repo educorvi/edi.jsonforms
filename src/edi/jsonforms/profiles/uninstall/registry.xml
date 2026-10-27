@@ -4,37 +4,44 @@
 >
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/highlight-css" remove="True"
+           prefix="plone.bundles/highlight-css"
+           remove="True"
   >
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/highlight-copy-css" remove="True"
+           prefix="plone.bundles/highlight-copy-css"
+           remove="True"
   >
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/highlight-jscript" remove="True"
+           prefix="plone.bundles/highlight-jscript"
+           remove="True"
   >
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/highlight-copy-jscript" remove="True"
+           prefix="plone.bundles/highlight-copy-jscript"
+           remove="True"
   >
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/vjf-css" remove="True"
+           prefix="plone.bundles/vjf-css"
+           remove="True"
   >
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/bi-css" remove="True"
+           prefix="plone.bundles/bi-css"
+           remove="True"
   >
   </records>
 
   <records interface="plone.base.interfaces.resources.IBundleRegistry"
-           prefix="plone.bundles/vjf-jscript" remove="True"
+           prefix="plone.bundles/vjf-jscript"
+           remove="True"
   >
   </records>
 
