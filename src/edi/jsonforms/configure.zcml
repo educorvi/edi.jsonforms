@@ -23,7 +23,7 @@
   <genericsetup:registerProfile
       name="default"
       title="edi.jsonforms"
-      description="Installs the edi.jsonforms add-on."
+      description="Installs the edi.jsonforms add-on. (You may also need to activate edi.bootstrapicons)"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       directory="profiles/default"
       post_handler=".setuphandlers.post_install"
