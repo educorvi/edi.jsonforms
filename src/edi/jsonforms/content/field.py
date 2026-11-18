@@ -1,8 +1,12 @@
 from edi.jsonforms import _
 from edi.jsonforms.content.common import IDependentExtended  # , check_dependencies
+
+# from plone import api
 from plone.dexterity.content import Item
 from plone.supermodel.directives import fieldset
 from zope import schema
+
+# from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.interface import Invalid
 from zope.interface import invariant
@@ -114,6 +118,15 @@ class IField(IDependentExtended):
             "integer",
             "password",
         ]:
+            # api.portal.show_message(
+            #     _(
+            #         "Minimum/Maximum are only valid options for the following "
+            #         + "answer types: Textline, Textarea, Password, Decimal number, "
+            #         + "Whole number."
+            #     ),
+            #     request=getRequest(),
+            #     type="error",
+            # )
             raise Invalid(
                 _(
                     "Minimum/Maximum are only valid options for the following "
@@ -122,14 +135,29 @@ class IField(IDependentExtended):
                 )
             )
         if data.minimum and data.maximum and data.maximum < data.minimum:
+            # api.portal.show_message(
+            #     _("Maximum cannot be smaller than Minimum."),
+            #     request=getRequest(),
+            #     type="error",
+            # )
             raise Invalid(_("Maximum cannot be smaller than Minimum."))
         if data.maximum is not None and data.maximum <= 0:
+            # api.portal.show_message(
+            #     _("Maximum cannot be smaller or equal to zero."),
+            #     request=getRequest(),
+            #     type="error",
+            # )
             raise Invalid(_("Maximum cannot be smaller or equal to zero."))
 
     @invariant
     def number_of_decimal_digits_invariant(data):
         if data.number_of_decimal_digits and data.answer_type != "number":
-            raise Invalid(_("Number of decimal digits is only a valid option for the " + "answer type Decimal number."))
+            # api.portal.show_message(
+            #     _("Number of decimal digits is only a valid option for the answer type Decimal number."),
+            #     request=getRequest(),
+            #     type="error",
+            # )
+            raise Invalid(_("Number of decimal digits is only a valid option for the answer type Decimal number."))
 
     @invariant
     def placeholder_invariant(data):
@@ -141,6 +169,15 @@ class IField(IDependentExtended):
             "url",
             "email",
         ]:
+            # api.portal.show_message(
+            #     _(
+            #         "A Placeholder is only possible if the answer type is one of "
+            #         + "the following: Textline, Textarea, Password, Telephone, URL, "
+            #         + "Email."
+            #     ),
+            #     request=getRequest(),
+            #     type="error",
+            # )
             raise Invalid(
                 _(
                     "A Placeholder is only possible if the answer type is one of "
@@ -152,18 +189,28 @@ class IField(IDependentExtended):
     @invariant
     def unit_invariant(data):
         if data.unit and data.answer_type not in ["number", "integer"]:
+            # api.portal.show_message(
+            #     _("Unit is only a valid option for the following answer types: " + "Decimal Number, Whole Number."),
+            #     request=getRequest(),
+            #     type="error",
+            # )
             raise Invalid(
-                _("Unit is only a valid option for the following answer types: " + "Decimal Number, Whole Number.")
+                _("Unit is only a valid option for the following answer types: Decimal Number, Whole Number.")
             )
 
     @invariant
     def pattern_invariant(data):
         if data.pattern and data.answer_type not in ["text", "textarea"]:
+            # api.portal.show_message(
+            #     _(
+            #         "A regular expression pattern is only a valid option for the "
+            #         + "answer types Textline and Textarea."
+            #     ),
+            #     request=getRequest(),
+            #     type="error",
+            # )
             raise Invalid(
-                _(
-                    "A regular expression pattern is only a valid option for the "
-                    + "answer types Textline and Textarea."
-                )
+                _("A regular expression pattern is only a valid option for the answer types Textline and Textarea.")
             )
 
 
